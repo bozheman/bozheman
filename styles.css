@@ -29,14 +29,14 @@ h1 {
 
 .btn {
     display: block;
-    background-color: #288;
+    background-color: #18510f;
     color: white;
     text-decoration: none;
     padding: 15px;
     margin: 5px 0;
     border: 1px solid white;
     border-radius: 2px;
-    font-size: 20px;
+    font-size: 20%;
 }
 
 .special {
@@ -46,5 +46,5 @@ h1 {
 }
 
 .special span {
-    font-size: 14px;
+    font-size: 14%;
 }
