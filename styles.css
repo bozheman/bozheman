@@ -36,7 +36,7 @@ h1 {
     margin: 5px 0;
     border: 1px solid white;
     border-radius: 2px;
-    font-size: 20%;
+    font-size: 90%;
 }
 
 .special {
@@ -46,5 +46,5 @@ h1 {
 }
 
 .special span {
-    font-size: 14%;
+    font-size: 50%;
 }
