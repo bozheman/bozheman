@@ -38,6 +38,12 @@
       text-align: center;
     }
 
+    .input-group select {
+      padding: 10px;
+      font-size: 1em;
+      margin-left: 10px;
+    }
+
     .input-group button {
       padding: 10px 20px;
       background: crimson;
@@ -64,25 +70,25 @@
     }
 
     .wheel {
-      display: flex;
       margin-top: 30px;
-    }
-
-    .slot {
-      width: 60px;
-      height: 60px;
-      margin: 0 10px;
+      width: 240px;
+      height: 240px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2em;
+      border: 5px solid crimson;
+      position: relative;
+      animation: spin 0s linear;
     }
 
-    .red { background: #b30000; }
-    .black { background: #111; }
-    .green { background: #007700; }
+    .number-display {
+      margin-top: 20px;
+      font-size: 1.4em;
+      color: #00ff99;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -91,11 +97,19 @@
   <div class="message" id="message"></div>
   <div class="input-group">
     <input type="number" id="bet" placeholder="Ставка" min="1" />
-    <button onclick="spin('red')">🔴</button>
-    <button onclick="spin('black')">⚫</button>
-    <button onclick="spin('green')">🟢</button>
+    <select id="choice">
+      <option value="red">Красное</option>
+      <option value="black">Чёрное</option>
+      <option value="green">Зелёное (0)</option>
+      <option value="7">Цифра 7</option>
+      <option value="13">Цифра 13</option>
+      <option value="17">Цифра 17</option>
+      <option value="21">Цифра 21</option>
+    </select>
+    <button onclick="spin()">🎰 Крутить</button>
   </div>
   <div class="wheel" id="wheel"></div>
+  <div class="number-display" id="result-display"></div>
   <button id="buy-access" onclick="alert('Доступ куплен!')">💎 КУПИТЬ ПРОХОД</button>
 
   <script>
@@ -119,8 +133,9 @@
       }
     }
 
-    function spin(choice) {
+    function spin() {
       const bet = parseInt(document.getElementById('bet').value);
+      const choice = document.getElementById('choice').value;
       if (isNaN(bet) || bet <= 0 || bet > balance) {
         alert('Неверная ставка');
         return;
@@ -128,28 +143,31 @@
 
       balance -= bet;
 
-      const outcomes = ['red', 'black', 'green'];
-      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
-
       const wheel = document.getElementById('wheel');
-      wheel.innerHTML = '';
-      outcomes.forEach(color => {
-        const div = document.createElement('div');
-        div.className = 'slot ' + color;
-        div.textContent = color.toUpperCase();
-        wheel.appendChild(div);
-      });
+      wheel.style.animation = 'spin 2s ease-out';
+      setTimeout(() => wheel.style.animation = '', 2000);
 
       setTimeout(() => {
-        if (result === choice) {
-          const win = result === 'green' ? bet * 10 : bet * 2;
+        const resultNum = Math.floor(Math.random() * 37); // 0 - 36
+        const color = resultNum === 0 ? 'green' : resultNum % 2 === 0 ? 'black' : 'red';
+        document.getElementById('result-display').textContent = `Выпало: ${resultNum} (${color})`;
+
+        let win = 0;
+        if (choice === color) {
+          win = color === 'green' ? bet * 14 : bet * 2;
+        } else if (!isNaN(parseInt(choice)) && parseInt(choice) === resultNum) {
+          win = bet * 36;
+        }
+
+        if (win > 0) {
           balance += win;
           document.getElementById('message').textContent = `Ты выиграл ${win} BMAN!`;
         } else {
-          document.getElementById('message').textContent = `Ты проиграл. Выпало: ${result}`;
+          document.getElementById('message').textContent = `Ты проиграл. Попробуй снова.`;
         }
+
         updateBalance();
-      }, 1000);
+      }, 2000);
     }
   </script>
 </body>
