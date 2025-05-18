@@ -166,7 +166,7 @@
   </div>
 
   <script>
-    let balance = parseInt(localStorage.getItem('bman_balance')) || 0;
+    let balance = 9000;
     const lastClaim = localStorage.getItem('bman_claim_date');
     const today = new Date().toISOString().split('T')[0];
 
@@ -197,11 +197,11 @@
       balance -= bet;
 
       const wheel = document.getElementById('wheel');
-      const degree = 3600 + Math.floor(Math.random() * 360); // multiple turns + random angle
+      const degree = 3600 + Math.floor(Math.random() * 360);
       wheel.style.transform = `rotate(${degree}deg)`;
 
       setTimeout(() => {
-        const resultNum = Math.floor(Math.random() * 37); // 0 - 36
+        const resultNum = Math.floor(Math.random() * 37);
         const color = resultNum === 0 ? 'green' : resultNum % 2 === 0 ? 'black' : 'red';
         document.getElementById('result-display').textContent = `Выпало: ${resultNum} (${color})`;
 
