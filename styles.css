@@ -157,10 +157,15 @@ h1 {
 }
 
 .sub-btn {
-    background: linear-gradient(to right, #6a1b9a, #8e24aa);
+    background: linear-gradient(to right, #7f0000, #b71c1c);
     font-size: 16px;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
 .sub-btn:hover {
-    background: linear-gradient(to right, #ab47bc, #ce93d8);
+    background: linear-gradient(to right, #d32f2f, #ff5252);
+    transform: scale(1.02);
 }
