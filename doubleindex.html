@@ -31,24 +31,30 @@
       color: #ffaaaa;
     }
 
-    .exit-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #400000;
-      color: #fff;
-      padding: 12px 18px;
-      border: 2px solid crimson;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
+    #roulette {
+      margin-top: 30px;
     }
 
-    .exit-button:hover {
+    #spin-button {
+      padding: 10px 20px;
+      background: #600000;
+      border: 2px solid crimson;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 6px;
+    }
+
+    #spin-button:hover {
       background: crimson;
-      color: #000;
+    }
+
+    #roulette-result {
+      margin-top: 15px;
+      font-size: 1.1em;
+      color: #ff5555;
+      min-height: 30px;
     }
 
     @keyframes realisticDrip {
@@ -85,12 +91,15 @@
   <h1>BOZHEMAN ≡ Иллюзия</h1>
   <p>Ты добрался сюда, потому что не боишься тени.<br> Это только начало. /omega/...</p>
 
+  <div id="roulette">
+    <button id="spin-button">🎰 Вращать</button>
+    <div id="roulette-result"></div>
+  </div>
+
   <audio autoplay loop>
     <source src="omega.m4a" type="audio/mp4">
     Your browser does not support the audio element.
   </audio>
-
-  <a href="index.html" class="exit-button">⭥ ВЫЙТИ</a>
 
   <script>
     const dropCount = 60;
@@ -107,6 +116,23 @@
       drop.style.animationDelay = (Math.random() * 10) + 's';
       document.body.appendChild(drop);
     }
+
+    setTimeout(() => {
+      window.location.href = "roulet.html";
+    }, 10000);
+
+    const outcomes = [
+      "Ты уже проиграл.",
+      "Скоро всё изменится.",
+      "Ты нашёл глиф: /sigil",
+      "Наблюдай...",
+      "Здесь пусто, как в тебе."
+    ];
+
+    document.getElementById('spin-button').onclick = () => {
+      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
+      document.getElementById('roulette-result').textContent = result;
+    };
   </script>
 </body>
 </html>

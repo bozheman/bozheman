@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOZHEMAN ROULETTE</title>
+  <style>
+    body {
+      background: #0a0a0a;
+      color: white;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      color: crimson;
+      text-shadow: 0 0 8px red;
+    }
+
+    .balance, .message {
+      margin: 10px;
+      font-size: 1.2em;
+    }
+
+    .input-group {
+      margin-top: 20px;
+    }
+
+    .input-group input {
+      padding: 10px;
+      font-size: 1em;
+      width: 100px;
+      text-align: center;
+    }
+
+    .input-group button {
+      padding: 10px 20px;
+      background: crimson;
+      border: none;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .input-group button:hover {
+      background: red;
+    }
+
+    #buy-access {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .wheel {
+      display: flex;
+      margin-top: 30px;
+    }
+
+    .slot {
+      width: 60px;
+      height: 60px;
+      margin: 0 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .red { background: #b30000; }
+    .black { background: #111; }
+    .green { background: #007700; }
+  </style>
+</head>
+<body>
+  <h1>ROULETTE OF BOZHEMAN</h1>
+  <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
+  <div class="message" id="message"></div>
+  <div class="input-group">
+    <input type="number" id="bet" placeholder="Ставка" min="1" />
+    <button onclick="spin('red')">🔴</button>
+    <button onclick="spin('black')">⚫</button>
+    <button onclick="spin('green')">🟢</button>
+  </div>
+  <div class="wheel" id="wheel"></div>
+  <button id="buy-access" onclick="alert('Доступ куплен!')">💎 КУПИТЬ ПРОХОД</button>
+
+  <script>
+    let balance = parseInt(localStorage.getItem('bman_balance')) || 0;
+    const lastClaim = localStorage.getItem('bman_claim_date');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (lastClaim !== today) {
+      balance += 10;
+      localStorage.setItem('bman_claim_date', today);
+      document.getElementById('message').textContent = '+10 BMAN за вход сегодня';
+    }
+
+    updateBalance();
+
+    function updateBalance() {
+      document.getElementById('balance').textContent = balance;
+      localStorage.setItem('bman_balance', balance);
+      if (balance >= 1000) {
+        document.getElementById('buy-access').style.display = 'inline-block';
+      }
+    }
+
+    function spin(choice) {
+      const bet = parseInt(document.getElementById('bet').value);
+      if (isNaN(bet) || bet <= 0 || bet > balance) {
+        alert('Неверная ставка');
+        return;
+      }
+
+      balance -= bet;
+
+      const outcomes = ['red', 'black', 'green'];
+      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
+
+      const wheel = document.getElementById('wheel');
+      wheel.innerHTML = '';
+      outcomes.forEach(color => {
+        const div = document.createElement('div');
+        div.className = 'slot ' + color;
+        div.textContent = color.toUpperCase();
+        wheel.appendChild(div);
+      });
+
+      setTimeout(() => {
+        if (result === choice) {
+          const win = result === 'green' ? bet * 10 : bet * 2;
+          balance += win;
+          document.getElementById('message').textContent = `Ты выиграл ${win} BMAN!`;
+        } else {
+          document.getElementById('message').textContent = `Ты проиграл. Выпало: ${result}`;
+        }
+        updateBalance();
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
