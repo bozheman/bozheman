@@ -121,29 +121,28 @@ h1 {
 
 /* Горизонтальные кнопки */
 .row-buttons {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-top: 8px;
-  flex-wrap: wrap;
 }
 
 .half-btn {
-  flex: 1 1 45%;
   padding: 12px 10px;
   font-size: 15px;
-  text-align: center;
   background: linear-gradient(to right, #7f0000, #b71c1c);
   border-radius: 10px;
   color: #fff;
-  transition: all 0.3s ease;
+  text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .half-btn:hover {
   background: linear-gradient(to right, #d32f2f, #ff5252);
   transform: scale(1.03);
 }
+
 
 /* Мобильная адаптация */
 @media (max-width: 600px) {
