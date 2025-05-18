@@ -190,32 +190,45 @@ h1 {
   }
 }
 
-/* Тема светлая */
+/* Светлая тема — благородный стиль */
 body.light {
-  background: #fff0f0;
-  color: #111;
+  background: linear-gradient(to bottom, #f9f3f0, #e7ddd8);
+  color: #1c1c1c;
 }
 
 body.light .container {
-  background: #ffffffcc;
-  color: #000;
+  background: rgba(255, 255, 255, 0.9);
+  color: #111;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 body.light .btn {
-  background: linear-gradient(to right, #ff9999, #e57373);
-  color: #000;
+  background: linear-gradient(to right, #c14444, #b62d2d);
+  color: #ffffff;
 }
 
 body.light .btn:hover {
-  background: linear-gradient(to right, #f44336, #e53935);
+  background: linear-gradient(to right, #a82626, #8b1e1e);
+  transform: scale(1.02);
 }
 
 body.light .special {
-  background: #111;
-  color: #fff;
-  border-color: #ff9999;
+  background: #2b0000;
+  color: #ffdddd;
+  border-color: #cc4444;
 }
 
+body.light .special span {
+  color: #ff9999;
+}
+
+/* Капли в светлой теме остаются буро-кровавыми */
+body.light .drop {
+  background: radial-gradient(circle, #911818, #5a0000);
+  filter: drop-shadow(0 0 1px #911818);
+}
+
+/* Кнопка темы */
 .theme-bar {
   position: absolute;
   top: 15px;
@@ -230,3 +243,4 @@ body.light .special {
   cursor: pointer;
   color: inherit;
 }
+
