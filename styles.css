@@ -1,20 +1,65 @@
 body {
-    background-color: #121212;
+    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
     color: #f0f0f0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
     margin: 0;
     padding: 0;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+    text-align: center;
+}
+
+/* Капельки */
+body::before, body::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: drip 5s infinite ease-in-out;
+    opacity: 0.7;
+    z-index: 0;
+}
+
+body::before {
+    left: 10%;
+    top: -10%;
+    animation-delay: 0s;
+}
+
+body::after {
+    right: 10%;
+    top: -15%;
+    animation-delay: 2.5s;
+}
+
+@keyframes drip {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(120vh) scale(0.7);
+        opacity: 0;
+    }
 }
 
 .container {
+    position: relative;
+    z-index: 1;
     width: 90%;
     max-width: 420px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    margin: 60px auto;
+    padding: 30px;
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
 }
 
 .avatar {
@@ -23,38 +68,48 @@ body {
     border-radius: 50%;
     margin-bottom: 20px;
     border: 4px solid #4caf50;
+    transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+    transform: scale(1.05) rotate(2deg);
 }
 
 h1 {
-    font-size: 32px;
+    font-size: 34px;
     margin-bottom: 25px;
-    color: #4caf50;
+    color: #a0ffba;
+    text-shadow: 0 0 10px #4caf50;
 }
 
 .links {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .btn {
-    background-color: #2e7d32;
+    background: linear-gradient(to right, #2e7d32, #388e3c);
     color: white;
     text-decoration: none;
     padding: 15px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 18px;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
 }
 
 .btn:hover {
-    background-color: #388e3c;
-    transform: scale(1.03);
+    background: linear-gradient(to right, #43a047, #66bb6a);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .special {
-    background-color: #ffffff;
+    background: #ffffff;
     color: #1b1b1b;
     font-weight: bold;
     border: 2px solid #4caf50;
@@ -63,4 +118,6 @@ h1 {
 .special span {
     font-size: 13px;
     color: #4caf50;
+    display: block;
+    margin-top: 5px;
 }
