@@ -104,15 +104,42 @@ h1 {
   flex-wrap: wrap;
 }
 
-.input-group input {
+.input-group input[type="number"], .input-group input[type="text"] {
   padding: 10px;
   font-size: 1em;
   min-width: 80px;
-  flex: 1;
   background: #222;
   color: #fff;
   border: 1px solid #555;
   border-radius: 5px;
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.input-group input[type=number]::-webkit-inner-spin-button,
+.input-group input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bet-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.bet-controls button {
+  background: #444;
+  border: 1px solid #666;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.3s;
+}
+
+.bet-controls button:hover {
+  background: #666;
 }
 
 .input-group button {
