@@ -6,6 +6,7 @@
   <title>BOZHEMAN</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div class="container">
     <img src="avatar.png" alt="BOZHEMAN" class="avatar">
@@ -19,5 +20,15 @@
       <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special">💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span></a>
     </div>
   </div>
+  <script>
+  for (let i = 0; i < 300; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'drop';
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.animationDelay = (Math.random() * 10) + 's';
+    drop.style.animationDuration = (4 + Math.random() * 6) + 's';
+    document.body.appendChild(drop);
+  }
+</script>
 </body>
 </html>
