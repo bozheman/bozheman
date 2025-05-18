@@ -146,7 +146,7 @@ h1 {
 }
 
 /* Мобильная адаптация */
-@media (max-width: 600px) {
+@media (max-width: 500px) {
     .container {
         margin: 40px auto;
         padding: 20px;
