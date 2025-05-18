@@ -35,9 +35,19 @@
     Подсказка ставок: b — чёрное, r — красное, g — зелёное, 0-36 — число, x — нечётное, xx — чётное
   </div>
 
+  <!-- Улучшения -->
+  <div class="extras">
+    <div id="history-log"></div>
+    <div id="jackpot-status"></div>
+    <div id="mini-games"></div>
+  </div>
+
   <script>
     let balance = 10;
     let isSpinning = false;
+    let currentRotation = 0;
+    let spinCount = 0;
+    const history = [];
 
     updateBalance();
 
@@ -62,9 +72,17 @@
       wheel.appendChild(div);
     });
 
+    function logHistory(num, color, win, bet) {
+      const log = `#${spinCount}: ${num} (${color}) — ${win > 0 ? '+ ' + win : '- ' + bet} BMAN`;
+      history.unshift(log);
+      if (history.length > 10) history.pop();
+      document.getElementById('history-log').innerHTML = history.map(h => `<div>${h}</div>`).join('');
+    }
+
     function spin() {
       if (isSpinning) return;
       isSpinning = true;
+      spinCount++;
 
       const bet = parseInt(document.getElementById('bet').value);
       const choice = document.getElementById('choice').value.trim().toLowerCase();
@@ -79,9 +97,12 @@
 
       const resultNum = Math.floor(Math.random() * 37);
       const sectorAngle = 360 / 37;
-      const stopAngle = 3600 + (360 - resultNum * sectorAngle) + sectorAngle / 2;
+      const additionalRotations = 10 * 360;
+      const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2);
+      currentRotation += additionalRotations + stopAngle;
+
       wheel.style.transition = 'transform 7s ease-in-out';
-      wheel.style.transform = `rotate(${stopAngle}deg)`;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
 
       setTimeout(() => {
         const color = resultNum === 0 ? 'green' : resultNum % 2 === 0 ? 'black' : 'red';
@@ -107,6 +128,7 @@
           document.getElementById('message').textContent = `Ты проиграл. Попробуй снова.`;
         }
 
+        logHistory(resultNum, color, win, bet);
         updateBalance();
         isSpinning = false;
       }, 7000);
