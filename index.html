@@ -20,8 +20,17 @@
       <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special">💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span></a>
     </div>
   </div>
-  <script>
-  for (let i = 0; i < 300; i++) {
+ <script>
+  const screenWidth = window.innerWidth;
+  let dropCount = 300; // по умолчанию
+
+  if (screenWidth <= 1440) dropCount = 200;
+  if (screenWidth <= 1024) dropCount = 100;
+  if (screenWidth <= 768)  dropCount = 60;
+  if (screenWidth <= 480)  dropCount = 40;
+  if (screenWidth <= 320)  dropCount = 25;
+
+  for (let i = 0; i < dropCount; i++) {
     const drop = document.createElement('div');
     drop.className = 'drop';
     drop.style.left = Math.random() * 100 + 'vw';
@@ -30,6 +39,7 @@
     document.body.appendChild(drop);
   }
 </script>
+
 
 </body>
 </html>
