@@ -29,10 +29,37 @@
       font-size: 1.2em;
       color: #ffaaaa;
     }
+
+    .exit-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #400000;
+      color: #fff;
+      padding: 12px 18px;
+      border: 2px solid crimson;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .exit-button:hover {
+      background: crimson;
+      color: #000;
+    }
   </style>
 </head>
 <body>
   <h1>BOZHEMAN ≠ Реальность</h1>
-  <p>Ты добрался сюда, потому что не боишься тени. <br> Это только начало. /omega/...</p>
+  <p>Ты добрался сюда, потому что не боишься тени.<br> Это только начало. /omega/...</p>
+
+  <audio autoplay loop>
+    <source src="omega.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <a href="index.html" class="exit-button">⟵ ВЫЙТИ</a>
 </body>
 </html>
