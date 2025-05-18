@@ -56,19 +56,44 @@
       position: absolute;
       top: 0;
       left: 0;
-      background: conic-gradient(
-        red 0deg 30deg,
-        black 30deg 60deg,
-        red 60deg 90deg,
-        black 90deg 120deg,
-        red 120deg 150deg,
-        black 150deg 180deg,
-        red 180deg 210deg,
-        black 210deg 240deg,
-        red 240deg 270deg,
-        black 270deg 300deg,
-        green 300deg 330deg,
-        red 330deg 360deg
+      background: repeating-conic-gradient(
+        green 0deg 9.73deg,
+        red 9.73deg 19.46deg,
+        black 19.46deg 29.19deg,
+        red 29.19deg 38.92deg,
+        black 38.92deg 48.65deg,
+        red 48.65deg 58.38deg,
+        black 58.38deg 68.11deg,
+        red 68.11deg 77.84deg,
+        black 77.84deg 87.57deg,
+        red 87.57deg 97.3deg,
+        black 97.3deg 107.03deg,
+        red 107.03deg 116.76deg,
+        black 116.76deg 126.49deg,
+        red 126.49deg 136.22deg,
+        black 136.22deg 145.95deg,
+        red 145.95deg 155.68deg,
+        black 155.68deg 165.41deg,
+        red 165.41deg 175.14deg,
+        black 175.14deg 184.87deg,
+        red 184.87deg 194.6deg,
+        black 194.6deg 204.33deg,
+        red 204.33deg 214.06deg,
+        black 214.06deg 223.79deg,
+        red 223.79deg 233.52deg,
+        black 233.52deg 243.25deg,
+        red 243.25deg 252.98deg,
+        black 252.98deg 262.71deg,
+        red 262.71deg 272.44deg,
+        black 272.44deg 282.17deg,
+        red 282.17deg 291.9deg,
+        black 291.9deg 301.63deg,
+        red 301.63deg 311.36deg,
+        black 311.36deg 321.09deg,
+        red 321.09deg 330.82deg,
+        black 330.82deg 340.55deg,
+        red 340.55deg 350.28deg,
+        black 350.28deg 360deg
       );
       transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
     }
@@ -131,6 +156,14 @@
       border: none;
       cursor: pointer;
     }
+
+    .hint {
+      position: absolute;
+      bottom: 80px;
+      color: #ccc;
+      font-size: 0.9em;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -152,17 +185,12 @@
   <div class="bottom-bar">
     <div class="input-group">
       <input type="number" id="bet" placeholder="Ставка" min="1" />
-      <select id="choice">
-        <option value="red">Красное</option>
-        <option value="black">Чёрное</option>
-        <option value="green">Зелёное (0)</option>
-        <option value="7">Цифра 7</option>
-        <option value="13">Цифра 13</option>
-        <option value="17">Цифра 17</option>
-        <option value="21">Цифра 21</option>
-      </select>
+      <input type="text" id="choice" placeholder="Введите ставку: b / r / g / 0-36 / x / xx" />
       <button onclick="spin()">🎰 Крутить</button>
     </div>
+  </div>
+  <div class="hint">
+    Подсказка ставок: b — чёрное, r — красное, g — зелёное, 0-36 — число, x — нечётное, xx — чётное
   </div>
 
   <script>
@@ -188,7 +216,7 @@
 
     function spin() {
       const bet = parseInt(document.getElementById('bet').value);
-      const choice = document.getElementById('choice').value;
+      const choice = document.getElementById('choice').value.trim().toLowerCase();
       if (isNaN(bet) || bet <= 0 || bet > balance) {
         alert('Неверная ставка');
         return;
@@ -206,10 +234,16 @@
         document.getElementById('result-display').textContent = `Выпало: ${resultNum} (${color})`;
 
         let win = 0;
-        if (choice === color) {
-          win = color === 'green' ? bet * 14 : bet * 2;
-        } else if (!isNaN(parseInt(choice)) && parseInt(choice) === resultNum) {
-          win = bet * 36;
+        if ((choice === 'b' && color === 'black') ||
+            (choice === 'r' && color === 'red') ||
+            (choice === 'g' && resultNum === 0) ||
+            (choice === 'x' && resultNum % 2 === 1) ||
+            (choice === 'xx' && resultNum !== 0 && resultNum % 2 === 0) ||
+            (!isNaN(parseInt(choice)) && parseInt(choice) === resultNum)) {
+
+          win = ['g'].includes(choice) ? bet * 14 :
+                ['b', 'r', 'x', 'xx'].includes(choice) ? bet * 2 :
+                bet * 36;
         }
 
         if (win > 0) {
