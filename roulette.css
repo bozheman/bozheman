@@ -5,6 +5,12 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
+
+body.light {
+  background: #f5f5f5;
+  color: #111;
 }
 
 .top-bar {
@@ -14,6 +20,10 @@ body {
   padding: 10px 20px;
   background: #111;
   flex-wrap: wrap;
+}
+
+.top-bar.light {
+  background: #ddd;
 }
 
 .balance {
@@ -42,6 +52,7 @@ h1 {
   width: 300px;
   height: 300px;
   margin-bottom: 20px;
+  transform: translateX(-2px); /* для центрирования */
 }
 
 .wheel {
@@ -65,6 +76,7 @@ h1 {
   position: absolute;
   top: -20px;
   left: calc(50% - 10px);
+  z-index: 10;
 }
 
 .wheel-number {
@@ -197,6 +209,24 @@ h1 {
   color: #eee;
   overflow-y: auto;
   max-height: 150px;
+}
+
+#toggle-log {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #333;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.8em;
+  z-index: 10;
+}
+
+#toggle-log:hover {
+  background: #555;
 }
 
 @media (max-width: 500px) {
