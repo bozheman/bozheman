@@ -37,22 +37,36 @@
 
   <script>
     const screenWidth = window.innerWidth;
-    let dropCount = 300;
+let dropCount = 300;
 
-    if (screenWidth <= 1440) dropCount = 200;
-    if (screenWidth <= 1024) dropCount = 100;
-    if (screenWidth <= 768)  dropCount = 60;
-    if (screenWidth <= 480)  dropCount = 40;
-    if (screenWidth <= 320)  dropCount = 25;
+if (screenWidth <= 1440) dropCount = 200;
+if (screenWidth <= 1024) dropCount = 100;
+if (screenWidth <= 768)  dropCount = 60;
+if (screenWidth <= 480)  dropCount = 40;
+if (screenWidth <= 320)  dropCount = 25;
 
-    for (let i = 0; i < dropCount; i++) {
-      const drop = document.createElement('div');
-      drop.className = 'drop';
-      drop.style.left = Math.random() * 100 + 'vw';
-      drop.style.animationDelay = (Math.random() * 10) + 's';
-      drop.style.animationDuration = (4 + Math.random() * 6) + 's';
-      document.body.appendChild(drop);
-    }
+for (let i = 0; i < dropCount; i++) {
+  const drop = document.createElement('div');
+  const size = 10 + Math.random() * 20;
+  drop.className = 'realistic-drop';
+  drop.style.left = Math.random() * 100 + 'vw';
+  drop.style.setProperty('--drop-size', `${size}px`);
+  drop.style.animationDelay = (Math.random() * 10) + 's';
+  drop.style.animationDuration = (3 + Math.random() * 4) + 's';
+
+  document.body.appendChild(drop);
+
+  setTimeout(() => {
+    const splash = document.createElement('div');
+    splash.className = 'splash';
+    splash.style.left = drop.style.left;
+    splash.style.top = '100vh';
+    splash.style.setProperty('--drop-size', `${size}px`);
+    document.body.appendChild(splash);
+    setTimeout(() => splash.remove(), 1000);
+  }, parseFloat(drop.style.animationDelay) * 1000 + parseFloat(drop.style.animationDuration) * 1000);
+}
+
   </script>
   <div id="secret-content" style="display: none; margin-top: 20px;">
   <a href="doubleindex.html" class="btn special">BOZHEMAN не существует. Но ты нашёл меня</a>
