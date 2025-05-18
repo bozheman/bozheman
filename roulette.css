@@ -92,6 +92,7 @@ h1 {
   display: flex;
   justify-content: center;
   padding: 0 10px;
+  flex-wrap: wrap;
 }
 
 .input-group {
@@ -102,6 +103,8 @@ h1 {
   padding: 10px 20px;
   border-radius: 10px;
   flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .input-group input[type="number"], .input-group input[type="text"] {
@@ -114,6 +117,7 @@ h1 {
   border-radius: 5px;
   appearance: none;
   -moz-appearance: textfield;
+  flex: 1 1 auto;
 }
 
 .input-group input[type=number]::-webkit-inner-spin-button,
@@ -125,6 +129,7 @@ h1 {
 .bet-controls {
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 .bet-controls button {
@@ -171,12 +176,12 @@ h1 {
 }
 
 .hint {
-  position: absolute;
-  bottom: 70px;
+  margin-top: 6px;
   color: #ccc;
-  font-size: 0.9em;
+  font-size: 0.85em;
   text-align: center;
   width: 100%;
+  padding: 0 10px;
 }
 
 #history-log {
@@ -223,5 +228,15 @@ h1 {
     top: auto;
     bottom: 90px;
     right: 5%;
+  }
+
+  .bottom-bar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
