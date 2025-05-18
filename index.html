@@ -13,39 +13,41 @@
     <h1>BOZHEMAN</h1>
     <div class="links">
       <div class="btn-group">
-  <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
-  <div class="sub-links">
-    <a href="https://t.me/protocol_0zero" class="btn sub-btn" target="_blank">Нулевой протокол</a>
-    <a href="https://t.me/vidpovnac" class="btn sub-btn" target="_blank">Відповідальна Нація</a>
-  </div>
-</div>
+        <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
+        <div class="row-buttons">
+          <a href="https://t.me/protocol_0zero" class="btn half-btn" target="_blank">Нулевой протокол</a>
+          <a href="https://t.me/vidpovnac" class="btn half-btn" target="_blank">Відповідальна Нація</a>
+        </div>
+      </div>
+
       <a href="https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw" class="btn" target="_blank">YouTube</a>
       <a href="https://www.tiktok.com/@bozheman_" class="btn" target="_blank">TikTok</a>
       <a href="https://discord.gg/jNFZTsBz8j" class="btn" target="_blank">Discord</a>
       <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">Donate with Steam items<br>my trade url</a>
-      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special">💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span></a>
+      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special">
+        💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span>
+      </a>
     </div>
   </div>
- <script>
-  const screenWidth = window.innerWidth;
-  let dropCount = 300; // по умолчанию
 
-  if (screenWidth <= 1440) dropCount = 200;
-  if (screenWidth <= 1024) dropCount = 100;
-  if (screenWidth <= 768)  dropCount = 60;
-  if (screenWidth <= 480)  dropCount = 40;
-  if (screenWidth <= 320)  dropCount = 25;
+  <script>
+    const screenWidth = window.innerWidth;
+    let dropCount = 300;
 
-  for (let i = 0; i < dropCount; i++) {
-    const drop = document.createElement('div');
-    drop.className = 'drop';
-    drop.style.left = Math.random() * 100 + 'vw';
-    drop.style.animationDelay = (Math.random() * 10) + 's';
-    drop.style.animationDuration = (4 + Math.random() * 6) + 's';
-    document.body.appendChild(drop);
-  }
-</script>
+    if (screenWidth <= 1440) dropCount = 200;
+    if (screenWidth <= 1024) dropCount = 100;
+    if (screenWidth <= 768)  dropCount = 60;
+    if (screenWidth <= 480)  dropCount = 40;
+    if (screenWidth <= 320)  dropCount = 25;
 
-
+    for (let i = 0; i < dropCount; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      drop.style.left = Math.random() * 100 + 'vw';
+      drop.style.animationDelay = (Math.random() * 10) + 's';
+      drop.style.animationDuration = (4 + Math.random() * 6) + 's';
+      document.body.appendChild(drop);
+    }
+  </script>
 </body>
 </html>
