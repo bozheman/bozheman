@@ -1,6 +1,6 @@
 body {
-    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-    color: #f0f0f0;
+    background: linear-gradient(to bottom, #3b0000, #5a0101, #220000);
+    color: #fcecec;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
@@ -11,40 +11,23 @@ body {
 }
 
 /* Капельки */
-body::before, body::after {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #4caf50;
+.drop {
+    position: fixed;
+    top: -10vh;
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, #ff1a1a, #8b0000);
     border-radius: 50%;
-    animation: drip 5s infinite ease-in-out;
-    opacity: 0.7;
+    opacity: 0.4;
     z-index: 0;
+    animation: dripFall linear infinite;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px #ff3333);
 }
 
-body::before {
-    left: 10%;
-    top: -10%;
-    animation-delay: 0s;
-}
-
-body::after {
-    right: 10%;
-    top: -15%;
-    animation-delay: 2.5s;
-}
-
-@keyframes drip {
-    0% {
-        transform: translateY(0) scale(1);
-        opacity: 0.7;
-    }
-    50% {
-        opacity: 0.3;
-    }
-    100% {
-        transform: translateY(120vh) scale(0.7);
+@keyframes dripFall {
+    to {
+        transform: translateY(130vh);
         opacity: 0;
     }
 }
@@ -56,7 +39,7 @@ body::after {
     max-width: 420px;
     margin: 60px auto;
     padding: 30px;
-    background: rgba(30, 30, 30, 0.95);
+    background: rgba(30, 10, 10, 0.95);
     border-radius: 20px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(6px);
@@ -67,7 +50,7 @@ body::after {
     height: 120px;
     border-radius: 50%;
     margin-bottom: 20px;
-    border: 4px solid #4caf50;
+    border: 4px solid #ff4d4d;
     transition: transform 0.3s ease;
 }
 
@@ -78,8 +61,8 @@ body::after {
 h1 {
     font-size: 34px;
     margin-bottom: 25px;
-    color: #a0ffba;
-    text-shadow: 0 0 10px #4caf50;
+    color: #ff9999;
+    text-shadow: 0 0 10px #ff4d4d;
 }
 
 .links {
@@ -89,7 +72,7 @@ h1 {
 }
 
 .btn {
-    background: linear-gradient(to right, #2e7d32, #388e3c);
+    background: linear-gradient(to right, #b71c1c, #c62828);
     color: white;
     text-decoration: none;
     padding: 15px 20px;
@@ -103,41 +86,21 @@ h1 {
 }
 
 .btn:hover {
-    background: linear-gradient(to right, #43a047, #66bb6a);
+    background: linear-gradient(to right, #e53935, #ef5350);
     transform: translateY(-2px) scale(1.03);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .special {
     background: #ffffff;
-    color: #1b1b1b;
+    color: #330000;
     font-weight: bold;
-    border: 2px solid #4caf50;
+    border: 2px solid #ff4d4d;
 }
 
 .special span {
     font-size: 13px;
-    color: #4caf50;
+    color: #b71c1c;
     display: block;
     margin-top: 5px;
-}
-.drop {
-    position: fixed;
-    top: -10vh;
-    width: 20px;
-    height: 20px;
-    background: #4caf50;
-    border-radius: 50%;
-    opacity: 0.3;
-    z-index: 0;
-    animation: dripFall linear infinite;
-    pointer-events: none;
-    filter: blur(1px);
-}
-
-@keyframes dripFall {
-    to {
-        transform: translateY(120vh);
-        opacity: 0;
-    }
 }
