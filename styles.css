@@ -189,3 +189,44 @@ h1 {
     flex: 1 1 100%;
   }
 }
+
+/* Тема светлая */
+body.light {
+  background: #fff0f0;
+  color: #111;
+}
+
+body.light .container {
+  background: #ffffffcc;
+  color: #000;
+}
+
+body.light .btn {
+  background: linear-gradient(to right, #ff9999, #e57373);
+  color: #000;
+}
+
+body.light .btn:hover {
+  background: linear-gradient(to right, #f44336, #e53935);
+}
+
+body.light .special {
+  background: #111;
+  color: #fff;
+  border-color: #ff9999;
+}
+
+.theme-bar {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  z-index: 10;
+}
+
+#theme-toggle {
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: inherit;
+}

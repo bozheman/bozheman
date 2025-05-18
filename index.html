@@ -12,6 +12,10 @@
 <body>
   <div class="container">
     <img src="avatar.png" alt="BOZHEMAN" class="avatar">
+    <div class="theme-bar">
+  <button id="theme-toggle" title="Переключить тему">🌙</button>
+</div>
+
     <h1>BOZHEMAN</h1>
     <div class="links">
       <div class="btn-group">
@@ -53,5 +57,37 @@
       document.body.appendChild(drop);
     }
   </script>
+  <div id="secret-content" style="display: none; margin-top: 20px;">
+  <a href="https://example.com/secret" class="btn special">🤫 Тайный портал</a>
+</div>
+
+<script>
+  const toggleBtn = document.getElementById('theme-toggle');
+  let secretCounter = 0;
+
+  function setTheme(mode) {
+    document.body.classList.toggle('light', mode === 'light');
+    toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
+    localStorage.setItem('theme', mode);
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    const isLight = document.body.classList.contains('light');
+    const newTheme = isLight ? 'dark' : 'light';
+    setTheme(newTheme);
+
+    if (!isLight) {
+      secretCounter++;
+      if (secretCounter === 3) {
+        document.getElementById('secret-content').style.display = 'block';
+      }
+    }
+  });
+
+  // Установить тему из localStorage
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+</script>
+
 </body>
 </html>
