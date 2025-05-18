@@ -9,39 +9,107 @@
       background: #0a0a0a;
       color: white;
       font-family: monospace;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .top-bar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
+      padding: 10px 20px;
+      background: #111;
+    }
+
+    .balance {
+      font-size: 1.2em;
+      color: #0f0;
     }
 
     h1 {
       color: crimson;
       text-shadow: 0 0 8px red;
-    }
-
-    .balance, .message {
-      margin: 10px;
-      font-size: 1.2em;
-    }
-
-    .input-group {
+      text-align: center;
       margin-top: 20px;
     }
 
-    .input-group input {
-      padding: 10px;
-      font-size: 1em;
-      width: 100px;
-      text-align: center;
+    .roulette-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 180px);
     }
 
-    .input-group select {
+    .wheel-wrapper {
+      position: relative;
+      width: 300px;
+      height: 300px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 8px solid crimson;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: conic-gradient(
+        red 0deg 30deg,
+        black 30deg 60deg,
+        red 60deg 90deg,
+        black 90deg 120deg,
+        red 120deg 150deg,
+        black 150deg 180deg,
+        red 180deg 210deg,
+        black 210deg 240deg,
+        red 240deg 270deg,
+        black 270deg 300deg,
+        green 300deg 330deg,
+        red 330deg 360deg
+      );
+      transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid white;
+      position: absolute;
+      top: -20px;
+      left: calc(50% - 10px);
+    }
+
+    .number-display, .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #111;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .input-group input, .input-group select {
       padding: 10px;
       font-size: 1em;
-      margin-left: 10px;
     }
 
     .input-group button {
@@ -51,11 +119,6 @@
       color: white;
       font-size: 1em;
       cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .input-group button:hover {
-      background: red;
     }
 
     #buy-access {
@@ -68,49 +131,39 @@
       border: none;
       cursor: pointer;
     }
-
-    .wheel {
-      margin-top: 30px;
-      width: 240px;
-      height: 240px;
-      border-radius: 50%;
-      border: 5px solid crimson;
-      position: relative;
-      animation: spin 0s linear;
-    }
-
-    .number-display {
-      margin-top: 20px;
-      font-size: 1.4em;
-      color: #00ff99;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
-  <h1>ROULETTE OF BOZHEMAN</h1>
-  <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
-  <div class="message" id="message"></div>
-  <div class="input-group">
-    <input type="number" id="bet" placeholder="Ставка" min="1" />
-    <select id="choice">
-      <option value="red">Красное</option>
-      <option value="black">Чёрное</option>
-      <option value="green">Зелёное (0)</option>
-      <option value="7">Цифра 7</option>
-      <option value="13">Цифра 13</option>
-      <option value="17">Цифра 17</option>
-      <option value="21">Цифра 21</option>
-    </select>
-    <button onclick="spin()">🎰 Крутить</button>
+  <div class="top-bar">
+    <h1>ROULETTE OF BOZHEMAN</h1>
+    <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
   </div>
-  <div class="wheel" id="wheel"></div>
-  <div class="number-display" id="result-display"></div>
-  <button id="buy-access" onclick="alert('Доступ куплен!')">💎 КУПИТЬ ПРОХОД</button>
+
+  <div class="roulette-container">
+    <div class="wheel-wrapper">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+    </div>
+    <div class="number-display" id="result-display"></div>
+    <div class="message" id="message"></div>
+    <button id="buy-access" onclick="alert('Доступ куплен!')">💎 КУПИТЬ ПРОХОД</button>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="input-group">
+      <input type="number" id="bet" placeholder="Ставка" min="1" />
+      <select id="choice">
+        <option value="red">Красное</option>
+        <option value="black">Чёрное</option>
+        <option value="green">Зелёное (0)</option>
+        <option value="7">Цифра 7</option>
+        <option value="13">Цифра 13</option>
+        <option value="17">Цифра 17</option>
+        <option value="21">Цифра 21</option>
+      </select>
+      <button onclick="spin()">🎰 Крутить</button>
+    </div>
+  </div>
 
   <script>
     let balance = parseInt(localStorage.getItem('bman_balance')) || 0;
@@ -144,8 +197,8 @@
       balance -= bet;
 
       const wheel = document.getElementById('wheel');
-      wheel.style.animation = 'spin 2s ease-out';
-      setTimeout(() => wheel.style.animation = '', 2000);
+      const degree = 3600 + Math.floor(Math.random() * 360); // multiple turns + random angle
+      wheel.style.transform = `rotate(${degree}deg)`;
 
       setTimeout(() => {
         const resultNum = Math.floor(Math.random() * 37); // 0 - 36
@@ -167,7 +220,7 @@
         }
 
         updateBalance();
-      }, 2000);
+      }, 4000);
     }
   </script>
 </body>
