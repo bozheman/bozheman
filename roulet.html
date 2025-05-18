@@ -36,15 +36,8 @@
   </div>
 
   <script>
-    let balance = 9000;
-    const lastClaim = localStorage.getItem('bman_claim_date');
-    const today = new Date().toISOString().split('T')[0];
-
-    if (lastClaim !== today) {
-      balance += 10;
-      localStorage.setItem('bman_claim_date', today);
-      document.getElementById('message').textContent = '+10 BMAN за вход сегодня';
-    }
+    let balance = 10;
+    let isSpinning = false;
 
     updateBalance();
 
@@ -70,14 +63,19 @@
     });
 
     function spin() {
+      if (isSpinning) return;
+      isSpinning = true;
+
       const bet = parseInt(document.getElementById('bet').value);
       const choice = document.getElementById('choice').value.trim().toLowerCase();
       if (isNaN(bet) || bet <= 0 || bet > balance) {
         alert('Неверная ставка');
+        isSpinning = false;
         return;
       }
 
       balance -= bet;
+      updateBalance();
 
       const resultNum = Math.floor(Math.random() * 37);
       const sectorAngle = 360 / 37;
@@ -110,6 +108,7 @@
         }
 
         updateBalance();
+        isSpinning = false;
       }, 7000);
     }
   </script>
