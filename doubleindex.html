@@ -16,6 +16,7 @@
       height: 100vh;
       text-align: center;
       flex-direction: column;
+      overflow: hidden;
     }
 
     h1 {
@@ -49,18 +50,63 @@
       background: crimson;
       color: #000;
     }
+
+    @keyframes realisticDrip {
+      0% {
+        transform: translateY(-10vh) scaleX(1) scaleY(1);
+        opacity: 0.8;
+      }
+      80% {
+        transform: translateY(90vh) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(100vh) scaleX(0.5) scaleY(0.3);
+        opacity: 0;
+      }
+    }
+
+    .realistic-drop {
+      position: fixed;
+      top: -10vh;
+      width: var(--drop-size, 12px);
+      height: calc(var(--drop-size, 12px) * 1.6);
+      background: radial-gradient(circle at 40% 30%, #911818, #5a0000);
+      border-radius: 60% 60% 90% 90% / 70% 70% 100% 100%;
+      box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
+      opacity: 0.6;
+      z-index: 0;
+      animation: realisticDrip linear forwards;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
-  <h1>BOZHEMAN ≠ Реальность</h1>
+  <h1>BOZHEMAN ≡ Иллюзия</h1>
   <p>Ты добрался сюда, потому что не боишься тени.<br> Это только начало. /omega/...</p>
 
   <audio autoplay loop>
-  <source src="omega.m4a" type="audio/mp4">
-  Your browser does not support the audio element.
-</audio>
+    <source src="omega.m4a" type="audio/mp4">
+    Your browser does not support the audio element.
+  </audio>
 
+  <a href="index.html" class="exit-button">⭥ ВЫЙТИ</a>
 
-  <a href="index.html" class="exit-button">⟵ ВЫЙТИ</a>
+  <script>
+    const dropCount = 60;
+    for (let i = 0; i < dropCount; i++) {
+      const drop = document.createElement('div');
+      const size = 6 + Math.random() * 18;
+      const speedFactor = size / 20;
+      drop.className = 'realistic-drop';
+      drop.style.left = Math.random() * 100 + 'vw';
+      drop.style.setProperty('--drop-size', `${size}px`);
+      drop.style.setProperty('--scale-x', `${1 - speedFactor * 0.3}`);
+      drop.style.setProperty('--scale-y', `${1 + speedFactor * 0.7}`);
+      drop.style.animationDuration = (3 + Math.random() * 3) + 's';
+      drop.style.animationDelay = (Math.random() * 10) + 's';
+      document.body.appendChild(drop);
+    }
+  </script>
 </body>
 </html>
