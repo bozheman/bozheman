@@ -227,6 +227,10 @@ body.light .drop {
   background: radial-gradient(circle, #911818, #5a0000);
   filter: drop-shadow(0 0 1px #911818);
 }
+body.light h1 {
+  color: #7f0000;
+  text-shadow: 0 0 2px #cc4c4c;
+}
 
 /* Кнопка темы */
 .theme-bar {
