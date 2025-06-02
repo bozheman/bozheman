@@ -1,302 +1,127 @@
-body {
-  background: linear-gradient(to bottom, #3b0000, #5a0101, #220000);
-  color: #fcecec;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  overflow-x: hidden;
-  min-height: 100vh;
-  text-align: center;
+/* ============================
+   BOZHEMAN — revamped styles
+   Author: ChatGPT (2025‑06‑02)
+   Mobile‑first, themeable,
+   fluid typography & extras
+=============================*/
+:root {
+  /* Color palette */
+  --clr-bg‑dark‑1:#3b0000;
+  --clr-bg‑dark‑2:#220000;
+  --clr-bg‑light‑1:#f9f3f0;
+  --clr-bg‑light‑2:#e7ddd8;
+  --clr-text‑dark:#fcecec;
+  --clr-text‑light:#1c1c1c;
+  --clr-primary:#b71c1c;
+  --clr-primary‑dark:#7f0000;
+  --clr-accent:#ff4d4d;
+  --clr-btn‑hover:#e53935;
+  --clr-white:#ffffff;
+
+  /* Layout */
+  --radius‑lg:1.25rem;
+  --radius:0.625rem;
+  --gap:0.75rem;
+
+  /* Typography */
+  --fs‑base:clamp(0.95rem,0.85rem+0.5vw,1.125rem);
+  --fs‑h1:clamp(1.75rem,1.35rem+1.8vw,2.25rem);
 }
 
-/* Капли */
-.drop {
-  position: fixed;
-  top: -10vh;
-  width: 24px;
-  height: 24px;
-  background: radial-gradient(circle, #ff1a1a, #8b0000);
-  border-radius: 50%;
-  opacity: 0.4;
-  z-index: 0;
-  animation: dripFall linear infinite;
-  pointer-events: none;
-  filter: drop-shadow(0 0 4px #ff3333);
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100svh;/* small‑viewport units */
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:linear-gradient(to bottom,var(--clr-bg‑dark‑1),var(--clr-primary‑dark) 60%,var(--clr-bg‑dark‑2));
+  color:var(--clr-text‑dark);
+  overflow-x:hidden;text-align:center;
 }
 
-@keyframes dripFall {
-  to {
-    transform: translateY(130vh);
-    opacity: 0;
-  }
+/* ---------- Raindrop effect (infinite) --------- */
+@keyframes realisticDrip{
+  0%{transform:translateY(-10svh) scale(1);opacity:.8}
+  80%{transform:translateY(92svh) scale(.9,1.05);opacity:.9}
+  100%{transform:translateY(100svh) scale(.25,.05);opacity:0}
+}
+.realistic-drop{
+  --size:clamp(0.5rem,0.35rem+0.6vw,1.5rem);
+  position:fixed;top:-10svh;left:0;
+  width:var(--size);height:calc(var(--size)*1.6);
+  border-radius:60% 60% 90% 90%/70% 70% 100% 100%;
+  background:radial-gradient(circle at 40% 30%,#911818,#5a0000);
+  box-shadow:0 0 6px rgba(255,0,0,.25);
+  opacity:.6;pointer-events:none;z-index:0;
+  animation:realisticDrip linear forwards;
 }
 
-/* Контейнер */
-.container {
-  position: relative;
-  z-index: 1;
-  width: 90%;
-  max-width: 420px;
-  margin: 60px auto;
-  padding: 30px;
-  background: rgba(30, 10, 10, 0.95);
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
+/* ---------- Layout container ---------- */
+.container{
+  position:relative;z-index:1;width:min(90%,26rem);
+  margin-block:4rem;padding:2rem 1.75rem;
+  background:rgba(30,10,10,.9);
+  border-radius:var(--radius‑lg);
+  box-shadow:0 0.75rem 2rem rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);
 }
 
-/* Аватар */
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  border: 4px solid #ff4d4d;
-  transition: transform 0.3s ease;
+/* Avatar */
+.avatar{width:7rem;height:7rem;border-radius:50%;border:4px solid var(--clr-accent);margin-bottom:1.25rem;transition:transform .3s ease;}
+@media(hover:hover){.avatar:hover{transform:scale(1.08) rotate(2deg)}}
+
+/* Heading */
+h1{font-size:var(--fs‑h1);margin-bottom:1.5rem;color:#ff9999;text-shadow:0 0 0.625rem var(--clr-accent);letter-spacing:.02em;}
+
+/* Links wrapper */
+.links{display:flex;flex-direction:column;gap:var(--gap);}
+
+/* Button base */
+.btn{display:block;text-decoration:none;border:none;border-radius:var(--radius);
+  background:linear-gradient(to right,var(--clr-primary),var(--clr-primary‑dark));
+  color:var(--clr-white);padding:.9rem 1.25rem;font-size:var(--fs‑base);
+  box-shadow:0 .25rem .75rem rgba(0,0,0,.3);
+  transition:transform .25s ease,background .25s ease,box-shadow .25s ease;
+}
+@media(hover:hover){.btn:hover{background:linear-gradient(to right,var(--clr-btn‑hover),#ef5350);transform:translateY(-2px) scale(1.03);box-shadow:0 .5rem 1rem rgba(0,0,0,.4);}}
+
+/* Special (white) button */
+.btn.special{background:var(--clr-white);color:#330000;font-weight:600;border:2px solid var(--clr-accent);}
+.btn.special span{display:block;font-size:.8rem;color:var(--clr-primary‑dark);margin-top:0.25rem;}
+
+/* Telegram group layout */
+.btn-group{display:flex;flex-direction:column;gap:.5rem;align-items:center;}
+
+.row-buttons{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));}
+.half-btn{padding:.75rem;/* fluid font */font-size:calc(var(--fs‑base)*.9);background:linear-gradient(to right,var(--clr-primary‑dark),var(--clr-primary));border-radius:var(--radius);color:#fff;text-align:center;box-shadow:0 .125rem .4rem rgba(0,0,0,.35);transition:transform .25s ease;}
+@media(hover:hover){.half-btn:hover{background:linear-gradient(to right,#d32f2f,#ff5252);transform:scale(1.04);}}
+
+/* ---------- Theme switcher ---------- */
+.theme-bar{position:absolute;top:1rem;right:1.25rem;z-index:5;}
+#theme-toggle{background:none;border:none;font-size:1.7rem;cursor:pointer;color:inherit;}
+
+/* ---------- Light theme overrides ---------- */
+body.light{
+  background:linear-gradient(to bottom,var(--clr-bg‑light‑1),var(--clr-bg‑light‑2));
+  color:var(--clr-text‑light);
+}
+body.light .container{background:rgba(255,255,255,.9);box-shadow:0 .5rem 1.25rem rgba(0,0,0,.15);}
+body.light .btn{background:linear-gradient(to right,#c14444,#b62d2d);}
+body.light .btn:hover{background:linear-gradient(to right,#a82626,#8b1e1e);}
+body.light .btn.special{background:#2b0000;color:#ffdddd;border-color:#cc4444;}
+body.light .btn.special span{color:#ff9999;}
+body.light h1{color:#7f0000;text-shadow:0 0 0.125rem #cc4c4c;}
+
+/* Drops keep bloody */
+body.light .realistic-drop{background:radial-gradient(circle at 40% 30%,#911818,#5a0000);filter:drop-shadow(0 0 1px #911818);}
+
+/* ---------- Responsive tweaks ---------- */
+@media(min-width:36rem){/* tablets */
+  .container{margin-block:5rem;padding:2.5rem 2rem;}
+  .links{flex-direction:row;flex-wrap:wrap;justify-content:center;}
+  .btn{min-width:10rem;}
 }
 
-.avatar:hover {
-  transform: scale(1.05) rotate(2deg);
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important}
 }
-
-/* Заголовок */
-h1 {
-  font-size: 34px;
-  margin-bottom: 25px;
-  color: #ff9999;
-  text-shadow: 0 0 10px #ff4d4d;
-}
-
-/* Ссылки */
-.links {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Основная кнопка */
-.btn {
-  background: linear-gradient(to right, #b71c1c, #c62828);
-  color: white;
-  text-decoration: none;
-  padding: 15px 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  position: relative;
-  z-index: 1;
-}
-
-.btn:hover {
-  background: linear-gradient(to right, #e53935, #ef5350);
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-}
-
-/* Особая кнопка */
-.special {
-  background: #ffffff;
-  color: #330000;
-  font-weight: bold;
-  border: 2px solid #ff4d4d;
-}
-
-.special span {
-  font-size: 13px;
-  color: #b71c1c;
-  display: block;
-  margin-top: 5px;
-}
-
-/* Группа кнопок Telegram */
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
-
-/* Горизонтальные кнопки */
-.row-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.half-btn {
-  padding: 12px 10px;
-  font-size: 15px;
-  background: linear-gradient(to right, #7f0000, #b71c1c);
-  border-radius: 10px;
-  color: #fff;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.half-btn:hover {
-  background: linear-gradient(to right, #d32f2f, #ff5252);
-  transform: scale(1.03);
-}
-
-
-/* Мобильная адаптация */
-@media (max-width: 600px) {
-  .container {
-    margin: 40px auto;
-    padding: 20px;
-    border-radius: 15px;
-    max-width: 95%;
-  }
-
-  .avatar {
-    width: 90px;
-    height: 90px;
-    margin-bottom: 15px;
-    border-width: 3px;
-  }
-
-  h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-
-  .btn {
-    font-size: 16px;
-    padding: 12px 16px;
-    border-radius: 8px;
-  }
-
-  .special span {
-    font-size: 12px;
-  }
-
-  .drop {
-    width: 14px;
-    height: 14px;
-    filter: blur(0.5px);
-  }
-
-  .row-buttons {
-    flex-direction: column;
-  }
-
-  .half-btn {
-    flex: 1 1 100%;
-  }
-}
-
-/* Светлая тема — благородный стиль */
-body.light {
-  background: linear-gradient(to bottom, #f9f3f0, #e7ddd8);
-  color: #1c1c1c;
-}
-
-body.light .container {
-  background: rgba(255, 255, 255, 0.9);
-  color: #111;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-body.light .btn {
-  background: linear-gradient(to right, #c14444, #b62d2d);
-  color: #ffffff;
-}
-
-body.light .btn:hover {
-  background: linear-gradient(to right, #a82626, #8b1e1e);
-  transform: scale(1.02);
-}
-
-body.light .special {
-  background: #2b0000;
-  color: #ffdddd;
-  border-color: #cc4444;
-}
-
-body.light .special span {
-  color: #ff9999;
-}
-
-/* Капли в светлой теме остаются буро-кровавыми */
-body.light .drop {
-  background: radial-gradient(circle, #911818, #5a0000);
-  filter: drop-shadow(0 0 1px #911818);
-}
-body.light h1 {
-  color: #7f0000;
-  text-shadow: 0 0 2px #cc4c4c;
-}
-
-/* Кнопка темы */
-.theme-bar {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  z-index: 10;
-}
-
-#theme-toggle {
-  background: transparent;
-  border: none;
-  font-size: 26px;
-  cursor: pointer;
-  color: inherit;
-}
-
-@keyframes realisticDrip {
-  0% {
-    transform: translateY(-10vh) scaleX(1) scaleY(1);
-    opacity: 0.8;
-  }
-  80% {
-    transform: translateY(90vh) scaleX(0.9) scaleY(1.1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translateY(100vh) scale(0.2, 0.05);
-    opacity: 0;
-  }
-}
-
-@keyframes splash {
-  0% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-.realistic-drop {
-  position: fixed;
-  top: -10vh;
-  width: var(--drop-size, 20px);
-  height: calc(var(--drop-size, 20px) * 1.6);
-  background: radial-gradient(circle at 40% 30%, #911818, #5a0000);
-  border-radius: 60% 60% 90% 90% / 70% 70% 100% 100%;
-  box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
-  opacity: 0.6;
-  z-index: 0;
-  animation: realisticDrip linear forwards;
-  pointer-events: none;
-}
-
-.splash {
-  position: fixed;
-  width: var(--drop-size, 20px);
-  height: var(--drop-size, 20px);
-  background: radial-gradient(circle, #6d0000, #2a0000);
-  border-radius: 50%;
-  opacity: 0.4;
-  z-index: 0;
-  animation: splash 0.6s ease-out forwards;
-  pointer-events: none;
-}
-
