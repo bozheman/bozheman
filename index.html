@@ -1,105 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN</title>
   <link rel="icon" type="image/png" href="gg.png">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Minimal modal style; move to CSS later */
+    .modal{
+      position:fixed;
+      top:40%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      background:#222;
+      color:#fff;
+      padding:20px;
+      border-radius:10px;
+      z-index:1000;
+      text-align:center;
+      max-width:90%;
+    }
+    .modal button{
+      margin-top:10px;
+      padding:6px 12px;
+      background:#555;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <img src="avatar.png" alt="BOZHEMAN" class="avatar">
-    <div class="theme-bar">
-  <button id="theme-toggle" title="Переключить тему">🌙</button>
-</div>
+  <header class="theme-bar">
+    <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">🌙</button>
+  </header>
 
-    <h1>BOZHEMAN</h1>
-    <div class="links">
-      <div class="btn-group">
-  <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
-  <div class="row-buttons">
-    <a href="https://t.me/protocol_0zero" class="btn half-btn" target="_blank">Нулевой протокол</a>
-    <a href="https://t.me/vidpovnac" class="btn half-btn" target="_blank">Відповідальна Нація</a>
-  </div>
-</div>
+  <main class="container">
+    <img src="avatar.png" alt="BOZHEMAN avatar" class="avatar">
+    <h1 class="brand">BOZHEMAN</h1>
+
+    <nav class="links">
+      <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
+      <div class="row-buttons">
+        <a href="https://t.me/protocol_0zero" class="btn half-btn" target="_blank">Нулевой протокол</a>
+        <a href="https://t.me/vidpovnac" class="btn half-btn" target="_blank">Відповідальна Нація</a>
+      </div>
       <a href="https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw" class="btn" target="_blank">YouTube</a>
       <a href="https://www.tiktok.com/@bozheman_" class="btn" target="_blank">TikTok</a>
       <a href="https://www.instagram.com/bozheman" class="btn" target="_blank">Instagram</a>
       <a href="https://discord.gg/jNFZTsBz8j" class="btn" target="_blank">Discord</a>
-      <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">Donate with Steam items<br>my trade url</a>
-      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special">
+      <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">
+        Donate with Steam items<br>my trade url
+      </a>
+      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special" target="_blank">
         💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span>
       </a>
-    </div>
+    </nav>
+  </main>
+
+  <!-- Secret link after 3 theme toggles -->
+  <div id="secret-content" style="display:none;margin-top:20px;">
+    <a href="doubleindex.html" class="btn special">BOZHEMAN не существует. Но ты нашёл меня</a>
+  </div>
+
+  <!-- Reward & phrase modals -->
+  <div id="reward-modal" class="modal" hidden>
+    <p>Получено 10 монет!</p>
+    <button onclick="closeModal('reward-modal')">OK</button>
+  </div>
+
+  <div id="phrase-modal" class="modal" hidden>
+    <p id="phrase-content"></p>
+    <button onclick="closeModal('phrase-modal')">OK</button>
   </div>
 
   <script>
-    const screenWidth = window.innerWidth;
-let dropCount = 300;
-
-if (screenWidth <= 1440) dropCount = 200;
-if (screenWidth <= 1024) dropCount = 100;
-if (screenWidth <= 768)  dropCount = 60;
-if (screenWidth <= 480)  dropCount = 40;
-if (screenWidth <= 320)  dropCount = 25;
-
-for (let i = 0; i < dropCount; i++) {
-  const drop = document.createElement('div');
-  const size = 10 + Math.random() * 20;
-  drop.className = 'realistic-drop';
-  drop.style.left = Math.random() * 100 + 'vw';
-  drop.style.setProperty('--drop-size', `${size}px`);
-  drop.style.animationDelay = (Math.random() * 10) + 's';
-  drop.style.animationDuration = (3 + Math.random() * 4) + 's';
-
-  document.body.appendChild(drop);
-
-  setTimeout(() => {
-    const splash = document.createElement('div');
-    splash.className = 'splash';
-    splash.style.left = drop.style.left;
-    splash.style.top = '100vh';
-    splash.style.setProperty('--drop-size', `${size}px`);
-    document.body.appendChild(splash);
-    setTimeout(() => splash.remove(), 1000);
-  }, parseFloat(drop.style.animationDelay) * 1000 + parseFloat(drop.style.animationDuration) * 1000);
-}
-
-  </script>
-  <div id="secret-content" style="display: none; margin-top: 20px;">
-  <a href="doubleindex.html" class="btn special">BOZHEMAN не существует. Но ты нашёл меня</a>
-
-</div>
-
-<script>
-  const toggleBtn = document.getElementById('theme-toggle');
-  let secretCounter = 0;
-
-  function setTheme(mode) {
-    document.body.classList.toggle('light', mode === 'light');
-    toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
-    localStorage.setItem('theme', mode);
-  }
-
-  toggleBtn.addEventListener('click', () => {
-    const isLight = document.body.classList.contains('light');
-    const newTheme = isLight ? 'dark' : 'light';
-    setTheme(newTheme);
-
-    if (!isLight) {
-      secretCounter++;
-      if (secretCounter === 3) {
-        document.getElementById('secret-content').style.display = 'block';
-      }
+    /* ---------- Theme toggle & secret Easter egg ---------- */
+    const toggleBtn = document.getElementById('theme-toggle');
+    let secretCounter = 0;
+    function setTheme(mode){
+      document.body.classList.toggle('light', mode === 'light');
+      toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', mode);
     }
-  });
+    toggleBtn.addEventListener('click', () => {
+      const isLight = document.body.classList.contains('light');
+      const newTheme = isLight ? 'dark' : 'light';
+      setTheme(newTheme);
+      if (!isLight){
+        secretCounter++;
+        if(secretCounter === 3){
+          document.getElementById('secret-content').style.display='block';
+        }
+      }
+    });
+    setTheme(localStorage.getItem('theme') || 'dark');
 
-  // Установить тему из localStorage
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  setTheme(savedTheme);
-</script>
+    /* ---------- Cyclic blood drops ---------- */
+    function spawnDrop(){
+      const drop = document.createElement('div');
+      const size = 10 + Math.random()*20;
+      drop.className = 'realistic-drop';
+      drop.style.left = Math.random()*100 + 'vw';
+      drop.style.setProperty('--drop-size', size + 'px');
+      drop.style.animationDuration = (3 + Math.random()*4) + 's';
+      document.body.appendChild(drop);
+      setTimeout(()=>drop.remove(), 8000);
+    }
+    setInterval(spawnDrop, 600);
 
+    /* ---------- Daily reward & balance ---------- */
+    const today = new Date().toISOString().slice(0,10);
+    let lastClaim = localStorage.getItem('lastClaim') || '';
+    let balance = parseInt(localStorage.getItem('balance')) || 0;
+    if (today !== lastClaim){
+      balance += 10;
+      localStorage.setItem('lastClaim', today);
+      localStorage.setItem('balance', balance);
+      openModal('reward-modal');
+    }
+
+    /* ---------- Mysterious phrase after 1000 coins ---------- */
+    const phrases = [
+      "Твоя судьба запечатана. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>",
+      "Глаза открыты, но разум слеп. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>",
+      "Ты нашёл ключ, но дверь не твоя. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>"
+    ];
+    if (balance >= 1000 && !localStorage.getItem('phraseShown')){
+      const random = phrases[Math.floor(Math.random()*phrases.length)];
+      document.getElementById('phrase-content').innerHTML = random;
+      openModal('phrase-modal');
+      localStorage.setItem('phraseShown', 'true');
+    }
+
+    /* ---------- Modal helpers ---------- */
+    function openModal(id){
+      document.getElementById(id).hidden = false;
+    }
+    function closeModal(id){
+      document.getElementById(id).hidden = true;
+    }
+  </script>
 </body>
 </html>
