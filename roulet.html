@@ -134,5 +134,54 @@
       }, 7000);
     }
   </script>
+  <div id="reward-modal" style="display:none;position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:#333;color:#fff;padding:15px;border-radius:8px;z-index:999;">
+  Получено 10 монет!
+  <br><button onclick="document.getElementById('reward-modal').style.display='none'">OK</button>
+</div>
+
+<div id="phrase-modal" style="display:none;position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:#222;color:#fff;padding:15px;border-radius:8px;z-index:1000;">
+  <span id="phrase-content"></span>
+  <br><button onclick="document.getElementById('phrase-modal').style.display='none'">OK</button>
+</div>
+
+<script>
+const today = new Date().toISOString().slice(0,10);
+let lastClaim = localStorage.getItem('lastClaim')||'';
+let balance = parseInt(localStorage.getItem('balance'))||0;
+
+if(today!==lastClaim){
+  balance+=10;
+  localStorage.setItem('lastClaim',today);
+  localStorage.setItem('balance',balance);
+  document.getElementById('reward-modal').style.display='block';
+}
+
+const phrases=[
+  "Твоя судьба запечатана. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
+  "Глаза открыты, но разум слеп. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
+  "Ты нашёл ключ, но дверь не твоя. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
+  // Добавь еще до 50 фраз
+];
+
+if(balance>=1000&&!localStorage.getItem('phraseShown')){
+  const phrase=phrases[Math.floor(Math.random()*phrases.length)];
+  document.getElementById('phrase-content').innerHTML=phrase;
+  document.getElementById('phrase-modal').style.display='block';
+  localStorage.setItem('phraseShown',true);
+}
+
+// Цикличные капли
+setInterval(()=>{
+  const drop=document.createElement('div');
+  const size=10+Math.random()*20;
+  drop.className='realistic-drop';
+  drop.style.left=Math.random()*100+'vw';
+  drop.style.setProperty('--drop-size',`${size}px`);
+  drop.style.animationDuration=(3+Math.random()*4)+'s';
+  document.body.appendChild(drop);
+  setTimeout(()=>drop.remove(),7000);
+},500);
+</script>
+
 </body>
 </html>
