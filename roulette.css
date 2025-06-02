@@ -1,69 +1,150 @@
-/* ================================
-   ROULETTE UI  —  BOZHEMAN EDITION
-   Author: ChatGPT  |  2025‑06‑02
-   Mobile‑first responsive stylesheet
-   Works with roulette.html in canvas
-================================*/
-/* ---------- Root palette & reset ---------- */
-:root{
-  --bg-dark:#0d0d0d;
-  --bg-accent:#111;
-  --text:#f5f5f5;
-  --red:#d32f2f;
-  --black:#222;
-  --green:#2e7d32;
-  --gold:#ffcc33;
-  --chip-active-shadow:0 0 6px 3px rgba(255,215,0,.7);
+:root {
+  --bg-main: #0d0d0d;
+  --bg-aux : #161616;
+  --fg-main: #f2f2f2;
+  --red : #d32f2f;
+  --black : #1a1a1a;
+  --green : #2e7d32;
+  --gold : #ffcc33;
+  --gold-dark: #cfa300;
+  --radius: 10px;
+  --shadow: 0 2px 6px rgba(0,0,0,.6);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:16px;}
-body{background:var(--bg-dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 8px;overflow:hidden;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-family: 'Segoe UI',Tahoma,Arial, sans-serif; }
+body {
+  background: var(--bg-main);
+  color: var(--fg-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-/* ---------- Top bar ---------- */
-.top-bar{width:100%;max-width:900px;display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--bg-accent);border-bottom:2px solid var(--red);}
-.top-bar h1{font-size:1.1rem;letter-spacing:1px;color:var(--gold);text-shadow:0 0 4px var(--red);}
-.balance{font-weight:bold;}
-.balance span{color:var(--gold);}
+/* ========= TOP BAR ========= */
+.top-bar {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--bg-aux);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+.top-bar h1 { font-size: 1.3rem; color: var(--gold); text-shadow: 0 0 6px var(--gold-dark); }
+.balance { font-size: 1rem; }
+.balance span { color: var(--gold); }
 
-/* ---------- Layout ---------- */
-.layout{display:flex;gap:12px;width:100%;max-width:900px;justify-content:center;align-items:flex-start;margin-top:10px;}
-@media(max-width:640px){.layout{flex-direction:column;align-items:center;overflow-y:auto;}}
+/* ========= MAIN FLEX LAYOUT ========= */
+.layout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  padding: 20px;
+}
 
-/* ---------- Wheel ---------- */
-.wheel-wrapper{position:relative;width:280px;height:280px;flex-shrink:0;}
-@media(max-width:640px){.wheel-wrapper{width:220px;height:220px;}}
-.pointer{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:18px solid var(--gold);filter:drop-shadow(0 0 4px var(--gold));z-index:5;}
-.wheel{width:100%;height:100%;border:10px solid var(--black);border-radius:50%;background:conic-gradient(var(--green) 0deg 9.72973deg, var(--red) 9.72973deg 19.45946deg); /* fallback, actual numbers overlayed*/
-  position:relative;overflow:hidden;}
-.wheel-number{position:absolute;top:50%;left:50%;transform-origin:center;font-size:.7rem;font-weight:bold;user-select:none;pointer-events:none;}
-.ball{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg) translateY(-115px);width:16px;height:16px;background:#eee;border-radius:50%;box-shadow:0 0 4px #fff inset;z-index:4;}
+/* ===== WHEEL + POINTER + BALL ===== */
+.wheel-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  flex: 0 0 320px;
+}
+@media(max-width: 600px){ .wheel-wrapper{ width: 240px; height: 240px; flex-basis: 240px; } }
+.wheel {
+  width: 100%; height: 100%; border-radius: 50%;
+  border: 8px solid var(--gold); overflow: visible; position: relative;
+  transform: rotate(0deg);
+}
+.pointer {
+  position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right:14px solid transparent;
+  border-bottom: 24px solid var(--fg-main);
+  filter: drop-shadow(0 0 4px rgba(255,255,255,.6));
+  z-index: 5;
+}
+.ball {
+  position: absolute; top: 50%; left: 50%;
+  width: 14px; height: 14px; margin: -7px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 4px rgba(255,255,255,.9);
+  transform-origin: center -120px; /* will be animated by JS */
+}
+.wheel-number {
+  position: absolute; top: 50%; left: 50%; transform-origin: center;
+  font-size: 14px; font-weight: bold; user-select: none;
+}
 
-/* ---------- Bet board ---------- */
-.bet-board{display:flex;flex-direction:column;gap:6px;}
-.number-grid{display:grid;grid-template-columns:repeat(3,52px);gap:4px;}
-.num-cell,.outside-cell{width:52px;height:32px;display:flex;justify-content:center;align-items:center;font-size:.8rem;font-weight:bold;border:2px solid #555;cursor:pointer;user-select:none;border-radius:6px;position:relative;}
-.num-cell.red{background:var(--red);} .num-cell.black{background:var(--black);} .num-cell.green{background:var(--green);} .num-cell{color:#fff;}
-.outside-row{display:flex;gap:4px;}
-.outside-cell{flex:1;background:#444;color:#fff;text-transform:uppercase;}
-.outside-cell[data-type="red"]{background:var(--red);} .outside-cell[data-type="black"]{background:var(--black);} .outside-cell[data-type="even"],.outside-cell[data-type="odd"]{background:#444;}
+/* ===== BET BOARD ===== */
+.bet-board {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-auto-rows: 40px;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-aux);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+@media(max-width:600px){ .bet-board{ grid-template-columns: repeat(3, 45px); grid-auto-rows: 32px; } }
+.bet-cell {
+  display:flex; justify-content:center; align-items:center;
+  font-size: 14px; font-weight:600; cursor:pointer;
+  background:#2b2b2b; border-radius:6px; position:relative;
+  transition:background .2s;
+}
+.bet-cell:hover { background:#444; }
+.bet-cell.special { grid-column: span 3; background:#333; }
+.bet-cell.chosen { outline:2px solid var(--gold); }
 
-/* place mini‑chip inside cell */
-.mini-chip{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#000;font-size:.7rem;font-weight:bold;line-height:22px;text-align:center;box-shadow:0 0 2px rgba(0,0,0,.6);}
+/* mini chip on board */
+.mini-chip {
+  position:absolute; bottom:2px; right:2px; width:18px; height:18px;
+  border-radius:50%; background:var(--gold);
+  color:#000; font-size:10px; font-weight:700; display:flex;justify-content:center;align-items:center;
+  box-shadow:0 0 3px rgba(0,0,0,.7);
+}
 
-/* ---------- Chip row ---------- */
-.chip-row{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;justify-content:center;}
-.chip{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;justify-content:center;align-items:center;font-weight:bold;color:#000;font-size:.9rem;cursor:pointer;box-shadow:0 0 3px rgba(0,0,0,.7);transition:transform .25s;}
-.chip:hover{transform:scale(1.07);} .chip.active{box-shadow:var(--chip-active-shadow);}
+/* ===== RESULT / MESSAGE ===== */
+.result-block { text-align:center; margin-top:10px; min-height:48px; }
+.number-display { font-size:1.2rem; margin-bottom:4px; color:var(--gold); }
+.message { font-size:.95rem; min-height:20px; }
 
-/* ---------- Result & messages ---------- */
-.number-display,.message{margin:4px auto;font-size:1rem;text-align:center;}
-.message{min-height:24px;color:var(--gold);}
+/* ===== HISTORY ===== */
+.history {
+  margin-top:12px; max-height:120px; overflow-y:auto;
+  font-size:.85rem; width:95%; max-width:600px; background:#141414;
+  border-radius:var(--radius); padding:8px; box-shadow:var(--shadow);
+}
+.history div { margin-bottom:3px; }
 
-/* ---------- Buy access ---------- */
-.buy-access{display:none;margin:6px auto;padding:6px 14px;font-size:1rem;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer;}
+/* ===== CHIPS ROW ===== */
+.controls { width:100%; display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:16px; }
+.chip-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.chip {
+  width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+  background: radial-gradient(circle at 30% 30%, var(--gold), var(--gold-dark));
+  color:#000; font-size:1rem; font-weight:700; box-shadow:var(--shadow); transition:transform .15s, box-shadow .15s;
+}
+.chip.active, .chip:active { transform:scale(1.1); box-shadow:0 0 10px 4px rgba(255,204,51,.6); }
 
-/* ---------- History ---------- */
-.history-log{position:fixed;bottom:8px;right:8px;background:rgba(0,0,0,.65);padding:8px 10px;font-size:.7rem;max-width:180px;max-height:140px;overflow-y:auto;border:1px solid var(--red);border-radius:6px;}
+/* ===== SPIN BUTTON ===== */
+.spin-btn {
+  padding:10px 24px; font-size:1.1rem; font-weight:700; cursor:pointer;
+  background:var(--red); color:#fff; border:none; border-radius:var(--radius);
+  box-shadow:var(--shadow); transition:background .2s;
+}
+.spin-btn:hover { background:#b71c1c; }
 
-/* ---------- Scrollbar hide mobile ---------- */
-@media(max-width:640px){body{overflow:auto;}::-webkit-scrollbar{display:none;}}
+#buy-access {
+  display:none; margin-top:10px; background:var(--green); color:#fff;
+  padding:8px 16px; border:none; border-radius:var(--radius); cursor:pointer; font-size:1rem;
+}
+
+/* ===== SCROLLBAR TWEAK FOR HISTORY ===== */
+.history::-webkit-scrollbar{ width:6px; }
+.history::-webkit-scrollbar-thumb{ background:#444; border-radius:3px; }
