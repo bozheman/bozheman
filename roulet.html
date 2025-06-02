@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN ROULETTE</title>
   <link rel="stylesheet" href="roulette.css">
+  <style>
+    /* --- quick styles for new betting UI --- */
+    .layout{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:24px;}
+    .wheel-wrapper{flex:0 0 320px;}
+    .bet-board{display:grid;grid-template-columns:repeat(3,48px);grid-auto-rows:48px;gap:4px;background:#111;padding:6px;border:2px solid crimson;border-radius:6px;}
+    .bet-cell{display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;border:1px solid #333;border-radius:4px;color:#fff;position:relative;cursor:pointer;user-select:none;}
+    .bet-cell.green{background:green;} .bet-cell.red{background:crimson;} .bet-cell.black{background:#000;}
+    .chip{width:26px;height:26px;border-radius:50%;background:#ffd700;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#000;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 3px rgba(0,0,0,.6);}
+    .chips-panel{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap;}
+    .chip-btn{width:40px;height:40px;border-radius:50%;background:#ffd700;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.4);} .chip-btn.active{outline:3px solid #0f0;}
+    @media(max-width:640px){.layout{flex-direction:column;align-items:center;}.bet-board{grid-template-columns:repeat(6,48px);}}
+  </style>
 </head>
 <body>
   <div class="top-bar">
@@ -12,176 +24,96 @@
     <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
   </div>
 
-  <div class="roulette-container">
+  <!-- wheel + board -->
+  <div class="layout">
     <div class="wheel-wrapper">
       <div class="pointer"></div>
-      <div class="wheel" id="wheel">
-        <!-- Numbers dynamically injected here -->
-      </div>
+      <div class="wheel" id="wheel"></div>
+      <div class="number-display" id="result-display"></div>
+      <div class="message" id="message"></div>
     </div>
-    <div class="number-display" id="result-display"></div>
-    <div class="message" id="message"></div>
-    <button id="buy-access" onclick="window.location.href='https://t.me/bozheman';">💎 КУПИТЬ ПРОХОД</button>
+
+    <div class="bet-board" id="bet-board"></div>
   </div>
 
-  <div class="bottom-bar">
-    <div class="input-group">
-      <input type="number" id="bet" placeholder="Ставка" min="1" />
-      <input type="text" id="choice" placeholder="Введите ставку: b / r / g / 0-36 / x / xx" />
-      <button onclick="spin()">🎰 Крутить</button>
-    </div>
-  </div>
-  <div class="hint">
-    Подсказка ставок: b — чёрное, r — красное, g — зелёное, 0-36 — число, x — нечётное, xx — чётное
-  </div>
+  <!-- chips -->
+  <div class="chips-panel" id="chips-panel"></div>
 
-  <!-- Улучшения -->
-  <div class="extras">
-    <div id="history-log"></div>
-    <div id="jackpot-status"></div>
-    <div id="mini-games"></div>
-  </div>
+  <button id="spin-btn" style="margin-top:12px;">🎰 Крутить</button>
+  <button id="buy-access" style="display:none;margin-top:12px;" onclick="location.href='https://t.me/bozheman'">💎 КУПИТЬ ПРОХОД</button>
 
-  <script>
-    let balance = 10;
-    let isSpinning = false;
-    let currentRotation = 0;
-    let spinCount = 0;
-    const history = [];
-
-    updateBalance();
-
-    function updateBalance() {
-      document.getElementById('balance').textContent = balance;
-      localStorage.setItem('bman_balance', balance);
-      if (balance >= 1000) {
-        document.getElementById('buy-access').style.display = 'inline-block';
-      }
-    }
-
-    const numbers = Array.from({ length: 37 }, (_, i) => i);
-    const colors = ['green', ...numbers.slice(1).map(n => n % 2 === 0 ? 'black' : 'red')];
-
-    const wheel = document.getElementById('wheel');
-    numbers.forEach((num, i) => {
-      const div = document.createElement('div');
-      div.className = 'wheel-number';
-      div.textContent = num;
-      div.style.transform = `rotate(${i * (360 / 37)}deg) translateY(-140px)`;
-      div.style.color = colors[i];
-      wheel.appendChild(div);
-    });
-
-    function logHistory(num, color, win, bet) {
-      const log = `#${spinCount}: ${num} (${color}) — ${win > 0 ? '+ ' + win : '- ' + bet} BMAN`;
-      history.unshift(log);
-      if (history.length > 10) history.pop();
-      document.getElementById('history-log').innerHTML = history.map(h => `<div>${h}</div>`).join('');
-    }
-
-    function spin() {
-      if (isSpinning) return;
-      isSpinning = true;
-      spinCount++;
-
-      const bet = parseInt(document.getElementById('bet').value);
-      const choice = document.getElementById('choice').value.trim().toLowerCase();
-      if (isNaN(bet) || bet <= 0 || bet > balance) {
-        alert('Неверная ставка');
-        isSpinning = false;
-        return;
-      }
-
-      balance -= bet;
-      updateBalance();
-
-      const resultNum = Math.floor(Math.random() * 37);
-      const sectorAngle = 360 / 37;
-      const additionalRotations = 10 * 360;
-      const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2);
-      currentRotation += additionalRotations + stopAngle;
-
-      wheel.style.transition = 'transform 7s ease-in-out';
-      wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-      setTimeout(() => {
-        const color = resultNum === 0 ? 'green' : resultNum % 2 === 0 ? 'black' : 'red';
-        document.getElementById('result-display').textContent = `Выпало: ${resultNum} (${color})`;
-
-        let win = 0;
-        if ((choice === 'b' && color === 'black') ||
-            (choice === 'r' && color === 'red') ||
-            (choice === 'g' && resultNum === 0) ||
-            (choice === 'x' && resultNum % 2 === 1) ||
-            (choice === 'xx' && resultNum !== 0 && resultNum % 2 === 0) ||
-            (!isNaN(parseInt(choice)) && parseInt(choice) === resultNum)) {
-
-          win = ['g'].includes(choice) ? bet * 14 :
-                ['b', 'r', 'x', 'xx'].includes(choice) ? bet * 2 :
-                bet * 36;
-        }
-
-        if (win > 0) {
-          balance += win;
-          document.getElementById('message').textContent = `Ты выиграл ${win} BMAN!`;
-        } else {
-          document.getElementById('message').textContent = `Ты проиграл. Попробуй снова.`;
-        }
-
-        logHistory(resultNum, color, win, bet);
-        updateBalance();
-        isSpinning = false;
-      }, 7000);
-    }
-  </script>
-  <div id="reward-modal" style="display:none;position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:#333;color:#fff;padding:15px;border-radius:8px;z-index:999;">
-  Получено 10 монет!
-  <br><button onclick="document.getElementById('reward-modal').style.display='none'">OK</button>
-</div>
-
-<div id="phrase-modal" style="display:none;position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:#222;color:#fff;padding:15px;border-radius:8px;z-index:1000;">
-  <span id="phrase-content"></span>
-  <br><button onclick="document.getElementById('phrase-modal').style.display='none'">OK</button>
-</div>
+  <!-- history -->
+  <div id="history-log" style="margin-top:16px;font-family:monospace;font-size:.85rem;"></div>
 
 <script>
-const today = new Date().toISOString().slice(0,10);
-let lastClaim = localStorage.getItem('lastClaim')||'';
-let balance = parseInt(localStorage.getItem('balance'))||0;
-
-if(today!==lastClaim){
-  balance+=10;
-  localStorage.setItem('lastClaim',today);
-  localStorage.setItem('balance',balance);
-  document.getElementById('reward-modal').style.display='block';
+/******** CONFIG ********/
+const CHIP_VALUES=[1,5,10,50,250];
+const numbers=[...Array(37).keys()];
+const colors=['green',...numbers.slice(1).map(n=>n%2===0?'black':'red')];
+/******** STATE ********/
+let balance=parseInt(localStorage.getItem('bman_balance')||'10');
+let selectedChip=CHIP_VALUES[0];
+let bets={}; // key:number , value: total stake
+let isSpinning=false,currentRotation=0,spinCount=0,history=[];
+/******** INIT DOM ********/
+const wheelEl=document.getElementById('wheel');
+const boardEl=document.getElementById('bet-board');
+const chipsPanel=document.getElementById('chips-panel');
+const spinBtn=document.getElementById('spin-btn');
+/**** build wheel numbers ****/
+const sectorAngle=360/37;
+numbers.forEach((num,i)=>{
+  const d=document.createElement('div');
+  d.className='wheel-number';
+  d.textContent=num;
+  d.style.transform=`rotate(${i*sectorAngle}deg) translateY(-140px)`;
+  d.style.color=colors[i];
+  wheelEl.appendChild(d);
+});
+/**** build betting board ****/
+numbers.forEach(num=>{
+  const cell=document.createElement('div');
+  cell.className=`bet-cell ${colors[num]}`;
+  cell.textContent=num;
+  cell.onclick=()=>placeChip(num,cell);
+  boardEl.appendChild(cell);
+});
+/**** build chips panel ****/
+CHIP_VALUES.forEach(v=>{
+  const btn=document.createElement('div');
+  btn.className='chip-btn';
+  btn.textContent=v;
+  if(v===selectedChip)btn.classList.add('active');
+  btn.onclick=()=>{selectedChip=v;document.querySelectorAll('.chip-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
+  chipsPanel.appendChild(btn);
+});
+/********* FUNCTIONS *********/
+function placeChip(num,cell){
+  if(balance<selectedChip)return alert('Недостаточно средств');
+  balance-=selectedChip;updateBalance();
+  bets[num]=(bets[num]||0)+selectedChip;
+  // visual chip clone
+  const chip=document.createElement('div');chip.className='chip';chip.textContent=selectedChip;cell.appendChild(chip);
 }
-
-const phrases=[
-  "Твоя судьба запечатана. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
-  "Глаза открыты, но разум слеп. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
-  "Ты нашёл ключ, но дверь не твоя. <a href='https://t.me/protocol_0zero'>[Telegram]</a>",
-  // Добавь еще до 50 фраз
-];
-
-if(balance>=1000&&!localStorage.getItem('phraseShown')){
-  const phrase=phrases[Math.floor(Math.random()*phrases.length)];
-  document.getElementById('phrase-content').innerHTML=phrase;
-  document.getElementById('phrase-modal').style.display='block';
-  localStorage.setItem('phraseShown',true);
+function updateBalance(){document.getElementById('balance').textContent=balance;localStorage.setItem('bman_balance',balance);if(balance>=1000)document.getElementById('buy-access').style.display='inline-block';}
+updateBalance();
+function clearBoard(){bets={};document.querySelectorAll('.bet-cell .chip').forEach(c=>c.remove());}
+spinBtn.onclick=spin;
+function spin(){if(isSpinning)return;if(Object.keys(bets).length===0)return alert('Сделай ставку!');isSpinning=true;spinCount++;
+  const resultNum=Math.floor(Math.random()*37);
+  const addRot=10*360;const stopAngle=(360-resultNum*sectorAngle+sectorAngle/2);
+  currentRotation+=addRot+stopAngle;wheelEl.style.transition='transform 7s ease-in-out';wheelEl.style.transform=`rotate(${currentRotation}deg)`;
+  setTimeout(()=>{
+    const color=colors[resultNum];
+    document.getElementById('result-display').textContent=`Выпало: ${resultNum} (${color})`;
+    let totalWin=0;
+    Object.entries(bets).forEach(([num,stake])=>{if(parseInt(num)===resultNum)totalWin+=stake*36;});
+    balance+=totalWin;updateBalance();
+    document.getElementById('message').textContent=totalWin>0?`Ты выиграл ${totalWin} BMAN!`:'Ты проиграл. Попробуй снова.';
+    logHistory(resultNum,color,totalWin);
+    clearBoard();isSpinning=false;},7000);
 }
-
-// Цикличные капли
-setInterval(()=>{
-  const drop=document.createElement('div');
-  const size=10+Math.random()*20;
-  drop.className='realistic-drop';
-  drop.style.left=Math.random()*100+'vw';
-  drop.style.setProperty('--drop-size',`${size}px`);
-  drop.style.animationDuration=(3+Math.random()*4)+'s';
-  document.body.appendChild(drop);
-  setTimeout(()=>drop.remove(),7000);
-},500);
+function logHistory(num,color,win){const log=`#${spinCount}: ${num} (${color}) — ${win>0?'+ '+win:'0'} BMAN`;history.unshift(log);if(history.length>10)history.pop();document.getElementById('history-log').innerHTML=history.join('<br>');}
 </script>
-
 </body>
 </html>
