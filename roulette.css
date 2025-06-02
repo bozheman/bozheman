@@ -1,278 +1,69 @@
-body {
-  background: #0a0a0a;
-  color: white;
-  font-family: monospace;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  transition: background 0.5s, color 0.5s;
+/* ================================
+   ROULETTE UI  —  BOZHEMAN EDITION
+   Author: ChatGPT  |  2025‑06‑02
+   Mobile‑first responsive stylesheet
+   Works with roulette.html in canvas
+================================*/
+/* ---------- Root palette & reset ---------- */
+:root{
+  --bg-dark:#0d0d0d;
+  --bg-accent:#111;
+  --text:#f5f5f5;
+  --red:#d32f2f;
+  --black:#222;
+  --green:#2e7d32;
+  --gold:#ffcc33;
+  --chip-active-shadow:0 0 6px 3px rgba(255,215,0,.7);
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:16px;}
+body{background:var(--bg-dark);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 8px;overflow:hidden;}
 
-body.light {
-  background: #f5f5f5;
-  color: #111;
-}
+/* ---------- Top bar ---------- */
+.top-bar{width:100%;max-width:900px;display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--bg-accent);border-bottom:2px solid var(--red);}
+.top-bar h1{font-size:1.1rem;letter-spacing:1px;color:var(--gold);text-shadow:0 0 4px var(--red);}
+.balance{font-weight:bold;}
+.balance span{color:var(--gold);}
 
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background: #111;
-  flex-wrap: wrap;
-}
+/* ---------- Layout ---------- */
+.layout{display:flex;gap:12px;width:100%;max-width:900px;justify-content:center;align-items:flex-start;margin-top:10px;}
+@media(max-width:640px){.layout{flex-direction:column;align-items:center;overflow-y:auto;}}
 
-.top-bar.light {
-  background: #ddd;
-}
+/* ---------- Wheel ---------- */
+.wheel-wrapper{position:relative;width:280px;height:280px;flex-shrink:0;}
+@media(max-width:640px){.wheel-wrapper{width:220px;height:220px;}}
+.pointer{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:18px solid var(--gold);filter:drop-shadow(0 0 4px var(--gold));z-index:5;}
+.wheel{width:100%;height:100%;border:10px solid var(--black);border-radius:50%;background:conic-gradient(var(--green) 0deg 9.72973deg, var(--red) 9.72973deg 19.45946deg); /* fallback, actual numbers overlayed*/
+  position:relative;overflow:hidden;}
+.wheel-number{position:absolute;top:50%;left:50%;transform-origin:center;font-size:.7rem;font-weight:bold;user-select:none;pointer-events:none;}
+.ball{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg) translateY(-115px);width:16px;height:16px;background:#eee;border-radius:50%;box-shadow:0 0 4px #fff inset;z-index:4;}
 
-.balance {
-  font-size: 1.2em;
-  color: #0f0;
-}
+/* ---------- Bet board ---------- */
+.bet-board{display:flex;flex-direction:column;gap:6px;}
+.number-grid{display:grid;grid-template-columns:repeat(3,52px);gap:4px;}
+.num-cell,.outside-cell{width:52px;height:32px;display:flex;justify-content:center;align-items:center;font-size:.8rem;font-weight:bold;border:2px solid #555;cursor:pointer;user-select:none;border-radius:6px;position:relative;}
+.num-cell.red{background:var(--red);} .num-cell.black{background:var(--black);} .num-cell.green{background:var(--green);} .num-cell{color:#fff;}
+.outside-row{display:flex;gap:4px;}
+.outside-cell{flex:1;background:#444;color:#fff;text-transform:uppercase;}
+.outside-cell[data-type="red"]{background:var(--red);} .outside-cell[data-type="black"]{background:var(--black);} .outside-cell[data-type="even"],.outside-cell[data-type="odd"]{background:#444;}
 
-h1 {
-  color: crimson;
-  text-shadow: 0 0 8px red;
-  text-align: center;
-  margin-top: 20px;
-  flex: 1 1 100%;
-}
+/* place mini‑chip inside cell */
+.mini-chip{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#000;font-size:.7rem;font-weight:bold;line-height:22px;text-align:center;box-shadow:0 0 2px rgba(0,0,0,.6);}
 
-.roulette-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 200px);
-  text-align: center;
-}
+/* ---------- Chip row ---------- */
+.chip-row{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;justify-content:center;}
+.chip{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;justify-content:center;align-items:center;font-weight:bold;color:#000;font-size:.9rem;cursor:pointer;box-shadow:0 0 3px rgba(0,0,0,.7);transition:transform .25s;}
+.chip:hover{transform:scale(1.07);} .chip.active{box-shadow:var(--chip-active-shadow);}
 
-.wheel-wrapper {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-}
+/* ---------- Result & messages ---------- */
+.number-display,.message{margin:4px auto;font-size:1rem;text-align:center;}
+.message{min-height:24px;color:var(--gold);}
 
-.wheel {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid crimson;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: rotate(0deg);
-  transition: transform 7s ease-in-out;
-}
+/* ---------- Buy access ---------- */
+.buy-access{display:none;margin:6px auto;padding:6px 14px;font-size:1rem;background:var(--green);color:#fff;border:none;border-radius:8px;cursor:pointer;}
 
-.pointer {
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 20px solid white;
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
+/* ---------- History ---------- */
+.history-log{position:fixed;bottom:8px;right:8px;background:rgba(0,0,0,.65);padding:8px 10px;font-size:.7rem;max-width:180px;max-height:140px;overflow-y:auto;border:1px solid var(--red);border-radius:6px;}
 
-.wheel-number {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-origin: center;
-  font-size: 14px;
-  font-weight: bold;
-  pointer-events: none;
-  user-select: none;
-}
-
-.number-display, .message {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 1.2em;
-  min-height: 24px;
-}
-
-.bottom-bar {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 0 10px;
-  flex-wrap: wrap;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #111;
-  padding: 10px 20px;
-  border-radius: 10px;
-  flex-wrap: wrap;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.input-group input[type="number"], .input-group input[type="text"] {
-  padding: 10px;
-  font-size: 1em;
-  min-width: 80px;
-  background: #222;
-  color: #fff;
-  border: 1px solid #555;
-  border-radius: 5px;
-  appearance: none;
-  -moz-appearance: textfield;
-  flex: 1 1 auto;
-}
-
-.input-group input[type=number]::-webkit-inner-spin-button,
-.input-group input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.bet-controls {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-.bet-controls button {
-  background: #444;
-  border: 1px solid #666;
-  color: white;
-  padding: 8px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: background 0.3s;
-}
-
-.bet-controls button:hover {
-  background: #666;
-}
-
-.input-group button {
-  padding: 10px 20px;
-  background: crimson;
-  border: none;
-  color: white;
-  font-size: 1em;
-  cursor: pointer;
-  flex-shrink: 0;
-  border-radius: 5px;
-  transition: background 0.3s ease;
-}
-
-.input-group button:hover {
-  background: darkred;
-}
-
-#buy-access {
-  display: none;
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 1.2em;
-  background: green;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 10px;
-}
-
-.hint {
-  margin-top: 6px;
-  color: #ccc;
-  font-size: 0.85em;
-  text-align: center;
-  width: 100%;
-  padding: 0 10px;
-}
-
-#history-log {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 10px;
-  font-size: 0.9em;
-  max-width: 220px;
-  border: 1px solid crimson;
-  border-radius: 8px;
-  color: #eee;
-  overflow-y: auto;
-  max-height: 150px;
-}
-
-#toggle-log {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #333;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 0.8em;
-  z-index: 10;
-}
-
-#toggle-log:hover {
-  background: #555;
-}
-
-@media (max-width: 500px) {
-  .wheel-wrapper {
-    width: 240px;
-    height: 240px;
-  }
-
-  .wheel-number {
-    font-size: 10px;
-    transform: translateY(-100px);
-  }
-
-  .input-group input {
-    font-size: 0.9em;
-  }
-
-  .input-group button {
-    font-size: 0.9em;
-    padding: 8px 16px;
-  }
-
-  h1 {
-    font-size: 1.2em;
-  }
-
-  #history-log {
-    max-width: 90%;
-    top: auto;
-    bottom: 90px;
-    right: 5%;
-  }
-
-  .bottom-bar {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .input-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
+/* ---------- Scrollbar hide mobile ---------- */
+@media(max-width:640px){body{overflow:auto;}::-webkit-scrollbar{display:none;}}

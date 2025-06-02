@@ -5,115 +5,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN ROULETTE</title>
   <link rel="stylesheet" href="roulette.css">
-  <style>
-    /* --- quick styles for new betting UI --- */
-    .layout{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:24px;}
-    .wheel-wrapper{flex:0 0 320px;}
-    .bet-board{display:grid;grid-template-columns:repeat(3,48px);grid-auto-rows:48px;gap:4px;background:#111;padding:6px;border:2px solid crimson;border-radius:6px;}
-    .bet-cell{display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;border:1px solid #333;border-radius:4px;color:#fff;position:relative;cursor:pointer;user-select:none;}
-    .bet-cell.green{background:green;} .bet-cell.red{background:crimson;} .bet-cell.black{background:#000;}
-    .chip{width:26px;height:26px;border-radius:50%;background:#ffd700;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#000;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 3px rgba(0,0,0,.6);}
-    .chips-panel{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap;}
-    .chip-btn{width:40px;height:40px;border-radius:50%;background:#ffd700;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.4);} .chip-btn.active{outline:3px solid #0f0;}
-    @media(max-width:640px){.layout{flex-direction:column;align-items:center;}.bet-board{grid-template-columns:repeat(6,48px);}}
-  </style>
 </head>
 <body>
-  <div class="top-bar">
-    <h1>ROULETTE OF BOZHEMAN</h1>
+  <!-- ===== HEADER / BALANCE BAR ===== -->
+  <header class="top-bar">
+    <h1>ROULETTE&nbsp;OF&nbsp;BOZHEMAN</h1>
     <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
-  </div>
+  </header>
 
-  <!-- wheel + board -->
+  <!-- ===== MAIN LAYOUT ===== -->
   <div class="layout">
+    <!-- WHEEL + BALL -->
     <div class="wheel-wrapper">
       <div class="pointer"></div>
-      <div class="wheel" id="wheel"></div>
-      <div class="number-display" id="result-display"></div>
-      <div class="message" id="message"></div>
+      <div class="wheel" id="wheel">
+        <!-- wheel numbers injected here -->
+      </div>
+      <div class="ball" id="ball"></div>
     </div>
 
+    <!-- BET BOARD (numbers 0‑36 + outside bets) -->
     <div class="bet-board" id="bet-board"></div>
   </div>
 
-  <!-- chips -->
-  <div class="chips-panel" id="chips-panel"></div>
+  <!-- RESULT & MESSAGE -->
+  <div class="number-display" id="result-display"></div>
+  <div class="message" id="message"></div>
+  <button id="buy-access" class="buy-access" onclick="window.location.href='https://t.me/bozheman';">💎 КУПИТЬ ПРОХОД</button>
 
-  <button id="spin-btn" style="margin-top:12px;">🎰 Крутить</button>
-  <button id="buy-access" style="display:none;margin-top:12px;" onclick="location.href='https://t.me/bozheman'">💎 КУПИТЬ ПРОХОД</button>
+  <!-- CHIP ROW -->
+  <div class="chip-row" id="chip-row">
+    <!-- chips generated in JS -->
+  </div>
 
-  <!-- history -->
-  <div id="history-log" style="margin-top:16px;font-family:monospace;font-size:.85rem;"></div>
+  <!-- HISTORY -->
+  <div id="history-log" class="history-log"></div>
 
-<script>
-/******** CONFIG ********/
-const CHIP_VALUES=[1,5,10,50,250];
-const numbers=[...Array(37).keys()];
-const colors=['green',...numbers.slice(1).map(n=>n%2===0?'black':'red')];
-/******** STATE ********/
-let balance=parseInt(localStorage.getItem('bman_balance')||'10');
-let selectedChip=CHIP_VALUES[0];
-let bets={}; // key:number , value: total stake
-let isSpinning=false,currentRotation=0,spinCount=0,history=[];
-/******** INIT DOM ********/
-const wheelEl=document.getElementById('wheel');
-const boardEl=document.getElementById('bet-board');
-const chipsPanel=document.getElementById('chips-panel');
-const spinBtn=document.getElementById('spin-btn');
-/**** build wheel numbers ****/
-const sectorAngle=360/37;
-numbers.forEach((num,i)=>{
-  const d=document.createElement('div');
-  d.className='wheel-number';
-  d.textContent=num;
-  d.style.transform=`rotate(${i*sectorAngle}deg) translateY(-140px)`;
-  d.style.color=colors[i];
-  wheelEl.appendChild(d);
-});
-/**** build betting board ****/
-numbers.forEach(num=>{
-  const cell=document.createElement('div');
-  cell.className=`bet-cell ${colors[num]}`;
-  cell.textContent=num;
-  cell.onclick=()=>placeChip(num,cell);
-  boardEl.appendChild(cell);
-});
-/**** build chips panel ****/
-CHIP_VALUES.forEach(v=>{
-  const btn=document.createElement('div');
-  btn.className='chip-btn';
-  btn.textContent=v;
-  if(v===selectedChip)btn.classList.add('active');
-  btn.onclick=()=>{selectedChip=v;document.querySelectorAll('.chip-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
-  chipsPanel.appendChild(btn);
-});
-/********* FUNCTIONS *********/
-function placeChip(num,cell){
-  if(balance<selectedChip)return alert('Недостаточно средств');
-  balance-=selectedChip;updateBalance();
-  bets[num]=(bets[num]||0)+selectedChip;
-  // visual chip clone
-  const chip=document.createElement('div');chip.className='chip';chip.textContent=selectedChip;cell.appendChild(chip);
-}
-function updateBalance(){document.getElementById('balance').textContent=balance;localStorage.setItem('bman_balance',balance);if(balance>=1000)document.getElementById('buy-access').style.display='inline-block';}
-updateBalance();
-function clearBoard(){bets={};document.querySelectorAll('.bet-cell .chip').forEach(c=>c.remove());}
-spinBtn.onclick=spin;
-function spin(){if(isSpinning)return;if(Object.keys(bets).length===0)return alert('Сделай ставку!');isSpinning=true;spinCount++;
-  const resultNum=Math.floor(Math.random()*37);
-  const addRot=10*360;const stopAngle=(360-resultNum*sectorAngle+sectorAngle/2);
-  currentRotation+=addRot+stopAngle;wheelEl.style.transition='transform 7s ease-in-out';wheelEl.style.transform=`rotate(${currentRotation}deg)`;
-  setTimeout(()=>{
-    const color=colors[resultNum];
-    document.getElementById('result-display').textContent=`Выпало: ${resultNum} (${color})`;
-    let totalWin=0;
-    Object.entries(bets).forEach(([num,stake])=>{if(parseInt(num)===resultNum)totalWin+=stake*36;});
-    balance+=totalWin;updateBalance();
-    document.getElementById('message').textContent=totalWin>0?`Ты выиграл ${totalWin} BMAN!`:'Ты проиграл. Попробуй снова.';
-    logHistory(resultNum,color,totalWin);
-    clearBoard();isSpinning=false;},7000);
-}
-function logHistory(num,color,win){const log=`#${spinCount}: ${num} (${color}) — ${win>0?'+ '+win:'0'} BMAN`;history.unshift(log);if(history.length>10)history.pop();document.getElementById('history-log').innerHTML=history.join('<br>');}
-</script>
+  <!-- ================== SCRIPTS ================== -->
+  <script>
+  /* ---------- STATE ---------- */
+  let balance = parseInt(localStorage.getItem('bman_balance')) || 100;
+  let isSpinning = false;
+  let currentRotation = 0;
+  let spinCount = 0;
+  let selectedChip = 1; // default chip value
+  const history = [];
+
+  /* ---------- UI ELEMENTS ---------- */
+  const balanceSpan = document.getElementById('balance');
+  const wheelEl = document.getElementById('wheel');
+  const ballEl  = document.getElementById('ball');
+  const betInput= document.createElement('input'); // hidden, used internally
+  let choice = '';
+
+  updateBalance();
+
+  /* ---------- BUILD WHEEL ---------- */
+  const numbers = Array.from({length:37},(_,i)=>i);
+  const colors  = ['green',...numbers.slice(1).map(n=>n%2===0?'black':'red')];
+  numbers.forEach((num,i)=>{
+    const div=document.createElement('div');
+    div.className='wheel-number';
+    div.textContent=num;
+    div.style.transform=`rotate(${i* (360/37)}deg) translateY(-135px)`;
+    div.style.color=colors[i];
+    wheelEl.appendChild(div);
+  });
+
+  /* ---------- BUILD BET BOARD ---------- */
+  const board = document.getElementById('bet-board');
+  // outside bets row
+  const outsideRow=document.createElement('div');outsideRow.className='outside-row';
+  ['red','black','even','odd'].forEach(type=>{
+    const cell=document.createElement('div');cell.className='outside-cell';cell.dataset.type=type;
+    cell.textContent=type.toUpperCase();
+    cell.addEventListener('click',()=>selectChoice(type));
+    outsideRow.appendChild(cell);
+  });
+  board.appendChild(outsideRow);
+  // numeric grid 3×12 + zero column
+  const grid=document.createElement('div');grid.className='number-grid';
+  numbers.forEach(num=>{
+    const cell=document.createElement('div');
+    cell.className='num-cell';
+    cell.dataset.num=num;
+    cell.textContent=num;
+    if(num===0) cell.classList.add('green');
+    else cell.classList.add(num%2===0?'black':'red');
+    cell.addEventListener('click',()=>selectChoice(num.toString()));
+    grid.appendChild(cell);
+  });
+  board.appendChild(grid);
+
+  /* ---------- BUILD CHIP ROW ---------- */
+  const chipRow = document.getElementById('chip-row');
+  [1,5,10,50,250].forEach(val=>{
+    const chip=document.createElement('div');
+    chip.className='chip';
+    chip.dataset.value=val;
+    chip.textContent=val;
+    chip.addEventListener('click',()=>selectChip(val,chip));
+    chipRow.appendChild(chip);
+  });
+  // select first chip
+  chipRow.firstChild.classList.add('active');
+
+  function selectChip(val,el){
+    selectedChip=val;
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectChoice(val){
+    choice=val.toString().toLowerCase();
+    // place miniature chip on chosen cell
+    const target=event.currentTarget;
+    const mini=document.createElement('span');
+    mini.className='mini-chip';
+    mini.textContent=selectedChip;
+    target.innerHTML='';
+    target.appendChild(mini);
+  }
+
+  /* ---------- BALANCE ---------- */
+  function updateBalance(){
+    balanceSpan.textContent=balance;
+    localStorage.setItem('bman_balance',balance);
+    document.getElementById('buy-access').style.display=balance>=1000?'inline-block':'none';
+  }
+
+  /* ---------- SPIN ---------- */
+  function spin(){
+    if(isSpinning||!choice) return alert('Сделай ставку!');
+    isSpinning=true;spinCount++;
+    const bet=selectedChip;
+    if(bet>balance){alert('Недостаточно средств');isSpinning=false;return;}
+    balance-=bet;updateBalance();
+
+    const resultNum=Math.floor(Math.random()*37);
+    const sector=360/37;
+    const extra=720; // 2 оборота
+    const stopAngle=360-resultNum*sector+sector/2;
+    currentRotation+=extra+stopAngle;
+    wheelEl.style.transition='transform 6s cubic-bezier(0.15,0.7,0.3,1)';
+    wheelEl.style.transform=`rotate(${currentRotation}deg)`;
+
+    // Ball opposite direction, slower, ends at result
+    const ballRot=currentRotation-extra*0.4;
+    ballEl.style.transition='transform 6s linear';
+    ballEl.style.transform=`rotate(${-ballRot}deg)`;
+
+    setTimeout(()=>{
+      const color=resultNum===0?'green':resultNum%2===0?'black':'red';
+      document.getElementById('result-display').textContent=`Выпало: ${resultNum} (${color})`;
+      let win=0;
+      if((choice==='b'&&color==='black')||(choice==='r'&&color==='red')||(choice==='g'&&resultNum===0)||
+         (choice==='x'&&resultNum%2===1)||(choice==='xx'&&resultNum!==0&&resultNum%2===0)||
+         (choice==='red'&&color==='red')||(choice==='black'&&color==='black')||
+         (choice==='even'&&resultNum!==0&&resultNum%2===0)||(choice==='odd'&&resultNum%2===1)||
+         (!isNaN(parseInt(choice))&&parseInt(choice)===resultNum)){
+        if(['g','red','black','even','odd','b','r','x','xx'].includes(choice)) win=bet*2;
+        else win=bet*36;
+      }
+      if(win>0){balance+=win;document.getElementById('message').textContent=`Ты выиграл ${win} BMAN!`;}
+      else document.getElementById('message').textContent='Ты проиграл. Попробуй снова.';
+      // history
+      history.unshift(`#${spinCount}: ${resultNum} (${color}) — ${win?'+':'-'}${win||bet}`);
+      if(history.length>10)history.pop();
+      document.getElementById('history-log').innerHTML=history.map(h=>`<div>${h}</div>`).join('');
+      updateBalance();
+      // reset board chips
+      document.querySelectorAll('.num-cell,.outside-cell').forEach(c=>c.innerHTML=c.dataset.num||c.dataset.type.toUpperCase());
+      choice='';
+      isSpinning=false;
+    },6000);
+  }
+  // expose spin to button (used in HTML)
+  window.spin=spin;
+  </script>
 </body>
 </html>
