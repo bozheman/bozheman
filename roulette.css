@@ -1,3 +1,8 @@
+/* =====================================================
+   ROULETTE.CSS  –  BOZHEMAN MINI‑CASINO  (2025‑06‑02)
+   Полностью переписанный стиль для файла roulette.html
+   Адаптивный (mobile‑first), без прокрутки, чистая сетка
+===================================================== */
 :root {
   --bg-main: #0d0d0d;
   --bg-aux : #161616;
@@ -69,14 +74,21 @@ body {
   z-index: 5;
 }
 .ball {
-  position: absolute; top: 50%; left: 50%;
-  width: 14px; height: 14px; margin: -7px; border-radius: 50%;
-  background: #fff; box-shadow: 0 0 4px rgba(255,255,255,.9);
-  transform-origin: center -120px; /* will be animated by JS */
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px; margin: -8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,.9);
+  /* центр вращения смещён вверх на радиус колеса */
+  transform-origin: center -140px; /* 160‑8‑12 примерно */
+  z-index: 4;
 }
 .wheel-number {
   position: absolute; top: 50%; left: 50%; transform-origin: center;
-  font-size: 14px; font-weight: bold; user-select: none;
+  font-size: 18px; font-weight: 700; user-select: none;
+  color: #fff;
+  text-shadow: 0 0 3px rgba(0,0,0,.9);
 }
 
 /* ===== BET BOARD ===== */
