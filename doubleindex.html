@@ -7,12 +7,11 @@
   <style>
     :root {
       --main-color: crimson;
-      --glow-size: 10px;
       --bg-dark: #000;
       --text-light: #ffaaaa;
     }
 
-    /* === Layout & Base === */
+    /* === RESET & BASE === */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -37,7 +36,7 @@
       font-size: 2.4rem;
       letter-spacing: 0.05em;
       position: relative;
-      text-shadow: 0 0 var(--glow-size) var(--main-color);
+      text-shadow: 0 0 10px var(--main-color);
       animation: glitch 2.5s infinite;
     }
 
@@ -102,21 +101,17 @@
     }
 
     .flash {
-      transform: scale(1.15);
+      transform: scale(1.2);
     }
 
     /* === Drips === */
     @keyframes realisticDrip {
       0% {
-        transform: translateY(-10vh) scaleX(1) scaleY(1);
-        opacity: 0.8;
-      }
-      80% {
-        transform: translateY(90vh) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
-        opacity: 0.9;
+        transform: translateY(-10vh);
+        opacity: var(--start-opacity, 0.8);
       }
       100% {
-        transform: translateY(105vh) scaleX(0.5) scaleY(0.3);
+        transform: translateY(110vh);
         opacity: 0;
       }
     }
@@ -126,12 +121,9 @@
       top: -12vh;
       width: var(--drop-size, 12px);
       height: calc(var(--drop-size, 12px) * 1.6);
-      background: radial-gradient(circle at 40% 30%, #911818, #5a0000);
       border-radius: 60% 60% 90% 90% / 70% 70% 100% 100%;
-      box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
-      opacity: 0.6;
-      animation: realisticDrip linear forwards;
       pointer-events: none;
+      animation: realisticDrip linear forwards;
       z-index: 0;
     }
 
@@ -224,32 +216,35 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      /* === Audio: старт с 10 сек. === */
+      /* === Audio: старт с 7 сек. === */
       const audio = document.getElementById("myAudio");
-      function playFromTen() {
+      function playFromSeven() {
         if (audio.readyState >= 2) {
-          audio.currentTime = 10;
+          audio.currentTime = 7;
           audio.play().catch(() => {});
         } else {
-          audio.addEventListener("canplay", playFromTen, { once: true });
+          audio.addEventListener("canplay", playFromSeven, { once: true });
         }
       }
-      playFromTen();
+      playFromSeven();
 
       /* === Капли крови === */
       function spawnDrop() {
         const drop = document.createElement("div");
         const size = 10 + Math.random() * 18;
+        const hue = Math.random() * 20; // 0–20° ⇒ ярко‑красная гамма
+        const light = `hsl(${hue} 100% 55%)`;
+        const dark = `hsl(${hue} 100% 30%)`;
         drop.className = "realistic-drop";
         drop.style.left = Math.random() * 100 + "vw";
         drop.style.setProperty("--drop-size", size + "px");
-        drop.style.setProperty("--scale-x", 0.6 + Math.random() * 0.8);
-        drop.style.setProperty("--scale-y", 0.6 + Math.random() * 1);
+        drop.style.opacity = 0.65 + Math.random() * 0.25;
+        drop.style.background = `radial-gradient(circle at 40% 30%, ${light}, ${dark})`;
         drop.style.animationDuration = 3 + Math.random() * 4 + "s";
         document.body.appendChild(drop);
         setTimeout(() => drop.remove(), 8000);
       }
-      setInterval(spawnDrop, 550);
+      setInterval(spawnDrop, 500);
 
       /* === Роулетка === */
       const outcomes = [
@@ -270,7 +265,7 @@
         setTimeout(() => resultEl.classList.remove("flash"), 400);
       });
 
-      /* === Таймер переадресации (70 cек) + визуальный отсчёт === */
+      /* === Таймер переадресации (60 сек) + визуальный отсчёт === */
       let countdown = 60;
       const timer = setInterval(() => {
         countdown--;
