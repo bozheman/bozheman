@@ -5,15 +5,14 @@
 /* ---------- Переменные (цвета, шрифты, размеры) ---------- */
 :root {
   /* Основные цвета */
-  --clr-bg: #000000;         /* глубоко-чёрный фон */
-  --clr-text: #e52a2a;       /* ярко-красный текст */
-  --clr-accent: #900000;     /* тёмно-красный акцент */
-  --clr-border: #e52a2a;     /* красная граница */
-  --clr-surface: #1c1c1c;    /* тёмно-серый фон карточек */
-  --clr-highlight: #ff0000;  /* ярко-красный для выделения */
-  --clr-green: #008000;      /* для «0» */
-  --clr-white: #f0f0f0;      /* для шарика */
-  --clr-black: #000000;      /* для чёрных секторов */
+  --clr-bg: #000000;
+  --clr-text: #e52a2a;
+  --clr-accent: #900000;
+  --clr-border: #e52a2a;
+  --clr-surface: #1c1c1c;
+  --clr-highlight: #ff0000;
+  --clr-white: #f0f0f0;
+  --clr-black: #000000;
 
   /* Шрифт и переходы */
   --font-main: "Fira Code", monospace;
@@ -41,10 +40,6 @@ body {
   min-height: 100vh;
   padding: 1rem;
   overflow-x: hidden;
-}
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 /* ---------- HEADER (Top Bar) ---------- */
@@ -89,13 +84,12 @@ a {
   }
 }
 
-/* ---------- Wheel Container (PNG) ---------- */
+/* ---------- Wheel Container (с PNG-изображением) ---------- */
 .wheel-container {
   position: relative;
   width: 300px;
   height: 300px;
   margin: 0 auto;
-  overflow: visible;
 }
 @media (min-width: 800px) {
   .wheel-container {
@@ -104,7 +98,7 @@ a {
   }
 }
 
-/* PNG-картинка колеса */
+/* PNG-колесо (все цифры уже на картинке) */
 .wheel-image {
   width: 100%;
   height: 100%;
@@ -149,19 +143,6 @@ a {
   }
 }
 
-/* Числа поверх колеса (добавляются JS). Все они абсолютно позиционированы: */
-.wheel-number {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-origin: center center;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
-  color: #fff; /* Цвет переопределяется JS в зависимости от сектора */
-  pointer-events: none;
-}
-
 /* ---------- Bet Board (Таблица ставок) ---------- */
 .bet-board {
   background: var(--clr-surface);
@@ -173,13 +154,11 @@ a {
   max-width: 300px;
   gap: 0.4rem;
 
-  /* Сетка для 3-колоночного расположения:
-     12 строк по 3 колонки для чисел 1–36, число «0» будет первой ячейкой (grid-row:1 / grid-column:1).
-     Далее: 3 ячейки «1st12», «2nd12», «3rd12» (каждая span 3), затем 6 ячеек нижнего ряда (span 1). */
+  /* Сетка: 3 колонки для чисел, затем специальные ячейки span 3 и span 1 (нижний ряд) */
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* Обычные ячейки чисел */
+/* Обычные ячейки (числа) */
 .bet-cell {
   background: #222;
   color: #fff;
@@ -201,21 +180,9 @@ a {
   color: #000;
 }
 
-/* Специальное окрашивание для числа «0» */
-.bet-cell[data-choice="0"] {
-  background: var(--clr-green);
-  color: #000;
-}
+/* Для отдельных типов ячеек (CSS-классы будут устанавливаться JS через data-choice) */
 
-/* Чёрно/красные ячейки */
-.bet-cell[data-choice="red"] {
-  background: var(--clr-red);
-}
-.bet-cell[data-choice="black"] {
-  background: var(--clr-black);
-}
-
-/* Специальные ячейки «1st12», «2nd12», «3rd12» */
+/* Дюжины (span 3) */
 .bet-cell[data-choice="1st12"],
 .bet-cell[data-choice="2nd12"],
 .bet-cell[data-choice="3rd12"] {
@@ -225,20 +192,33 @@ a {
   font-weight: 700;
 }
 
-/* Нижний ряд: «1to18», «even», «redbottom», «blackbottom», «odd», «19to36» */
+/* Нижний ряд (span 1) */
 .bet-cell[data-choice="1to18"],
 .bet-cell[data-choice="even"],
 .bet-cell[data-choice="redbottom"],
 .bet-cell[data-choice="blackbottom"],
 .bet-cell[data-choice="odd"],
 .bet-cell[data-choice="19to36"] {
-  grid-column: span 1;
   background: #333;
   font-size: 0.9rem;
   font-weight: 700;
 }
 
-/* Mini-chip (показывает сумму ставки) */
+/* Цветовые обозначения: */
+.bet-cell[data-choice="0"] {
+  background: var(--clr-green);
+  color: #000;
+}
+
+/* Нижний «RED» и «BLACK» */
+.bet-cell[data-choice="redbottom"] {
+  background: var(--clr-red);
+}
+.bet-cell[data-choice="blackbottom"] {
+  background: var(--clr-black);
+}
+
+/* Mini-chip (вставляется JS внутрь ячейки) */
 .mini-chip {
   position: absolute;
   bottom: 4px;
@@ -383,7 +363,7 @@ a {
 }
 
 /* ---------- Animations ---------- */
-/* Указатель мигает во время вращения */
+/* Указатель мигает (blink) во время вращения */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

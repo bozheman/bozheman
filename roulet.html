@@ -11,10 +11,9 @@
     rel="stylesheet"
   />
 
-  <!-- Стили для рулетки -->
+  <!-- Стили рулетки -->
   <link rel="stylesheet" href="roulette.css" />
 </head>
-
 <body>
   <!-- ================= HEADER (Top Bar) ================= -->
   <header class="top-bar" role="banner">
@@ -26,25 +25,25 @@
 
   <!-- ================= MAIN LAYOUT ================= -->
   <main class="layout">
-    <!-- ===== LEFT: Wheel Area (PNG-колесо) ===== -->
+    <!-- ===== LEFT: Wheel Area (PNG-изображение) ===== -->
     <section class="wheel-container" aria-label="Рулетка">
-      <!-- Позиционный указатель -->
+      <!-- Указатель (pointer) -->
       <div class="pointer" id="pointer" aria-hidden="true"></div>
-      <!-- PNG-картинка колеса -->
+      <!-- Картинка колеса со всеми цифрами (wheel.png) -->
       <img
         src="wheel.png"
         alt="Рулетка"
         class="wheel-image"
         id="wheel"
       />
-      <!-- Мячик -->
+      <!-- Шарик, который крутится в той же плоскости -->
       <div class="ball" id="ball" aria-hidden="true"></div>
-      <!-- Числа поверх колеса (добавляются JS) -->
+      <!-- Больше ничего сюда не добавляется: цифр поверх не рисуем! -->
     </section>
 
     <!-- ===== RIGHT: Bet Board ===== -->
     <aside class="bet-board" id="bet-board" aria-label="Таблица ставок">
-      <!-- JS динамически создаст все ячейки -->
+      <!-- JS динамически сформирует структуру -->
     </aside>
   </main>
 
@@ -74,7 +73,7 @@
   <!-- ================= HISTORY LOG ================= -->
   <section id="history-log" class="history" aria-label="История результатов"></section>
 
-  <!-- ================= JavaScript логика ================= -->
+  <!-- ================= JavaScript (логика) ================= -->
   <script src="roulette.js"></script>
 </body>
 </html>

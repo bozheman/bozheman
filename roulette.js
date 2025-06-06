@@ -5,12 +5,12 @@
   let currentRotation = 0;
   let spinCount = 0;
   const history = [];
-  let selectedChip = 1; // текущий номинал фишки
+  let selectedChip = 1; // номинал фишки
   let placedBet = null; // { choice, amount }
 
   /* ========= HTML REFERENCES ========= */
   const balanceSpan = document.getElementById("balance");
-  const wheelImage = document.getElementById("wheel");
+  const wheelImage = document.getElementById("wheel"); // <img src="wheel.png">
   const ball = document.getElementById("ball");
   const pointer = document.getElementById("pointer");
   const msgBox = document.getElementById("message");
@@ -22,17 +22,17 @@
 
   /* ========= ИНИЦИАЛИЗАЦИЯ ========= */
   updateBalance();
-  buildWheelNumbers();
   buildBetBoard();
   initChips();
   spinBtn.addEventListener("click", spin);
 
   /* ========= ФУНКЦИИ ========= */
 
-  // Обновляет баланс в DOM и localStorage
+  // Обновление баланса в DOM и localStorage
   function updateBalance() {
     balanceSpan.textContent = balance;
     localStorage.setItem("bman_balance", balance);
+
     if (balance >= 1000) buyAccessBtn.style.display = "inline-block";
     else buyAccessBtn.style.display = "none";
 
@@ -44,38 +44,10 @@
     }
   }
 
-  // Строим «цифры» поверх колеса (JS)
-  function buildWheelNumbers() {
-    const sectorCount = 37;
-    const sectorAngle = 360 / sectorCount;
-    const numbers = Array.from({ length: sectorCount }, (_, i) => i);
-    const colors = [
-      "green",
-      ...numbers.slice(1).map((n) => (n % 2 === 0 ? "black" : "red")),
-    ];
-
-    numbers.forEach((num, i) => {
-      const label = document.createElement("div");
-      label.className = "wheel-number";
-      label.textContent = num;
-      // Каждое число: сначала поворот самой цифры на угол i * sectorAngle,
-      // затем сдвиг от центра на радиус (140px), и поворот обратно, чтобы текст был горизонтальным.
-      label.style.color =
-        colors[i] === "green" ? "var(--clr-green)" : colors[i];
-      label.style.transform = `
-        translate(-50%, -50%)
-        rotate(${i * sectorAngle}deg)
-        translateY(-140px)
-        rotate(-${i * sectorAngle}deg)
-      `;
-      document.querySelector(".wheel-container").appendChild(label);
-    });
-  }
-
-  // Строим «таблицу ставок» (числа и специальные ячейки)
+  // Строим таблицу ставок (числа + дюжины + нижний ряд)
   function buildBetBoard() {
     // 1) Числа 0…36
-    const numbers = [...Array(37).keys()];
+    const numbers = [...Array(37).keys()]; // [0, 1, 2, …, 36]
     numbers.forEach((n) => {
       const cell = document.createElement("div");
       cell.className = "bet-cell";
@@ -84,7 +56,7 @@
       betBoard.appendChild(cell);
     });
 
-    // 2) «1st12», «2nd12», «3rd12» (span 3)
+    // 2) Дюжины (span=3)
     ["1st12", "2nd12", "3rd12"].forEach((label) => {
       const cell = document.createElement("div");
       cell.className = "bet-cell";
@@ -94,7 +66,7 @@
       betBoard.appendChild(cell);
     });
 
-    // 3) Нижний ряд: «1 to 18», «EVEN», «RED», «BLACK», «ODD», «19 to 36»
+    // 3) Нижний ряд «1to18», «even», «redbottom», «blackbottom», «odd», «19to36»
     const bottom = [
       { choice: "1to18", label: "1 to 18" },
       { choice: "even", label: "EVEN" },
@@ -111,7 +83,7 @@
       betBoard.appendChild(cell);
     });
 
-    // Клик на cell → placeBet
+    // Навешиваем клик на все ячейки ставок
     betBoard.addEventListener("click", (e) => {
       const cell = e.target.closest(".bet-cell");
       if (!cell) return;
@@ -119,7 +91,7 @@
     });
   }
 
-  // Инициализация фишек (номиналы) и клики по ним
+  // Инициализация фишек (номиналы) и выбор номинала
   function initChips() {
     document.querySelectorAll(".chip").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -130,11 +102,11 @@
         selectedChip = parseInt(btn.dataset.value, 10);
       });
     });
-    // По умолчанию выставляем фишку «1»
+    // Автоматически активируем фишку “1”
     document.querySelector('.chip[data-value="1"]').classList.add("active");
   }
 
-  // Выбор ставки (ячейка)
+  // Функция: пользователь выбирает ячейку (ставку)
   function placeBet(cell) {
     if (isSpinning) return;
 
@@ -144,16 +116,18 @@
       return;
     }
 
-    // Сброс предыдущей ставки
+    // Сбрасываем предыдущую ставку
     resetBoard();
 
     cell.classList.add("chosen");
     placedBet = { choice, amount: selectedChip };
+
+    // Вставляем mini-chip внутрь ячейки и делаем текст выделенным
     cell.innerHTML = `<strong>${cell.textContent}</strong><span class="mini-chip">${selectedChip}</span>`;
     msgBox.textContent = `Ставка: ${selectedChip} BMAN на ${cell.textContent}`;
   }
 
-  // Сброс всех ячеек ставок
+  // Сброс всех ячеек (стираем .chosen и мини-фишки)
   function resetBoard() {
     document.querySelectorAll(".bet-cell").forEach((c) => {
       c.classList.remove("chosen");
@@ -162,7 +136,7 @@
     placedBet = null;
   }
 
-  // Запуск вращения
+  // Основная функция: запуск спина
   function spin() {
     if (isSpinning) return;
     if (!placedBet) {
@@ -176,7 +150,7 @@
       return;
     }
 
-    // Снимаем ставку с баланса
+    // Снимаем с баланса ставку
     balance -= amount;
     updateBalance();
     isSpinning = true;
@@ -184,11 +158,11 @@
     resultBox.textContent = "";
     msgBox.textContent = "Крутится...";
 
-    // Генерируем случайное число 0…36
+    // Генерируем результат 0..36
     const resultNum = Math.floor(Math.random() * 37);
     animateWheel(resultNum);
 
-    // По окончании анимации (~6.2 секунды) рассчитываем результат
+    // По завершении анимации (~6.2 сек) вычисляем итог
     setTimeout(() => {
       const color =
         resultNum === 0
@@ -214,10 +188,10 @@
     }, 6200);
   }
 
-  // Расчет выплаты (win):
+  // Расчёт выигрыша в зависимости от типа ставки
   // — 36×, если ставка на точное число
-  // — 3×, если дюжина (1st12/2nd12/3rd12)
-  // — 2×, если половина (1to18/19to36, even/odd, red/black)
+  // — 3×, если ставка «1st12», «2nd12», «3rd12»
+  // — 2×, если ставка «1to18», «19to36», «even», «odd», «redbottom», «blackbottom»
   function evaluateBet(choice, bet, num, color) {
     let payout = 0;
     if (choice === "redbottom" && color === "red") payout = bet * 2;
@@ -233,7 +207,7 @@
     return payout;
   }
 
-  // Запись истории (последние 5 результатов)
+  // Логирование истории: сохраняем максимум 5 записей
   function logHistory(num, color, win, bet) {
     const sign = win > 0 ? `+${win}` : `-${bet}`;
     const entry = `#${spinCount}: ${num} (${color.toUpperCase()}) — ${sign} BMAN`;
@@ -248,7 +222,7 @@
     const sectorAngle = 360 / sectorCount;
     const extraSpins = 8 * 360; // 8 полных оборотов
 
-    // Итоговый угол, чтобы сектор resultNum оказался под указателем
+    // Окончательный угол, чтобы нужный сектор оказался под указателем
     const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2) % 360;
     currentRotation = (currentRotation + extraSpins + stopAngle) % 360;
 
@@ -256,7 +230,7 @@
     wheelImage.style.transition = "transform 6s cubic-bezier(0.33,1,0.68,1)";
     wheelImage.style.transform = `rotate(${currentRotation}deg)`;
 
-    // Шарик вращается в противоположную сторону по окружности
+    // Шарик крутится в противоположную сторону по кругу
     ball.style.transition = "transform 6s linear";
     ball.style.transform = `rotate(${-currentRotation}deg) translateY(-120px)`;
 
