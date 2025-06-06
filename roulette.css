@@ -107,16 +107,17 @@ body {
   display: block;
 }
 
-/* Указатель */
+/* Указатель (pointer): более узкий и направлен вниз */
 .pointer {
   position: absolute;
   top: -10px;
   left: 50%;
   width: 0;
   height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-bottom: 25px solid var(--clr-highlight);
+  /* делаем треугольник с помощью border-top, чтобы он указывал вниз */
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 20px solid var(--clr-highlight);
   transform: translateX(-50%);
   z-index: 2;
 }
@@ -186,7 +187,8 @@ body {
   color: #000;
 }
 .bet-cell[data-choice="redbottom"] {
-  background: var(--clr-red);
+  background: var(--clr-highlight);
+  color: #000;
 }
 .bet-cell[data-choice="blackbottom"] {
   background: var(--clr-black);
@@ -325,21 +327,9 @@ body {
     height: 250px;
   }
   .pointer {
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid var(--clr-highlight);
-  }
-  .ball {
-    display: none; /* скрываем шарик */
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 16px solid var(--clr-highlight);
   }
 }
-
-/* ---------- Animations ---------- */
-/* Указатель мигает (blink) во время вращения */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-.pointer.spinning {
-  animation: blink 1s infinite;
-}
+*/
