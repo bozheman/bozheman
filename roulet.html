@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,8 +15,8 @@
 
   <!-- ===== MAIN LAYOUT ===== -->
   <div class="layout">
-    <!-- WHEEL AREA -->
-    <div class="wheel-wrapper">
+    <!-- WHEEL & POINTER -->
+    <div class="wheel-container">
       <div class="pointer"></div>
       <div class="wheel" id="wheel"></div>
       <div class="ball" id="ball"></div>
@@ -30,17 +30,17 @@
   <div class="result-block">
     <div id="result-display" class="number-display"></div>
     <div id="message" class="message"></div>
-    <button id="buy-access" onclick="window.location.href='https://t.me/bozheman';">💎 КУПИТЬ ПРОХОД</button>
+    <button id="buy-access" class="buy-access" onclick="window.location.href='https://t.me/bozheman';">💎 КУПИТЬ ПРОХОД</button>
   </div>
 
   <!-- CHIP ROW + SPIN BUTTON -->
   <div class="controls">
     <div class="chip-row">
-      <button class="chip" data-n="1">1</button>
-      <button class="chip" data-n="5">5</button>
-      <button class="chip" data-n="10">10</button>
-      <button class="chip" data-n="50">50</button>
-      <button class="chip" data-n="250">250</button>
+      <button class="chip" data-value="1">1</button>
+      <button class="chip" data-value="5">5</button>
+      <button class="chip" data-value="10">10</button>
+      <button class="chip" data-value="50">50</button>
+      <button class="chip" data-value="250">250</button>
     </div>
     <button id="spin-btn" class="spin-btn">🎰 Крутить</button>
   </div>
@@ -48,18 +48,16 @@
   <!-- HISTORY LOG -->
   <div id="history-log" class="history"></div>
 
-  <!-- MODALS (reward / phrase) --><!-- (от предыдущих версий) -->
-
   <script>
   (function(){
     /* ---------------- STATE ---------------- */
-    let balance = 10;
+    let balance = parseInt(localStorage.getItem('bman_balance')) || 100; // стартовый баланс
     let isSpinning = false;
     let currentRotation = 0;
     let spinCount = 0;
     const history = [];
-
     let selectedChip = 1; // default chip value
+    let placedBet = null; // {choice, amount}
 
     /* -------------- HTML REFS -------------- */
     const balanceSpan = document.getElementById('balance');
@@ -85,140 +83,131 @@
 
     function buildWheelNumbers(){
       const numbers = Array.from({length:37},(_,i)=>i);
-      const colors = ['green', ...numbers.slice(1).map(n=>n%2===0?'black':'red')];
+      const colors = ['green', ...numbers.slice(1).map(n => n % 2 === 0 ? 'black' : 'red')];
       numbers.forEach((num,i)=>{
-        const d=document.createElement('div');
-        d.className='wheel-number';
-        d.textContent=num;
-        d.style.transform=`rotate(${i*(360/37)}deg) translateY(-140px)`;
-        d.style.color=colors[i];
-        wheel.appendChild(d);
+        const slice = document.createElement('div');
+        slice.className = 'wheel-number';
+        slice.textContent = num;
+        slice.style.transform = `rotate(${i*(360/37)}deg) translateY(-130px)`;
+        slice.style.color = colors[i];
+        wheel.appendChild(slice);
       });
     }
 
     function buildBetBoard(){
       const board = document.getElementById('bet-board');
-      // grid template already in CSS
-      const cells=[...Array(37).keys()]; // 0-36
-      cells.forEach(n=>{
-        const cell=document.createElement('div');
-        cell.className='bet-cell';
-        cell.dataset.choice=n.toString();
-        cell.textContent=n;
+      const numbers = [...Array(37).keys()]; // 0-36
+      numbers.forEach(n=>{
+        const cell = document.createElement('div');
+        cell.className = 'bet-cell';
+        cell.dataset.choice = n;
+        cell.textContent = n;
         board.appendChild(cell);
       });
-      // special cells
-      ['red','black','even','odd'].forEach(id=>{
-        const cell=document.createElement('div');
-        cell.className='bet-cell special';
-        cell.dataset.choice=id[0]; // r / b / e / o but we map later
-        cell.textContent=id.toUpperCase();
+      ['red','black','even','odd'].forEach(type=>{
+        const cell = document.createElement('div');
+        cell.className = 'bet-cell special';
+        cell.dataset.choice = type;
+        cell.textContent = type.toUpperCase();
         board.appendChild(cell);
       });
-      board.addEventListener('click',e=>{
-        const target=e.target.closest('.bet-cell');
-        if(!target) return;
-        placeMiniChip(target);
+      board.addEventListener('click', e=>{
+        const cell = e.target.closest('.bet-cell');
+        if(!cell) return;
+        placeBet(cell);
       });
     }
 
     function initChips(){
       document.querySelectorAll('.chip').forEach(btn=>{
-        btn.addEventListener('click',()=>{
+        btn.addEventListener('click', ()=>{
           document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
           btn.classList.add('active');
-          selectedChip=parseInt(btn.dataset.n);
+          selectedChip = parseInt(btn.dataset.value);
         });
       });
-      // activate first chip
-      document.querySelector('.chip[data-n="1"]').classList.add('active');
+      document.querySelector('.chip[data-value="1"]').classList.add('active');
     }
 
-    function placeMiniChip(cell){
+    function placeBet(cell){
+      if(isSpinning) return;
       const choice = cell.dataset.choice;
-      // toggle highlight
+      if(balance < selectedChip){ msgBox.textContent = 'Недостаточно BMAN'; return; }
+      resetBoard();
       cell.classList.add('chosen');
-      cell.dataset.bet = selectedChip; // store bet amount per cell
-      cell.innerHTML = `<span>${choice}</span><div class="mini-chip">${selectedChip}</div>`;
-      cell.dataset.choice = choice; // restore text inside span
-      // store choice globally (we allow one active choice at a time)
+      placedBet = { choice, amount: selectedChip };
+      cell.innerHTML = `<strong>${choice}</strong><span class="mini-chip">${selectedChip}</span>`;
+      msgBox.textContent = `Ставка: ${selectedChip} BMAN на ${choice}`;
+    }
+
+    function resetBoard(){
       document.querySelectorAll('.bet-cell').forEach(c=>{
-        if(c!==cell){ c.classList.remove('chosen'); delete c.dataset.bet; c.querySelector('.mini-chip')&&c.querySelector('.mini-chip').remove(); }
+        c.classList.remove('chosen');
+        c.innerHTML = c.dataset.choice.toUpperCase();
       });
-      resultBox.textContent='';
-      msgBox.textContent='Ставка: '+selectedChip+' на '+choice;
+      placedBet = null;
     }
 
     function spin(){
       if(isSpinning) return;
-      // get active bet cell
-      const active=document.querySelector('.bet-cell.chosen');
-      if(!active){ msgBox.textContent='Сначала выберите ставку!'; return; }
-      const betAmount=parseInt(active.dataset.bet||0);
-      const choiceRaw = active.dataset.choice;
-      if(betAmount>balance){ msgBox.textContent='У вас недостаточно BMAN'; return; }
+      if(!placedBet){ msgBox.textContent = 'Выберите ставку!'; return; }
+      const { choice, amount } = placedBet;
+      if(amount > balance){ msgBox.textContent = 'Недостаточно BMAN'; return; }
 
-      /* ----- proceed ----- */
-      balance -= betAmount;
+      balance -= amount;
       updateBalance();
-      isSpinning=true; spinCount++;
-      // random outcome
-      const resultNum=Math.floor(Math.random()*37);
+      isSpinning = true;
+      spinCount++;
+      resultBox.textContent = '';
+      msgBox.textContent = 'Крутится...';
+
+      const resultNum = Math.floor(Math.random() * 37);
       animateWheel(resultNum);
 
       setTimeout(()=>{
-        const color = resultNum===0?'green': (resultNum%2===0?'black':'red');
-        resultBox.textContent=`Выпало: ${resultNum} (${color})`;
-        const choice = normalizeChoice(choiceRaw);
-        let win=0;
-        if(matchBet(choice, resultNum, color)){
-          win = payoff(choice, betAmount);
+        const color = resultNum === 0 ? 'green' : (resultNum % 2 === 0 ? 'black' : 'red');
+        resultBox.textContent = `Выпало: ${resultNum} (${color.toUpperCase()})`;
+        const win = evaluateBet(choice, amount, resultNum, color);
+        if(win > 0){
+          balance += win;
+          msgBox.textContent = `Поздравляем! Вы выиграли ${win} BMAN!`;
+        } else {
+          msgBox.textContent = 'Увы, вы проиграли.';
         }
-        if(win>0){
-          balance+=win; msgBox.textContent=`Ты выиграл ${win} BMAN!`;
-        } else { msgBox.textContent='Ты проиграл. Попробуй снова.'; }
-        logHistory(resultNum,color,win,betAmount);
+        logHistory(resultNum, color, win, amount);
         updateBalance();
-        isSpinning=false;
-      },7000);
+        resetBoard();
+        isSpinning = false;
+      }, 6500);
     }
 
-    /* ---------- Helpers ---------- */
-    function normalizeChoice(raw){
-      if(raw==='e')return 'xx'; // even
-      if(raw==='o')return 'x';  // odd
-      return raw;
-    }
-    function matchBet(choice,num,color){
-      switch(choice){
-        case 'b': return color==='black';
-        case 'r': return color==='red';
-        case 'g': return num===0;
-        case 'x': return num%2===1;
-        case 'xx':return num!==0&&num%2===0;
-        default:  return parseInt(choice)===num;
-      }
-    }
-    function payoff(choice,bet){
-      return ['g'].includes(choice)?bet*14 : ['b','r','x','xx','e','o'].includes(choice)?bet*2 : bet*36;
-    }
-    function logHistory(num,color,win,bet){
-      const log=`#${spinCount}: ${num} (${color}) — ${win>0?'+ '+win:'- '+bet} BMAN`;
-      history.unshift(log); if(history.length>10)history.pop();
-      historyLog.innerHTML=history.map(h=>`<div>${h}</div>`).join('');
+    function evaluateBet(choice, bet, num, color){
+      let payout = 0;
+      if(choice === 'red' && color === 'red') payout = bet * 2;
+      else if(choice === 'black' && color === 'black') payout = bet * 2;
+      else if(choice === 'even' && num !== 0 && num % 2 === 0) payout = bet * 2;
+      else if(choice === 'odd' && num % 2 === 1) payout = bet * 2;
+      else if(parseInt(choice) === num) payout = bet * 36;
+      return payout;
     }
 
-    /* ---------- Wheel + ball animation ---------- */
+    function logHistory(num, color, win, bet){
+      const sign = win > 0 ? '+' + win : '-' + bet;
+      const entry = `#${spinCount}: ${num} (${color.toUpperCase()}) — ${sign} BMAN`;
+      history.unshift(entry);
+      if(history.length > 5) history.pop();
+      historyLog.innerHTML = history.map(h => `<div>${h}</div>`).join('');
+    }
+
     function animateWheel(resultNum){
-      const sectorAngle=360/37;
-      const additionalRot=10*360;
-      const stopAngle = (360 - resultNum*sectorAngle + sectorAngle/2);
-      currentRotation += additionalRot + stopAngle;
-      wheel.style.transition='transform 7s cubic-bezier(0.25,0.1,0.25,1)';
-      wheel.style.transform=`rotate(${currentRotation}deg)`;
-      // ball opposite dir
-      ball.style.transition='transform 7s cubic-bezier(0.25,0.1,0.25,1)';
-      ball.style.transform=`rotate(${-currentRotation}deg)`;
+      const sectorAngle = 360 / 37;
+      const extraSpins = 8 * 360;
+      const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2) % 360;
+      currentRotation = (currentRotation + extraSpins + stopAngle) % 360;
+      wheel.style.transition = 'transform 6s cubic-bezier(0.33, 1, 0.68, 1)';
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+      ball.style.transition = 'transform 6s linear';
+      ball.style.transform = `rotate(${-currentRotation}deg) translateY(-120px)`;
     }
 
   })();
