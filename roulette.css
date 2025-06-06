@@ -121,30 +121,6 @@ body {
   z-index: 2;
 }
 
-/* Мячик (уменьшили размер) */
-.ball {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;   /* было 18px */
-  height: 12px;  /* было 18px */
-  background: var(--clr-white);
-  border: 2px solid var(--clr-accent); /* чуть потоньше */
-  border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(0deg) translateY(-100px);
-  /* сместили на 100px вместо 110, чтобы подогнать изображение */
-  transition: transform 0.25s linear; /* плавность, но ускорили */
-  z-index: 1;
-}
-@media (min-width: 800px) {
-  .ball {
-    width: 16px;    /* было 22px */
-    height: 16px;   /* было 22px */
-    transform: translate(-50%, -50%) rotate(0deg) translateY(-120px);
-    /* смещено на 120px вместо 130px */
-  }
-}
-
 /* ---------- Bet Board (Таблица ставок) ---------- */
 .bet-board {
   background: var(--clr-surface);
@@ -354,9 +330,7 @@ body {
     border-bottom: 20px solid var(--clr-highlight);
   }
   .ball {
-    width: 12px;   /* уменьшенный к 12px на мобильном */
-    height: 12px;  /* соответственно */
-    transform: translate(-50%, -50%) rotate(0deg) translateY(-75px);
+    display: none; /* скрываем шарик */
   }
 }
 

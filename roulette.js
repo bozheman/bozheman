@@ -8,10 +8,16 @@
   let selectedChip = 1; // номинал фишки
   let placedBet = null; // { choice, amount }
 
+  // Последовательность чисел на колесе по часовой стрелке, начиная с 0 сверху
+  const sectors = [
+    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8,
+    23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12,
+    35, 3, 26
+  ];
+
   /* ========= HTML REFERENCES ========= */
   const balanceSpan = document.getElementById("balance");
-  const wheelImage = document.getElementById("wheel"); // <img src="wheel.png">
-  const ball = document.getElementById("ball");
+  const wheelImage = document.getElementById("wheel");
   const pointer = document.getElementById("pointer");
   const msgBox = document.getElementById("message");
   const resultBox = document.getElementById("result-display");
@@ -28,7 +34,6 @@
 
   /* ========= ФУНКЦИИ ========= */
 
-  // Обновление баланса в DOM и localStorage
   function updateBalance() {
     balanceSpan.textContent = balance;
     localStorage.setItem("bman_balance", balance);
@@ -44,10 +49,8 @@
     }
   }
 
-  // Строим таблицу ставок (числа + дюжины + нижний ряд)
   function buildBetBoard() {
-    // 1) Числа 0…36
-    const numbers = [...Array(37).keys()]; // [0, 1, 2, …, 36]
+    const numbers = [...Array(37).keys()];
     numbers.forEach((n) => {
       const cell = document.createElement("div");
       cell.className = "bet-cell";
@@ -56,7 +59,6 @@
       betBoard.appendChild(cell);
     });
 
-    // 2) Дюжины (span=3)
     ["1st12", "2nd12", "3rd12"].forEach((label) => {
       const cell = document.createElement("div");
       cell.className = "bet-cell";
@@ -66,7 +68,6 @@
       betBoard.appendChild(cell);
     });
 
-    // 3) Нижний ряд «1to18», «even», «redbottom», «blackbottom», «odd», «19to36»
     const bottom = [
       { choice: "1to18", label: "1 to 18" },
       { choice: "even", label: "EVEN" },
@@ -83,7 +84,6 @@
       betBoard.appendChild(cell);
     });
 
-    // Навешиваем клик на все ячейки ставок
     betBoard.addEventListener("click", (e) => {
       const cell = e.target.closest(".bet-cell");
       if (!cell) return;
@@ -91,66 +91,50 @@
     });
   }
 
-  // Инициализация фишек (номиналы) и выбор номинала
   function initChips() {
     document.querySelectorAll(".chip").forEach((btn) => {
       btn.addEventListener("click", () => {
-        document
-          .querySelectorAll(".chip")
-          .forEach((c) => c.classList.remove("active"));
+        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
         btn.classList.add("active");
         selectedChip = parseInt(btn.dataset.value, 10);
       });
     });
-    // Автоматически активируем фишку “1”
     document.querySelector('.chip[data-value="1"]').classList.add("active");
   }
 
-  // Функция: пользователь выбирает ячейку (ставку)
   function placeBet(cell) {
     if (isSpinning) return;
-
     const choice = cell.dataset.choice;
     if (balance < selectedChip) {
       msgBox.textContent = "Недостаточно BMAN";
       return;
     }
-
-    // Сбрасываем предыдущую ставку
     resetBoard();
-
     cell.classList.add("chosen");
     placedBet = { choice, amount: selectedChip };
-
-    // Вставляем mini-chip внутрь ячейки и делаем текст выделенным
     cell.innerHTML = `<strong>${cell.textContent}</strong><span class="mini-chip">${selectedChip}</span>`;
     msgBox.textContent = `Ставка: ${selectedChip} BMAN на ${cell.textContent}`;
   }
 
-  // Сброс всех ячеек (стираем .chosen и мини-фишки)
   function resetBoard() {
     document.querySelectorAll(".bet-cell").forEach((c) => {
       c.classList.remove("chosen");
-      c.innerHTML = c.dataset.choice.toUpperCase();
+      c.innerHTML = c.dataset.choice.toString().toUpperCase();
     });
     placedBet = null;
   }
 
-  // Основная функция: запуск спина
   function spin() {
     if (isSpinning) return;
     if (!placedBet) {
       msgBox.textContent = "Выберите ставку!";
       return;
     }
-
     const { choice, amount } = placedBet;
     if (amount > balance) {
       msgBox.textContent = "Недостаточно BMAN";
       return;
     }
-
-    // Снимаем с баланса ставку
     balance -= amount;
     updateBalance();
     isSpinning = true;
@@ -158,29 +142,24 @@
     resultBox.textContent = "";
     msgBox.textContent = "Крутится...";
 
-    // Генерируем результат 0..36
-    const resultNum = Math.floor(Math.random() * 37);
+    const resultNum = sectors[Math.floor(Math.random() * sectors.length)];
     animateWheel(resultNum);
 
-    // По завершении анимации (~6.2 сек) вычисляем итог
     setTimeout(() => {
       const color =
         resultNum === 0
           ? "green"
-          : resultNum % 2 === 0
-          ? "black"
-          : "red";
-
+          : [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3].includes(resultNum)
+          ? "red"
+          : "black";
       resultBox.textContent = `Выпало: ${resultNum} (${color.toUpperCase()})`;
       const win = evaluateBet(choice, amount, resultNum, color);
-
       if (win > 0) {
         balance += win;
         msgBox.textContent = `Поздравляем! Вы выиграли ${win} BMAN!`;
       } else {
         msgBox.textContent = "Увы, вы проиграли.";
       }
-
       logHistory(resultNum, color, win, amount);
       updateBalance();
       resetBoard();
@@ -188,10 +167,6 @@
     }, 6200);
   }
 
-  // Расчёт выигрыша в зависимости от типа ставки
-  // — 36×, если ставка на точное число
-  // — 3×, если ставка «1st12», «2nd12», «3rd12»
-  // — 2×, если ставка «1to18», «19to36», «even», «odd», «redbottom», «blackbottom»
   function evaluateBet(choice, bet, num, color) {
     let payout = 0;
     if (choice === "redbottom" && color === "red") payout = bet * 2;
@@ -207,7 +182,6 @@
     return payout;
   }
 
-  // Логирование истории: сохраняем максимум 5 записей
   function logHistory(num, color, win, bet) {
     const sign = win > 0 ? `+${win}` : `-${bet}`;
     const entry = `#${spinCount}: ${num} (${color.toUpperCase()}) — ${sign} BMAN`;
@@ -216,25 +190,18 @@
     historyLog.innerHTML = history.map((h) => `<div>${h}</div>`).join("");
   }
 
-  // Анимация вращения колеса и шарика
   function animateWheel(resultNum) {
-    const sectorCount = 37;
+    const sectorCount = sectors.length;
     const sectorAngle = 360 / sectorCount;
-    const extraSpins = 8 * 360; // 8 полных оборотов
-
-    // Окончательный угол, чтобы нужный сектор оказался под указателем
-    const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2) % 360;
+    const index = sectors.indexOf(resultNum);
+    const extraSpins = 8 * 360;
+    // Угол для выбранного сектора: сверху 0 => pointer показывает на сектор под углом 0, поэтому вычисляем смещение
+    const stopAngle = (360 - index * sectorAngle - sectorAngle / 2 + 360) % 360;
     currentRotation = (currentRotation + extraSpins + stopAngle) % 360;
 
-    // Поворачиваем <img> колеса
     wheelImage.style.transition = "transform 6s cubic-bezier(0.33,1,0.68,1)";
     wheelImage.style.transform = `rotate(${currentRotation}deg)`;
 
-    // Шарик крутится в противоположную сторону по кругу
-    ball.style.transition = "transform 6s linear";
-    ball.style.transform = `rotate(${-currentRotation}deg) translateY(-120px)`;
-
-    // Указатель мигает
     pointer.classList.add("spinning");
     setTimeout(() => pointer.classList.remove("spinning"), 6200);
   }
