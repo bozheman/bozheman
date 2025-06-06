@@ -103,7 +103,7 @@
 
 
   <script>
-    const dropCount = 6000;
+    const dropCount = 600;
     for (let i = 0; i < dropCount; i++) {
       const drop = document.createElement('div');
       const size = 6 + Math.random() * 18;
@@ -111,8 +111,8 @@
       drop.className = 'realistic-drop';
       drop.style.left = Math.random() * 100 + 'vw';
       drop.style.setProperty('--drop-size', `${size}px`);
-      drop.style.setProperty('--scale-x', `${1 - speedFactor * 0.3}`);
-      drop.style.setProperty('--scale-y', `${1 + speedFactor * 0.7}`);
+      drop.style.setProperty('--scale-x', `${1 - speedFactor * 0.1}`);
+      drop.style.setProperty('--scale-y', `${1 + speedFactor * 0.8}`);
       drop.style.animationDuration = (3 + Math.random() * 3) + 's';
       drop.style.animationDelay = (Math.random() * 10) + 's';
       document.body.appendChild(drop);
@@ -138,7 +138,7 @@
     };
      const audio = document.getElementById("myAudio");
   audio.addEventListener("loadedmetadata", function() {
-    audio.currentTime = 10; // начать с 10-й секунды
+    audio.currentTime = 7; // начать с 7-й секунды
   });
   </script>
 </body>
