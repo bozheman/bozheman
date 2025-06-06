@@ -1,26 +1,25 @@
-/* ============================================
+/* ==============================================
    BOZHEMAN ROULETTE  ‖  Casino Stylesheet
-   ============================================ */
+   ============================================== */
 
-/* ---------- Root & Variables ---------- */
+/* ---------- Переменные (цвета, шрифты, размеры) ---------- */
 :root {
-  /* Цветовая гамма */
-  --clr-bg: #121212;
-  --clr-text: #e52a2a;
-  --clr-accent: #900000;
-  --clr-border: #e52a2a;
-  --clr-surface: #1c1c1c;
-  --clr-highlight: #ff0000;
-  --clr-green: #008000;
-  --clr-black: #000000;
-  --clr-red: #ff0000;
+  /* Основные цвета */
+  --clr-bg: #000000;         /* глубоко-чёрный фон */
+  --clr-text: #e52a2a;       /* ярко-красный текст */
+  --clr-accent: #900000;     /* тёмно-красный акцент */
+  --clr-border: #e52a2a;     /* красная граница */
+  --clr-surface: #1c1c1c;    /* тёмно-серый фон карточек */
+  --clr-highlight: #ff0000;  /* ярко-красный для выделения */
+  --clr-green: #008000;      /* для «0» */
+  --clr-white: #f0f0f0;      /* для шарика */
+  --clr-black: #000000;      /* для чёрных секторов */
 
-  /* Шрифт */
+  /* Шрифт и переходы */
   --font-main: "Fira Code", monospace;
-
-  /* Размеры и переходы */
   --radius: 10px;
   --transition: 0.3s ease;
+  --max-w: 900px;
 }
 
 /* ---------- Reset & Base ---------- */
@@ -43,11 +42,15 @@ body {
   padding: 1rem;
   overflow-x: hidden;
 }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-/* ---------- Header (Top Bar) ---------- */
+/* ---------- HEADER (Top Bar) ---------- */
 .top-bar {
   width: 100%;
-  max-width: 900px;
+  max-width: var(--max-w);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +58,7 @@ body {
   padding: 0.8rem 1rem;
   border: 2px solid var(--clr-border);
   border-radius: var(--radius);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
   margin-bottom: 1.5rem;
 }
 .title {
@@ -64,22 +67,20 @@ body {
 }
 .balance {
   font-size: 1rem;
-  display: flex;
-  align-items: center;
 }
 .balance span {
   font-weight: 700;
   margin-left: 0.3rem;
 }
 
-/* ---------- Main Layout ---------- */
+/* ---------- MAIN LAYOUT ---------- */
 .layout {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
   width: 100%;
-  max-width: 900px;
+  max-width: var(--max-w);
 }
 @media (min-width: 800px) {
   .layout {
@@ -88,18 +89,28 @@ body {
   }
 }
 
-/* ---------- Wheel & Container ---------- */
+/* ---------- Wheel Container (PNG) ---------- */
 .wheel-container {
   position: relative;
   width: 300px;
   height: 300px;
   margin: 0 auto;
+  overflow: visible;
 }
 @media (min-width: 800px) {
   .wheel-container {
     width: 350px;
     height: 350px;
   }
+}
+
+/* PNG-картинка колеса */
+.wheel-image {
+  width: 100%;
+  height: 100%;
+  border: 8px solid var(--clr-border);
+  border-radius: 50%;
+  display: block;
 }
 
 /* Указатель */
@@ -116,98 +127,70 @@ body {
   z-index: 2;
 }
 
-/* Колесо (0 зеленый, 1–36 чередуются ч/к) */
-.wheel {
-  width: 100%;
-  height: 100%;
-  border: 8px solid var(--clr-border);
-  border-radius: 50%;
-  background: conic-gradient(
-    var(--clr-green) 0deg 9.7297deg,
-    var(--clr-black) 9.7297deg 19.4595deg,
-    var(--clr-red) 19.4595deg 29.1892deg,
-    var(--clr-black) 29.1892deg 38.9189deg,
-    var(--clr-red) 38.9189deg 48.6486deg,
-    var(--clr-black) 48.6486deg 58.3784deg,
-    var(--clr-red) 58.3784deg 68.1081deg,
-    var(--clr-black) 68.1081deg 77.8378deg,
-    var(--clr-red) 77.8378deg 87.5676deg,
-    var(--clr-black) 87.5676deg 97.2973deg,
-    var(--clr-red) 97.2973deg 107.027deg,
-    var(--clr-black) 107.027deg 116.757deg,
-    var(--clr-red) 116.757deg 126.486deg,
-    var(--clr-black) 126.486deg 136.216deg,
-    var(--clr-red) 136.216deg 145.946deg,
-    var(--clr-black) 145.946deg 155.676deg,
-    var(--clr-red) 155.676deg 165.405deg,
-    var(--clr-black) 165.405deg 175.135deg,
-    var(--clr-red) 175.135deg 184.865deg,
-    var(--clr-black) 184.865deg 194.595deg,
-    var(--clr-red) 194.595deg 204.324deg,
-    var(--clr-black) 204.324deg 214.054deg,
-    var(--clr-red) 214.054deg 223.784deg,
-    var(--clr-black) 223.784deg 233.514deg,
-    var(--clr-red) 233.514deg 243.243deg,
-    var(--clr-black) 243.243deg 252.973deg,
-    var(--clr-red) 252.973deg 262.703deg,
-    var(--clr-black) 262.703deg 272.432deg,
-    var(--clr-red) 272.432deg 282.162deg,
-    var(--clr-black) 282.162deg 291.892deg,
-    var(--clr-red) 291.892deg 301.622deg,
-    var(--clr-black) 301.622deg 311.351deg,
-    var(--clr-red) 311.351deg 321.081deg,
-    var(--clr-black) 321.081deg 330.811deg,
-    var(--clr-red) 330.811deg 340.541deg,
-    var(--clr-black) 340.541deg 350.27deg,
-    var(--clr-red) 350.27deg 360deg
-  );
-  transform: rotate(0deg);
-  transition: transform var(--transition) ease-out;
-}
-
 /* Мячик */
 .ball {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20px;
-  height: 20px;
-  background: #f0f0f0;
+  width: 18px;
+  height: 18px;
+  background: var(--clr-white);
   border: 3px solid var(--clr-accent);
   border-radius: 50%;
   transform: translate(-50%, -50%) rotate(0deg) translateY(-110px);
   transition: transform var(--transition) linear;
+  z-index: 1;
 }
 @media (min-width: 800px) {
   .ball {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     transform: translate(-50%, -50%) rotate(0deg) translateY(-130px);
   }
 }
 
-/* ---------- Bet Board ---------- */
+/* Числа поверх колеса (добавляются JS). Все они абсолютно позиционированы: */
+.wheel-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  color: #fff; /* Цвет переопределяется JS в зависимости от сектора */
+  pointer-events: none;
+}
+
+/* ---------- Bet Board (Таблица ставок) ---------- */
 .bet-board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
   background: var(--clr-surface);
   padding: 1rem;
   border: 2px solid var(--clr-border);
   border-radius: var(--radius);
-  max-width: 300px;
+  display: grid;
   width: 100%;
-  min-height: 350px;
+  max-width: 300px;
+  gap: 0.4rem;
+
+  /* Сетка для 3-колоночного расположения:
+     12 строк по 3 колонки для чисел 1–36, число «0» будет первой ячейкой (grid-row:1 / grid-column:1).
+     Далее: 3 ячейки «1st12», «2nd12», «3rd12» (каждая span 3), затем 6 ячеек нижнего ряда (span 1). */
+  grid-template-columns: repeat(3, 1fr);
 }
+
+/* Обычные ячейки чисел */
 .bet-cell {
   background: #222;
   color: #fff;
-  padding: 0.75rem;
+  padding: 0.7rem 0.4rem;
   text-align: center;
   border: 2px solid var(--clr-border);
   border-radius: var(--radius);
+  font-size: 0.9rem;
   position: relative;
   transition: background var(--transition), transform var(--transition);
+  user-select: none;
 }
 .bet-cell:hover {
   background: var(--clr-accent);
@@ -217,38 +200,73 @@ body {
   background: var(--clr-highlight);
   color: #000;
 }
-.bet-cell.special {
+
+/* Специальное окрашивание для числа «0» */
+.bet-cell[data-choice="0"] {
+  background: var(--clr-green);
+  color: #000;
+}
+
+/* Чёрно/красные ячейки */
+.bet-cell[data-choice="red"] {
+  background: var(--clr-red);
+}
+.bet-cell[data-choice="black"] {
+  background: var(--clr-black);
+}
+
+/* Специальные ячейки «1st12», «2nd12», «3rd12» */
+.bet-cell[data-choice="1st12"],
+.bet-cell[data-choice="2nd12"],
+.bet-cell[data-choice="3rd12"] {
   grid-column: span 3;
   background: #333;
+  font-size: 1rem;
+  font-weight: 700;
 }
+
+/* Нижний ряд: «1to18», «even», «redbottom», «blackbottom», «odd», «19to36» */
+.bet-cell[data-choice="1to18"],
+.bet-cell[data-choice="even"],
+.bet-cell[data-choice="redbottom"],
+.bet-cell[data-choice="blackbottom"],
+.bet-cell[data-choice="odd"],
+.bet-cell[data-choice="19to36"] {
+  grid-column: span 1;
+  background: #333;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Mini-chip (показывает сумму ставки) */
 .mini-chip {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
+  bottom: 4px;
+  right: 4px;
   background: var(--clr-highlight);
-  color: #fff;
+  color: #000;
   padding: 0.2rem 0.4rem;
   border-radius: 50%;
   font-size: 0.75rem;
   font-weight: 700;
+  pointer-events: none;
 }
 
 /* ---------- Result & Message ---------- */
 .result-block {
   margin-top: 1.5rem;
   text-align: center;
-  max-width: 900px;
   width: 100%;
+  max-width: var(--max-w);
 }
 .number-display {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 .message {
   font-size: 1.2rem;
   margin-bottom: 1rem;
-  color: var(--clr-text);
 }
 .buy-access {
   padding: 0.6rem 1.2rem;
@@ -310,7 +328,7 @@ body {
 /* ---------- History Log ---------- */
 .history {
   margin-top: 1rem;
-  max-width: 900px;
+  max-width: var(--max-w);
   width: 100%;
   background: var(--clr-surface);
   padding: 1rem;
@@ -318,6 +336,8 @@ body {
   border-radius: var(--radius);
   color: #ddd;
   font-size: 0.9rem;
+  max-height: 200px;
+  overflow-y: auto;
 }
 .history div + div {
   margin-top: 0.4rem;
@@ -331,7 +351,19 @@ body {
   .bet-board {
     grid-template-columns: repeat(2, 1fr);
   }
-  .bet-cell.special {
+  /* Дюжины span 2 */
+  .bet-cell[data-choice="1st12"],
+  .bet-cell[data-choice="2nd12"],
+  .bet-cell[data-choice="3rd12"] {
+    grid-column: span 2;
+  }
+  /* Нижний ряд span 2 */
+  .bet-cell[data-choice="1to18"],
+  .bet-cell[data-choice="even"],
+  .bet-cell[data-choice="redbottom"],
+  .bet-cell[data-choice="blackbottom"],
+  .bet-cell[data-choice="odd"],
+  .bet-cell[data-choice="19to36"] {
     grid-column: span 2;
   }
   .wheel-container {
@@ -343,25 +375,18 @@ body {
     border-right: 12px solid transparent;
     border-bottom: 20px solid var(--clr-highlight);
   }
-  .wheel {
-    border: 6px solid var(--clr-border);
-  }
   .ball {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     transform: translate(-50%, -50%) rotate(0deg) translateY(-90px);
   }
 }
 
 /* ---------- Animations ---------- */
-/* Мигающий указатель во время вращения */
+/* Указатель мигает во время вращения */
 @keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 .pointer.spinning {
   animation: blink 1s infinite;

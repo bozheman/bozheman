@@ -4,62 +4,77 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN ROULETTE</title>
+
   <!-- Подключаем шрифт Fira Code -->
   <link
     href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap"
     rel="stylesheet"
   />
+
+  <!-- Стили для рулетки -->
   <link rel="stylesheet" href="roulette.css" />
 </head>
 
 <body>
-  <!-- ========== HEADER (Top Bar) ========== -->
-  <header class="top-bar">
+  <!-- ================= HEADER (Top Bar) ================= -->
+  <header class="top-bar" role="banner">
     <h1 class="title">ROULETTE OF BOZHEMAN</h1>
-    <div class="balance">
+    <div class="balance" aria-live="polite">
       Баланс: <span id="balance">0</span> BMAN
     </div>
   </header>
 
-  <!-- ========== MAIN LAYOUT ========== -->
+  <!-- ================= MAIN LAYOUT ================= -->
   <main class="layout">
-    <!-- ===== LEFT: Wheel Area ===== -->
-    <section class="wheel-container">
-      <!-- Указатель -->
-      <div class="pointer" id="pointer"></div>
-      <!-- Собственно колесо -->
-      <div class="wheel" id="wheel"></div>
+    <!-- ===== LEFT: Wheel Area (PNG-колесо) ===== -->
+    <section class="wheel-container" aria-label="Рулетка">
+      <!-- Позиционный указатель -->
+      <div class="pointer" id="pointer" aria-hidden="true"></div>
+      <!-- PNG-картинка колеса -->
+      <img
+        src="wheel.png"
+        alt="Рулетка"
+        class="wheel-image"
+        id="wheel"
+      />
       <!-- Мячик -->
-      <div class="ball" id="ball"></div>
+      <div class="ball" id="ball" aria-hidden="true"></div>
+      <!-- Числа поверх колеса (добавляются JS) -->
     </section>
 
     <!-- ===== RIGHT: Bet Board ===== -->
-    <aside class="bet-board" id="bet-board"></aside>
+    <aside class="bet-board" id="bet-board" aria-label="Таблица ставок">
+      <!-- JS динамически создаст все ячейки -->
+    </aside>
   </main>
 
-  <!-- ========== RESULT & MESSAGE ========== -->
-  <section class="result-block">
+  <!-- ================= RESULT & MESSAGE ================= -->
+  <section class="result-block" aria-live="polite">
     <div id="result-display" class="number-display"></div>
     <div id="message" class="message"></div>
-    <button id="buy-access" class="buy-access">💎 КУПИТЬ ПРОХОД</button>
+    <button id="buy-access" class="buy-access" aria-hidden="true">
+      💎 КУПИТЬ ПРОХОД
+    </button>
   </section>
 
-  <!-- ========== CONTROLS (Chips + Spin) ========== -->
-  <section class="controls">
-    <div class="chip-row">
-      <button class="chip" data-value="1">1</button>
-      <button class="chip" data-value="5">5</button>
-      <button class="chip" data-value="10">10</button>
-      <button class="chip" data-value="50">50</button>
-      <button class="chip" data-value="250">250</button>
+  <!-- ================= CONTROLS (Chips + Spin) ================= -->
+  <section class="controls" aria-label="Управление">
+    <div class="chip-row" role="group" aria-label="Выберите номинал ставки">
+      <button class="chip" data-value="1" aria-label="Ставка 1 BMAN">1</button>
+      <button class="chip" data-value="5" aria-label="Ставка 5 BMAN">5</button>
+      <button class="chip" data-value="10" aria-label="Ставка 10 BMAN">10</button>
+      <button class="chip" data-value="50" aria-label="Ставка 50 BMAN">50</button>
+      <button class="chip" data-value="250" aria-label="Ставка 250 BMAN">250</button>
     </div>
-    <button id="spin-btn" class="spin-btn">🎰 КРУТИТЬ</button>
+    <button id="spin-btn" class="spin-btn" aria-label="Крутить рулетку">
+      🎰 КРУТИТЬ
+    </button>
   </section>
 
-  <!-- ========== HISTORY LOG ========== -->
-  <section id="history-log" class="history"></section>
+  <!-- ================= HISTORY LOG ================= -->
+  <section id="history-log" class="history" aria-label="История результатов"></section>
 
-  <!-- ========== JavaScript ========== -->
+  <!-- ================= JavaScript логика ================= -->
   <script src="roulette.js"></script>
 </body>
 </html>
