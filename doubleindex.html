@@ -103,20 +103,17 @@
 
 
   <script>
-    const dropCount = 600;
-    for (let i = 0; i < dropCount;) {
+    function spawnDrop(){
       const drop = document.createElement('div');
-      const size = 6 + Math.random() * 18;
-      const speedFactor = size / 20;
+      const size = 10 + Math.random()*20;
       drop.className = 'realistic-drop';
-      drop.style.left = Math.random() * 100 + 'vw';
-      drop.style.setProperty('--drop-size', `${size}px`);
-      drop.style.setProperty('--scale-x', `${1 - speedFactor * 0.9}`);
-      drop.style.setProperty('--scale-y', `${1 + speedFactor * 0.1}`);
-      drop.style.animationDuration = (3 + Math.random() * 3) + 's';
-      drop.style.animationDelay = (Math.random() * 10) + 's';
+      drop.style.left = Math.random()*100 + 'vw';
+      drop.style.setProperty('--drop-size', size + 'px');
+      drop.style.animationDuration = (3 + Math.random()*4) + 's';
       document.body.appendChild(drop);
+      setTimeout(()=>drop.remove(), 8000);
     }
+    setInterval(spawnDrop, 600);
 
     setTimeout(() => {
       window.location.href = "roulet.html";
