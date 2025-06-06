@@ -4,37 +4,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN ROULETTE</title>
+  <!-- Подключаем шрифт Fira Code -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="roulette.css" />
 </head>
+
 <body>
-  <!-- ===== TOP BAR ===== -->
+  <!-- ========== HEADER (Top Bar) ========== -->
   <header class="top-bar">
-    <h1>ROULETTE&nbsp;OF&nbsp;BOZHEMAN</h1>
-    <div class="balance">Баланс: <span id="balance">0</span> BMAN</div>
+    <h1 class="title">ROULETTE OF BOZHEMAN</h1>
+    <div class="balance">
+      Баланс: <span id="balance">0</span> BMAN
+    </div>
   </header>
 
-  <!-- ===== MAIN LAYOUT ===== -->
-  <div class="layout">
-    <!-- WHEEL & POINTER -->
-    <div class="wheel-container">
-      <div class="pointer"></div>
+  <!-- ========== MAIN LAYOUT ========== -->
+  <main class="layout">
+    <!-- ===== LEFT: Wheel Area ===== -->
+    <section class="wheel-container">
+      <!-- Указатель -->
+      <div class="pointer" id="pointer"></div>
+      <!-- Собственно колесо -->
       <div class="wheel" id="wheel"></div>
+      <!-- Мячик -->
       <div class="ball" id="ball"></div>
-    </div>
+    </section>
 
-    <!-- BET BOARD -->
-    <div class="bet-board" id="bet-board"></div>
-  </div>
+    <!-- ===== RIGHT: Bet Board ===== -->
+    <aside class="bet-board" id="bet-board"></aside>
+  </main>
 
-  <!-- RESULT / MESSAGE -->
-  <div class="result-block">
+  <!-- ========== RESULT & MESSAGE ========== -->
+  <section class="result-block">
     <div id="result-display" class="number-display"></div>
     <div id="message" class="message"></div>
-    <button id="buy-access" class="buy-access" onclick="window.location.href='https://t.me/bozheman';">💎 КУПИТЬ ПРОХОД</button>
-  </div>
+    <button id="buy-access" class="buy-access">💎 КУПИТЬ ПРОХОД</button>
+  </section>
 
-  <!-- CHIP ROW + SPIN BUTTON -->
-  <div class="controls">
+  <!-- ========== CONTROLS (Chips + Spin) ========== -->
+  <section class="controls">
     <div class="chip-row">
       <button class="chip" data-value="1">1</button>
       <button class="chip" data-value="5">5</button>
@@ -42,175 +53,13 @@
       <button class="chip" data-value="50">50</button>
       <button class="chip" data-value="250">250</button>
     </div>
-    <button id="spin-btn" class="spin-btn">🎰 Крутить</button>
-  </div>
+    <button id="spin-btn" class="spin-btn">🎰 КРУТИТЬ</button>
+  </section>
 
-  <!-- HISTORY LOG -->
-  <div id="history-log" class="history"></div>
+  <!-- ========== HISTORY LOG ========== -->
+  <section id="history-log" class="history"></section>
 
-  <script>
-  (function(){
-    /* ---------------- STATE ---------------- */
-    let balance = parseInt(localStorage.getItem('bman_balance')) || 100; // стартовый баланс
-    let isSpinning = false;
-    let currentRotation = 0;
-    let spinCount = 0;
-    const history = [];
-    let selectedChip = 1; // default chip value
-    let placedBet = null; // {choice, amount}
-
-    /* -------------- HTML REFS -------------- */
-    const balanceSpan = document.getElementById('balance');
-    const wheel      = document.getElementById('wheel');
-    const ball       = document.getElementById('ball');
-    const msgBox     = document.getElementById('message');
-    const resultBox  = document.getElementById('result-display');
-    const historyLog = document.getElementById('history-log');
-
-    /* -------------- INIT ------------------- */
-    updateBalance();
-    buildWheelNumbers();
-    buildBetBoard();
-    initChips();
-    document.getElementById('spin-btn').addEventListener('click', spin);
-
-    /* ---------- FUNCTIONS ---------- */
-    function updateBalance(){
-      balanceSpan.textContent = balance;
-      localStorage.setItem('bman_balance', balance);
-      if(balance >= 1000){ document.getElementById('buy-access').style.display='inline-block'; }
-    }
-
-    function buildWheelNumbers(){
-      const numbers = Array.from({length:37},(_,i)=>i);
-      const colors = ['green', ...numbers.slice(1).map(n => n % 2 === 0 ? 'black' : 'red')];
-      numbers.forEach((num,i)=>{
-        const slice = document.createElement('div');
-        slice.className = 'wheel-number';
-        slice.textContent = num;
-        slice.style.transform = `rotate(${i*(360/37)}deg) translateY(-130px)`;
-        slice.style.color = colors[i];
-        wheel.appendChild(slice);
-      });
-    }
-
-    function buildBetBoard(){
-      const board = document.getElementById('bet-board');
-      const numbers = [...Array(37).keys()]; // 0-36
-      numbers.forEach(n=>{
-        const cell = document.createElement('div');
-        cell.className = 'bet-cell';
-        cell.dataset.choice = n;
-        cell.textContent = n;
-        board.appendChild(cell);
-      });
-      ['red','black','even','odd'].forEach(type=>{
-        const cell = document.createElement('div');
-        cell.className = 'bet-cell special';
-        cell.dataset.choice = type;
-        cell.textContent = type.toUpperCase();
-        board.appendChild(cell);
-      });
-      board.addEventListener('click', e=>{
-        const cell = e.target.closest('.bet-cell');
-        if(!cell) return;
-        placeBet(cell);
-      });
-    }
-
-    function initChips(){
-      document.querySelectorAll('.chip').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-          btn.classList.add('active');
-          selectedChip = parseInt(btn.dataset.value);
-        });
-      });
-      document.querySelector('.chip[data-value="1"]').classList.add('active');
-    }
-
-    function placeBet(cell){
-      if(isSpinning) return;
-      const choice = cell.dataset.choice;
-      if(balance < selectedChip){ msgBox.textContent = 'Недостаточно BMAN'; return; }
-      resetBoard();
-      cell.classList.add('chosen');
-      placedBet = { choice, amount: selectedChip };
-      cell.innerHTML = `<strong>${choice}</strong><span class="mini-chip">${selectedChip}</span>`;
-      msgBox.textContent = `Ставка: ${selectedChip} BMAN на ${choice}`;
-    }
-
-    function resetBoard(){
-      document.querySelectorAll('.bet-cell').forEach(c=>{
-        c.classList.remove('chosen');
-        c.innerHTML = c.dataset.choice.toUpperCase();
-      });
-      placedBet = null;
-    }
-
-    function spin(){
-      if(isSpinning) return;
-      if(!placedBet){ msgBox.textContent = 'Выберите ставку!'; return; }
-      const { choice, amount } = placedBet;
-      if(amount > balance){ msgBox.textContent = 'Недостаточно BMAN'; return; }
-
-      balance -= amount;
-      updateBalance();
-      isSpinning = true;
-      spinCount++;
-      resultBox.textContent = '';
-      msgBox.textContent = 'Крутится...';
-
-      const resultNum = Math.floor(Math.random() * 37);
-      animateWheel(resultNum);
-
-      setTimeout(()=>{
-        const color = resultNum === 0 ? 'green' : (resultNum % 2 === 0 ? 'black' : 'red');
-        resultBox.textContent = `Выпало: ${resultNum} (${color.toUpperCase()})`;
-        const win = evaluateBet(choice, amount, resultNum, color);
-        if(win > 0){
-          balance += win;
-          msgBox.textContent = `Поздравляем! Вы выиграли ${win} BMAN!`;
-        } else {
-          msgBox.textContent = 'Увы, вы проиграли.';
-        }
-        logHistory(resultNum, color, win, amount);
-        updateBalance();
-        resetBoard();
-        isSpinning = false;
-      }, 6500);
-    }
-
-    function evaluateBet(choice, bet, num, color){
-      let payout = 0;
-      if(choice === 'red' && color === 'red') payout = bet * 2;
-      else if(choice === 'black' && color === 'black') payout = bet * 2;
-      else if(choice === 'even' && num !== 0 && num % 2 === 0) payout = bet * 2;
-      else if(choice === 'odd' && num % 2 === 1) payout = bet * 2;
-      else if(parseInt(choice) === num) payout = bet * 36;
-      return payout;
-    }
-
-    function logHistory(num, color, win, bet){
-      const sign = win > 0 ? '+' + win : '-' + bet;
-      const entry = `#${spinCount}: ${num} (${color.toUpperCase()}) — ${sign} BMAN`;
-      history.unshift(entry);
-      if(history.length > 5) history.pop();
-      historyLog.innerHTML = history.map(h => `<div>${h}</div>`).join('');
-    }
-
-    function animateWheel(resultNum){
-      const sectorAngle = 360 / 37;
-      const extraSpins = 8 * 360;
-      const stopAngle = (360 - resultNum * sectorAngle + sectorAngle / 2) % 360;
-      currentRotation = (currentRotation + extraSpins + stopAngle) % 360;
-      wheel.style.transition = 'transform 6s cubic-bezier(0.33, 1, 0.68, 1)';
-      wheel.style.transform = `rotate(${currentRotation}deg)`;
-      ball.style.transition = 'transform 6s linear';
-      ball.style.transform = `rotate(${-currentRotation}deg) translateY(-120px)`;
-    }
-
-  })();
-  </script>
+  <!-- ========== JavaScript ========== -->
+  <script src="roulette.js"></script>
 </body>
 </html>

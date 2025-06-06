@@ -1,24 +1,37 @@
-/* =============================================
+/* ============================================
    BOZHEMAN ROULETTE  ‖  Casino Stylesheet
-   ============================================= */
+   ============================================ */
 
 /* ---------- Root & Variables ---------- */
 :root {
+  /* Цветовая гамма */
   --clr-bg: #121212;
   --clr-text: #e52a2a;
-  --clr-accent: #900;
+  --clr-accent: #900000;
   --clr-border: #e52a2a;
   --clr-surface: #1c1c1c;
   --clr-highlight: #ff0000;
+  --clr-green: #008000;
+  --clr-black: #000000;
+  --clr-red: #ff0000;
 
+  /* Шрифт */
   --font-main: "Fira Code", monospace;
+
+  /* Размеры и переходы */
   --radius: 10px;
   --transition: 0.3s ease;
 }
 
-/* ---------- Global Reset & Base ---------- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* ---------- Reset & Base ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   background: var(--clr-bg);
   color: var(--clr-text);
@@ -30,10 +43,8 @@ body {
   padding: 1rem;
   overflow-x: hidden;
 }
-a { color: inherit; text-decoration: none; }
-button { cursor: pointer; font-family: var(--font-main); }
 
-/* ---------- Top Bar ---------- */
+/* ---------- Header (Top Bar) ---------- */
 .top-bar {
   width: 100%;
   max-width: 900px;
@@ -47,21 +58,21 @@ button { cursor: pointer; font-family: var(--font-main); }
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   margin-bottom: 1.5rem;
 }
-.top-bar h1 {
+.title {
   font-size: 1.5rem;
   letter-spacing: 0.05em;
 }
-.top-bar .balance {
+.balance {
   font-size: 1rem;
   display: flex;
   align-items: center;
 }
-.top-bar .balance span {
+.balance span {
   font-weight: 700;
   margin-left: 0.3rem;
 }
 
-/* ---------- Layout ---------- */
+/* ---------- Main Layout ---------- */
 .layout {
   display: flex;
   flex-direction: column;
@@ -71,7 +82,10 @@ button { cursor: pointer; font-family: var(--font-main); }
   max-width: 900px;
 }
 @media (min-width: 800px) {
-  .layout { flex-direction: row; justify-content: space-between; }
+  .layout {
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 
 /* ---------- Wheel & Container ---------- */
@@ -82,9 +96,13 @@ button { cursor: pointer; font-family: var(--font-main); }
   margin: 0 auto;
 }
 @media (min-width: 800px) {
-  .wheel-container { width: 350px; height: 350px; }
+  .wheel-container {
+    width: 350px;
+    height: 350px;
+  }
 }
 
+/* Указатель */
 .pointer {
   position: absolute;
   top: -10px;
@@ -98,55 +116,56 @@ button { cursor: pointer; font-family: var(--font-main); }
   z-index: 2;
 }
 
+/* Колесо (0 зеленый, 1–36 чередуются ч/к) */
 .wheel {
   width: 100%;
   height: 100%;
   border: 8px solid var(--clr-border);
   border-radius: 50%;
   background: conic-gradient(
-    #008000 0deg 9.72deg,
-    #000 9.72deg 19.44deg,
-    #ff0000 19.44deg 29.16deg,
-    /* continue alternating red/black and single green at 0 */
-    #000 29.16deg 38.88deg,
-    #ff0000 38.88deg 48.6deg,
-    #000 48.6deg 58.32deg,
-    #ff0000 58.32deg 68.04deg,
-    #000 68.04deg 77.76deg,
-    #ff0000 77.76deg 87.48deg,
-    #000 87.48deg 97.2deg,
-    #ff0000 97.2deg 106.92deg,
-    #000 106.92deg 116.64deg,
-    #ff0000 116.64deg 126.36deg,
-    #000 126.36deg 136.08deg,
-    #ff0000 136.08deg 145.8deg,
-    #000 145.8deg 155.52deg,
-    #ff0000 155.52deg 165.24deg,
-    #000 165.24deg 174.96deg,
-    #ff0000 174.96deg 184.68deg,
-    #000 184.68deg 194.4deg,
-    #ff0000 194.4deg 204.12deg,
-    #000 204.12deg 213.84deg,
-    #ff0000 213.84deg 223.56deg,
-    #000 223.56deg 233.28deg,
-    #ff0000 233.28deg 243deg,
-    #000 243deg 252.72deg,
-    #ff0000 252.72deg 262.44deg,
-    #000 262.44deg 272.16deg,
-    #ff0000 272.16deg 281.88deg,
-    #000 281.88deg 291.6deg,
-    #ff0000 291.6deg 301.32deg,
-    #000 301.32deg 311.04deg,
-    #ff0000 311.04deg 320.76deg,
-    #000 320.76deg 330.48deg,
-    #ff0000 330.48deg 340.2deg,
-    #000 340.2deg 349.92deg,
-    #ff0000 349.92deg 360deg
+    var(--clr-green) 0deg 9.7297deg,
+    var(--clr-black) 9.7297deg 19.4595deg,
+    var(--clr-red) 19.4595deg 29.1892deg,
+    var(--clr-black) 29.1892deg 38.9189deg,
+    var(--clr-red) 38.9189deg 48.6486deg,
+    var(--clr-black) 48.6486deg 58.3784deg,
+    var(--clr-red) 58.3784deg 68.1081deg,
+    var(--clr-black) 68.1081deg 77.8378deg,
+    var(--clr-red) 77.8378deg 87.5676deg,
+    var(--clr-black) 87.5676deg 97.2973deg,
+    var(--clr-red) 97.2973deg 107.027deg,
+    var(--clr-black) 107.027deg 116.757deg,
+    var(--clr-red) 116.757deg 126.486deg,
+    var(--clr-black) 126.486deg 136.216deg,
+    var(--clr-red) 136.216deg 145.946deg,
+    var(--clr-black) 145.946deg 155.676deg,
+    var(--clr-red) 155.676deg 165.405deg,
+    var(--clr-black) 165.405deg 175.135deg,
+    var(--clr-red) 175.135deg 184.865deg,
+    var(--clr-black) 184.865deg 194.595deg,
+    var(--clr-red) 194.595deg 204.324deg,
+    var(--clr-black) 204.324deg 214.054deg,
+    var(--clr-red) 214.054deg 223.784deg,
+    var(--clr-black) 223.784deg 233.514deg,
+    var(--clr-red) 233.514deg 243.243deg,
+    var(--clr-black) 243.243deg 252.973deg,
+    var(--clr-red) 252.973deg 262.703deg,
+    var(--clr-black) 262.703deg 272.432deg,
+    var(--clr-red) 272.432deg 282.162deg,
+    var(--clr-black) 282.162deg 291.892deg,
+    var(--clr-red) 291.892deg 301.622deg,
+    var(--clr-black) 301.622deg 311.351deg,
+    var(--clr-red) 311.351deg 321.081deg,
+    var(--clr-black) 321.081deg 330.811deg,
+    var(--clr-red) 330.811deg 340.541deg,
+    var(--clr-black) 340.541deg 350.27deg,
+    var(--clr-red) 350.27deg 360deg
   );
   transform: rotate(0deg);
   transition: transform var(--transition) ease-out;
 }
 
+/* Мячик */
 .ball {
   position: absolute;
   top: 50%;
@@ -160,7 +179,11 @@ button { cursor: pointer; font-family: var(--font-main); }
   transition: transform var(--transition) linear;
 }
 @media (min-width: 800px) {
-  .ball { width: 24px; height: 24px; transform: translate(-50%, -50%) rotate(0deg) translateY(-130px); }
+  .ball {
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%) rotate(0deg) translateY(-130px);
+  }
 }
 
 /* ---------- Bet Board ---------- */
@@ -174,6 +197,7 @@ button { cursor: pointer; font-family: var(--font-main); }
   border-radius: var(--radius);
   max-width: 300px;
   width: 100%;
+  min-height: 350px;
 }
 .bet-cell {
   background: #222;
@@ -185,9 +209,18 @@ button { cursor: pointer; font-family: var(--font-main); }
   position: relative;
   transition: background var(--transition), transform var(--transition);
 }
-.bet-cell:hover { background: var(--clr-accent); transform: scale(1.03); }
-.bet-cell.chosen { background: var(--clr-highlight); color: #fff; }
-.bet-cell.special { grid-column: span 3; background: #333; }
+.bet-cell:hover {
+  background: var(--clr-accent);
+  transform: scale(1.03);
+}
+.bet-cell.chosen {
+  background: var(--clr-highlight);
+  color: #000;
+}
+.bet-cell.special {
+  grid-column: span 3;
+  background: #333;
+}
 .mini-chip {
   position: absolute;
   bottom: 5px;
@@ -226,7 +259,10 @@ button { cursor: pointer; font-family: var(--font-main); }
   font-size: 1rem;
   transition: background var(--transition), transform var(--transition);
 }
-.buy-access:hover { background: #ff3333; transform: translateY(-2px); }
+.buy-access:hover {
+  background: #ff3333;
+  transform: translateY(-2px);
+}
 
 /* ---------- Controls (Chips + Spin) ---------- */
 .controls {
@@ -249,8 +285,14 @@ button { cursor: pointer; font-family: var(--font-main); }
   font-size: 1rem;
   transition: background var(--transition), transform var(--transition);
 }
-.chip:hover { background: var(--clr-accent); transform: scale(1.05); }
-.chip.active { background: var(--clr-highlight); color: #000; }
+.chip:hover {
+  background: var(--clr-accent);
+  transform: scale(1.05);
+}
+.chip.active {
+  background: var(--clr-highlight);
+  color: #000;
+}
 .spin-btn {
   background: var(--clr-accent);
   color: #fff;
@@ -260,7 +302,10 @@ button { cursor: pointer; font-family: var(--font-main); }
   font-size: 1.2rem;
   transition: background var(--transition), transform var(--transition);
 }
-.spin-btn:hover { background: #b30000; transform: scale(1.03); }
+.spin-btn:hover {
+  background: #b30000;
+  transform: scale(1.03);
+}
 
 /* ---------- History Log ---------- */
 .history {
@@ -278,21 +323,46 @@ button { cursor: pointer; font-family: var(--font-main); }
   margin-top: 0.4rem;
 }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive Adjustments ---------- */
 @media (max-width: 600px) {
-  .layout { flex-direction: column; }
-  .bet-board { grid-template-columns: repeat(2, 1fr); }
-  .bet-cell.special { grid-column: span 2; }
-  .wheel-container { width: 250px; height: 250px; }
-  .pointer { border-left: 12px solid transparent; border-right: 12px solid transparent; border-bottom: 20px solid var(--clr-highlight); }
-  .wheel { border: 6px solid var(--clr-border); }
-  .ball { width: 18px; height: 18px; transform: translate(-50%, -50%) rotate(0deg) translateY(-90px); }
+  .layout {
+    flex-direction: column;
+  }
+  .bet-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bet-cell.special {
+    grid-column: span 2;
+  }
+  .wheel-container {
+    width: 250px;
+    height: 250px;
+  }
+  .pointer {
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid var(--clr-highlight);
+  }
+  .wheel {
+    border: 6px solid var(--clr-border);
+  }
+  .ball {
+    width: 18px;
+    height: 18px;
+    transform: translate(-50%, -50%) rotate(0deg) translateY(-90px);
+  }
 }
 
 /* ---------- Animations ---------- */
+/* Мигающий указатель во время вращения */
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
-/* Pointer blink when spinning */
-.pointer.spinning { animation: blink 1s infinite; }
+.pointer.spinning {
+  animation: blink 1s infinite;
+}
