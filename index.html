@@ -4,32 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN</title>
-  <link rel="icon" type="image/png" href="gg.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="gg.png" />
+  <!-- Основная стилизация будет вынесена в styles.css (запросишь отдельно) -->
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Minimal modal style; move to CSS later */
-    .modal{
-      position:fixed;
-      top:40%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      background:#222;
-      color:#fff;
-      padding:20px;
-      border-radius:10px;
-      z-index:1000;
-      text-align:center;
-      max-width:90%;
+    /* --- Временный Glitch‑эффект, чтобы увидеть результат до подключения CSS --- */
+    .glitch {
+      position: relative;
+      display: inline-block;
     }
-    .modal button{
-      margin-top:10px;
-      padding:6px 12px;
-      background:#555;
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      overflow: hidden;
+      mix-blend-mode: screen;
+      animation: glitchAnim 2.5s infinite;
     }
+    .glitch::before { color: #ff0040; clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+    .glitch::after  { color: #04d9ff; clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
+    @keyframes glitchAnim {
+      0%   { transform: translate(0); }
+      20%  { transform: translate(-3px,-2px); }
+      40%  { transform: translate(3px,2px); }
+      60%  { transform: translate(-2px,1px); }
+      80%  { transform: translate(2px,-1px); }
+      100% { transform: translate(0); }
+    }
+    /* Крохотные базовые стили, чтобы всё не рассыпалось без CSS-файла */
+    body{margin:0;font-family:monospace;background:#000;color:crimson;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:1rem;text-align:center}
+    .container{max-width:420px;width:100%}
+    .links{display:flex;flex-direction:column;gap:.75rem;margin-top:1.5rem}
+    .btn{display:block;padding:.75rem 1rem;border:2px solid crimson;text-decoration:none;color:#fff;border-radius:8px}
+    .half-btn{flex:1;text-align:center}
+    .row-buttons{display:flex;gap:.75rem}
+    .theme-bar{position:fixed;top:.5rem;right:.5rem}
+    .theme-toggle{background:transparent;border:none;font-size:1.5rem;color:crimson;cursor:pointer}
   </style>
 </head>
 <body>
@@ -38,8 +51,8 @@
   </header>
 
   <main class="container">
-    <img src="avatar.png" alt="BOZHEMAN avatar" class="avatar">
-    <h1 class="brand">BOZHEMAN</h1>
+    <img src="avatar.png" alt="BOZHEMAN avatar" class="avatar" style="width:120px;border-radius:50%;margin-bottom:1rem" />
+    <h1 class="brand glitch" data-text="BOZHEMAN">BOZHEMAN</h1>
 
     <nav class="links">
       <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
@@ -51,97 +64,40 @@
       <a href="https://www.tiktok.com/@bozheman_" class="btn" target="_blank">TikTok</a>
       <a href="https://www.instagram.com/bozheman" class="btn" target="_blank">Instagram</a>
       <a href="https://discord.gg/jNFZTsBz8j" class="btn" target="_blank">Discord</a>
-      <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">
-        Donate with Steam items<br>my trade url
-      </a>
-      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special" target="_blank">
-        💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span>
-      </a>
+      <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">Donate (Steam Items)</a>
+      <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn" target="_blank">💰 Buy my tokens BMAN<br><span style="font-size:0.85em">спонсируй будущее!</span></a>
     </nav>
   </main>
 
-  <!-- Secret link after 3 theme toggles -->
-  <div id="secret-content" style="display:none;margin-top:20px;">
-    <a href="doubleindex.html" class="btn special">BOZHEMAN не существует. Но ты нашёл меня</a>
-  </div>
-
-  <!-- Reward & phrase modals -->
-  <div id="reward-modal" class="modal" hidden>
-    <p>Получено 10 монет!</p>
-    <button onclick="closeModal('reward-modal')">OK</button>
-  </div>
-
-  <div id="phrase-modal" class="modal" hidden>
-    <p id="phrase-content"></p>
-    <button onclick="closeModal('phrase-modal')">OK</button>
+  <!-- Тайный линк после 3 переключений темы -->
+  <div id="secret-content" style="display:none;margin-top:2rem;">
+    <a href="doubleindex.html" class="btn">BOZHEMAN не существует. Но ты нашёл меня</a>
   </div>
 
   <script>
-    /* ---------- Theme toggle & secret Easter egg ---------- */
+    /* === Тема + пасхалка === */
     const toggleBtn = document.getElementById('theme-toggle');
     let secretCounter = 0;
     function setTheme(mode){
-      document.body.classList.toggle('light', mode === 'light');
-      toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
+      document.body.classList.toggle('light', mode==='light');
+      toggleBtn.textContent = mode==='light' ? '☀️' : '🌙';
       localStorage.setItem('theme', mode);
     }
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click',()=>{
       const isLight = document.body.classList.contains('light');
       const newTheme = isLight ? 'dark' : 'light';
       setTheme(newTheme);
-      if (!isLight){
+      if(!isLight){
         secretCounter++;
-        if(secretCounter === 3){
+        if(secretCounter===3){
           document.getElementById('secret-content').style.display='block';
         }
       }
     });
-    setTheme(localStorage.getItem('theme') || 'dark');
+    setTheme(localStorage.getItem('theme')|| (window.matchMedia('(prefers-color-scheme: light)').matches? 'light':'dark'));
 
-    /* ---------- Cyclic blood drops ---------- */
-    function spawnDrop(){
-      const drop = document.createElement('div');
-      const size = 10 + Math.random()*20;
-      drop.className = 'realistic-drop';
-      drop.style.left = Math.random()*100 + 'vw';
-      drop.style.setProperty('--drop-size', size + 'px');
-      drop.style.animationDuration = (3 + Math.random()*4) + 's';
-      document.body.appendChild(drop);
-      setTimeout(()=>drop.remove(), 8000);
-    }
-    setInterval(spawnDrop, 600);
-
-    /* ---------- Daily reward & balance ---------- */
-    const today = new Date().toISOString().slice(0,10);
-    let lastClaim = localStorage.getItem('lastClaim') || '';
-    let balance = parseInt(localStorage.getItem('balance')) || 0;
-    if (today !== lastClaim){
-      balance += 10;
-      localStorage.setItem('lastClaim', today);
-      localStorage.setItem('balance', balance);
-      openModal('reward-modal');
-    }
-
-    /* ---------- Mysterious phrase after 1000 coins ---------- */
-    const phrases = [
-      "Твоя судьба запечатана. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>",
-      "Глаза открыты, но разум слеп. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>",
-      "Ты нашёл ключ, но дверь не твоя. <a href='https://t.me/protocol_0zero' target='_blank'>[Telegram]</a>"
-    ];
-    if (balance >= 1000 && !localStorage.getItem('phraseShown')){
-      const random = phrases[Math.floor(Math.random()*phrases.length)];
-      document.getElementById('phrase-content').innerHTML = random;
-      openModal('phrase-modal');
-      localStorage.setItem('phraseShown', 'true');
-    }
-
-    /* ---------- Modal helpers ---------- */
-    function openModal(id){
-      document.getElementById(id).hidden = false;
-    }
-    function closeModal(id){
-      document.getElementById(id).hidden = true;
-    }
+    /* Горячая клавиша «T» для смены темы */
+    document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='t'){toggleBtn.click();}});
   </script>
 </body>
 </html>
