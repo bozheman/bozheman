@@ -136,6 +136,10 @@
       const result = outcomes[Math.floor(Math.random() * outcomes.length)];
       document.getElementById('roulette-result').textContent = result;
     };
+     const audio = document.getElementById("myAudio");
+  audio.addEventListener("loadedmetadata", function() {
+    audio.currentTime = 10; // начать с 10-й секунды
+  });
   </script>
 </body>
 </html>
