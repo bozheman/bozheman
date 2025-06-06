@@ -1,62 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>THE OMEGA</title>
   <style>
-    body {
+    :root {
+      --main-color: crimson;
+      --glow-size: 10px;
+      --bg-dark: #000;
+      --text-light: #ffaaaa;
+    }
+
+    /* === Layout & Base === */
+    * {
+      box-sizing: border-box;
       margin: 0;
-      background: black;
-      color: crimson;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--main-color);
       font-family: monospace;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       text-align: center;
-      flex-direction: column;
       overflow: hidden;
+      animation: bodyFlicker 3s linear infinite;
     }
 
     h1 {
-      font-size: 2em;
-      text-shadow: 0 0 10px crimson;
+      font-size: 2.4rem;
+      letter-spacing: 0.05em;
+      position: relative;
+      text-shadow: 0 0 var(--glow-size) var(--main-color);
+      animation: glitch 2.5s infinite;
+    }
+
+    /* glitch layers */
+    h1::before,
+    h1::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      overflow: hidden;
+      text-shadow: none;
+      mix-blend-mode: screen;
+    }
+
+    h1::before {
+      animation: glitchTop 2.5s infinite;
+      color: #ff0040;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    }
+
+    h1::after {
+      animation: glitchBottom 2.5s infinite;
+      color: #04d9ff;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
     }
 
     p {
       max-width: 600px;
       padding: 20px;
       font-size: 1.2em;
-      color: #ffaaaa;
+      color: var(--text-light);
     }
 
+    /* === Roulette section === */
     #roulette {
       margin-top: 30px;
     }
 
     #spin-button {
-      padding: 10px 20px;
+      padding: 10px 28px;
       background: #600000;
-      border: 2px solid crimson;
+      border: 2px solid var(--main-color);
       color: white;
       font-size: 16px;
       cursor: pointer;
-      margin-top: 20px;
-      border-radius: 6px;
+      border-radius: 8px;
+      transition: background 0.3s;
     }
 
     #spin-button:hover {
-      background: crimson;
+      background: var(--main-color);
     }
 
     #roulette-result {
-      margin-top: 15px;
+      margin-top: 18px;
       font-size: 1.1em;
       color: #ff5555;
-      min-height: 30px;
+      min-height: 32px;
+      transition: transform 0.2s;
     }
 
+    .flash {
+      transform: scale(1.15);
+    }
+
+    /* === Drips === */
     @keyframes realisticDrip {
       0% {
         transform: translateY(-10vh) scaleX(1) scaleY(1);
@@ -67,76 +116,172 @@
         opacity: 0.9;
       }
       100% {
-        transform: translateY(100vh) scaleX(0.5) scaleY(0.3);
+        transform: translateY(105vh) scaleX(0.5) scaleY(0.3);
         opacity: 0;
       }
     }
 
     .realistic-drop {
       position: fixed;
-      top: -10vh;
+      top: -12vh;
       width: var(--drop-size, 12px);
       height: calc(var(--drop-size, 12px) * 1.6);
       background: radial-gradient(circle at 40% 30%, #911818, #5a0000);
       border-radius: 60% 60% 90% 90% / 70% 70% 100% 100%;
       box-shadow: 0 0 6px rgba(255, 0, 0, 0.3);
       opacity: 0.6;
-      z-index: 0;
       animation: realisticDrip linear forwards;
       pointer-events: none;
+      z-index: 0;
+    }
+
+    /* === Keyframes for atmosphere === */
+    @keyframes glitch {
+      0%, 60%, 100% {
+        filter: none;
+      }
+      15% {
+        filter: hue-rotate(-15deg) contrast(150%);
+      }
+      30% {
+        filter: hue-rotate(15deg) contrast(150%);
+      }
+      45% {
+        filter: hue-rotate(-10deg) contrast(180%);
+      }
+    }
+
+    @keyframes glitchTop {
+      0% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(-3px, -2px);
+      }
+      40% {
+        transform: translate(-3px, 2px);
+      }
+      60% {
+        transform: translate(2px, -2px);
+      }
+      80% {
+        transform: translate(2px, 2px);
+      }
+      100% {
+        transform: translate(0);
+      }
+    }
+
+    @keyframes glitchBottom {
+      0% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(3px, 2px);
+      }
+      40% {
+        transform: translate(3px, -2px);
+      }
+      60% {
+        transform: translate(-2px, 2px);
+      }
+      80% {
+        transform: translate(-2px, -2px);
+      }
+      100% {
+        transform: translate(0);
+      }
+    }
+
+    @keyframes bodyFlicker {
+      0%, 18%, 22%, 25%, 54%, 100% {
+        opacity: 1;
+      }
+      20%, 24%, 56% {
+        opacity: 0.75;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>BOZHEMAN ≡ Иллюзия</h1>
-  <p>Ты добрался сюда, потому что не боишься тени.<br> Это только начало. /omega/...</p>
+  <h1 data-text="BOZHEMAN ≡ Иллюзия">BOZHEMAN ≡ Иллюзия</h1>
+  <p>
+    Ты добрался сюда, потому что не боишься тени.<br />
+    Это только начало. <code>/omega/</code>...
+  </p>
 
+  <!-- === ROULETTE === -->
   <div id="roulette">
     <button id="spin-button">🎰 Вращать</button>
     <div id="roulette-result"></div>
   </div>
 
-  <audio id="myAudio" autoplay loop>
-  <source src="omega.m4a" type="audio/mp4">
-  Ваш браузер не поддерживает аудиоэлемент.
-</audio>
-
+  <!-- === AUDIO === -->
+  <audio id="myAudio" preload="auto" loop>
+    <source src="omega.m4a" type="audio/mp4" />
+    Ваш браузер не поддерживает аудиоэлемент.
+  </audio>
 
   <script>
-    function spawnDrop(){
-      const drop = document.createElement('div');
-      const size = 10 + Math.random()*20;
-      drop.className = 'realistic-drop';
-      drop.style.left = Math.random()*100 + 'vw';
-      drop.style.setProperty('--drop-size', size + 'px');
-      drop.style.animationDuration = (3 + Math.random()*4) + 's';
-      document.body.appendChild(drop);
-      setTimeout(()=>drop.remove(), 8000);
-    }
-    setInterval(spawnDrop, 600);
+    document.addEventListener("DOMContentLoaded", () => {
+      /* === Audio: старт с 10 сек. === */
+      const audio = document.getElementById("myAudio");
+      function playFromTen() {
+        if (audio.readyState >= 2) {
+          audio.currentTime = 10;
+          audio.play().catch(() => {});
+        } else {
+          audio.addEventListener("canplay", playFromTen, { once: true });
+        }
+      }
+      playFromTen();
 
-    setTimeout(() => {
-      window.location.href = "roulet.html";
-    }, 70000);
+      /* === Капли крови === */
+      function spawnDrop() {
+        const drop = document.createElement("div");
+        const size = 10 + Math.random() * 18;
+        drop.className = "realistic-drop";
+        drop.style.left = Math.random() * 100 + "vw";
+        drop.style.setProperty("--drop-size", size + "px");
+        drop.style.setProperty("--scale-x", 0.6 + Math.random() * 0.8);
+        drop.style.setProperty("--scale-y", 0.6 + Math.random() * 1);
+        drop.style.animationDuration = 3 + Math.random() * 4 + "s";
+        document.body.appendChild(drop);
+        setTimeout(() => drop.remove(), 8000);
+      }
+      setInterval(spawnDrop, 550);
 
-    const outcomes = [
-      "Ты уже проиграл.",
-      "Ты слеп.",
-      "Узри.",
-      "Скоро всё изменится.",
-      "Ты нашёл глиф: /sigil",
-      "Наблюдай...",
-      "Здесь пусто, как в тебе."
-    ];
+      /* === Роулетка === */
+      const outcomes = [
+        "Ты уже проиграл.",
+        "Ты слеп.",
+        "Узри.",
+        "Скоро всё изменится.",
+        "Ты нашёл глиф: /sigil",
+        "Наблюдай...",
+        "Здесь пусто, как в тебе.",
+      ];
 
-    document.getElementById('spin-button').onclick = () => {
-      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
-      document.getElementById('roulette-result').textContent = result;
-    };
-     const audio = document.getElementById("myAudio");
-  audio.addEventListener("loadedmetadata", function() {
-    audio.currentTime = 7; // начать с 7-й секунды
-  });
+      const resultEl = document.getElementById("roulette-result");
+      document.getElementById("spin-button").addEventListener("click", () => {
+        const result = outcomes[Math.floor(Math.random() * outcomes.length)];
+        resultEl.textContent = result;
+        resultEl.classList.add("flash");
+        setTimeout(() => resultEl.classList.remove("flash"), 400);
+      });
+
+      /* === Таймер переадресации (70 cек) + визуальный отсчёт === */
+      let countdown = 60;
+      const timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          window.location.href = "roulet.html";
+        } else {
+          resultEl.textContent = `Переадресация через ${countdown}s`;
+        }
+      }, 1000);
+    });
   </script>
 </body>
 </html>
