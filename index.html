@@ -5,38 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOZHEMAN</title>
   <link rel="icon" type="image/png" href="gg.png" />
-  <!-- Core CSS (детализирован в Styles) -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Swiper slider (Testimonials) -->
-  <link rel="stylesheet" href="https://unpkg.com/swiper@11/swiper-bundle.min.css" />
 </head>
 <body>
-  <!-- ================= HERO ================= -->
-  <section class="hero" aria-label="Cinematic intro">
-    <video id="hero-video" autoplay muted loop playsinline preload="auto" poster="hero-poster.jpg">
-      <source src="hero.webm" type="video/webm" />
-      <source src="hero.mp4"  type="video/mp4" />
-    </video>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="brand glitch" data-text="BOZHEMAN">BOZHEMAN</h1>
-      <!-- Lottie accent -->
-      <div id="lottie-flare" class="lottie"></div>
-    </div>
-  </section>
-
-  <!-- ================= MAIN ================= -->
+  <!-- ===== Theme toggle ===== -->
   <header class="theme-bar">
     <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">🌙</button>
   </header>
 
-  <main class="container" id="main-scroll">
-    <!-- Avatar skeleton loader -->
+  <!-- ===== Main content ===== -->
+  <main class="container">
     <div class="avatar-wrapper loading">
       <img src="avatar.png" alt="BOZHEMAN avatar" class="avatar" loading="lazy" />
     </div>
+    <h1 class="brand glitch" data-text="BOZHEMAN">BOZHEMAN</h1>
 
-    <!-- Links -->
     <nav class="links">
       <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
       <div class="row-buttons">
@@ -51,131 +34,54 @@
       <a href="https://www.sushi.com/optimism/swap?token0=NATIVE&token1=0xfb4BacD8E74f16c5b867cc524806ca326a456273&swapAmount=0.00001" class="btn special" target="_blank">💰 Buy my tokens BMAN<br><span>спонсируй будущее!</span></a>
     </nav>
 
-    <!-- ================= STATS ================= -->
-    <section class="stats" aria-label="Community & uptime stats">
+    <section class="stats" aria-label="Community size">
       <div class="stat-item">
-        <span id="community-count" class="count">0</span>
+        <span id="community-count" class="count">158&nbsp;437</span>
         <p>подписчиков во всех соцсетях</p>
-      </div>
-      <div class="stat-item">
-        <span class="count">99.98%</span>
-        <p>серверный uptime</p>
-      </div>
-    </section>
-
-    <!-- ================= PRESS ================= -->
-    <section class="press" aria-label="Press logos">
-      <h2 class="section-title">Featured in</h2>
-      <div class="press-logos">
-        <img src="logo-ain.svg" alt="AIN" />
-        <img src="logo-dou.svg" alt="DOU" />
-        <img src="logo-ministry.svg" alt="Ministry of Digital" />
-      </div>
-    </section>
-
-    <!-- ================= TESTIMONIALS ================= -->
-    <section class="testimonials" aria-label="Testimonials">
-      <h2 class="section-title">Отзывы</h2>
-      <div class="swiper">
-        <div class="swiper-wrapper">
-          <div class="swiper-slide"><blockquote>«BOZHEMAN — это энергия будущего» <cite>— TechCrunch*maybe*</cite></blockquote></div>
-          <div class="swiper-slide"><blockquote>«Уроки смелости и креатива» <cite>— HackerNoon</cite></blockquote></div>
-          <div class="swiper-slide"><blockquote>«Символ новой кибер-этики» <cite>— Wired</cite></blockquote></div>
-        </div>
       </div>
     </section>
   </main>
 
-  <!-- ================= SECRET CONTENT ================= -->
+  <!-- ===== Secret content ===== -->
   <div id="secret-content" class="secret">
     <a href="doubleindex.html" class="btn">BOZHEMAN не существует. Но ты нашёл меня</a>
   </div>
 
-  <!-- ================= TERMINAL OVERLAY (Konami) ================= -->
-  <div id="terminal-overlay" class="terminal" hidden>
-    <pre id="terminal-text">Connecting to /omega/...</pre>
-  </div>
-
-  <!-- ================= SCRIPTS ================= -->
-  <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-  <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script>
+  <!-- ===== Cursor follower ===== -->
+  <div class="cursor-follower"></div>
 
   <script>
     /* ===== Theme toggle & secret reveal ===== */
     const toggleBtn = document.getElementById('theme-toggle');
     let secretCounter = 0;
-    const setTheme = m => {
-      document.body.classList.toggle('light', m==='light');
-      toggleBtn.textContent = m==='light' ? '☀️' : '🌙';
-      localStorage.setItem('theme', m);
-    };
-    toggleBtn.addEventListener('click', ()=>{
+    function applyTheme(mode){
+      document.body.classList.toggle('light', mode==='light');
+      toggleBtn.textContent = mode==='light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', mode);
+    }
+    toggleBtn.addEventListener('click', () => {
       const isLight = document.body.classList.contains('light');
       const newTheme = isLight ? 'dark' : 'light';
-      setTheme(newTheme);
-      if(!isLight){ if(++secretCounter===3){ document.getElementById('secret-content').classList.add('revealed'); playUiSound(); }}
+      applyTheme(newTheme);
+      if(!isLight && ++secretCounter === 3){
+        document.getElementById('secret-content').classList.add('revealed');
+      }
     });
-    setTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches? 'light':'dark'));
-    document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='t') toggleBtn.click(); });
+    applyTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+    document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='t'){ toggleBtn.click(); }});
 
-    /* ===== Cinematic parallax on scroll ===== */
-    const hero = document.querySelector('.hero');
-    document.addEventListener('scroll', () => {
-      const offset = window.scrollY * 0.4;
-      hero.style.transform = `translateY(${offset}px)`;
-    });
-
-    /* ===== Lottie flare ===== */
-    lottie.loadAnimation({ container: document.getElementById('lottie-flare'), renderer:'svg', loop:true, autoplay:true, path:'flare.json' });
-
-    /* ===== Custom cursor follower ===== */
-    const cursor = document.createElement('div');
-    cursor.className = 'cursor-follower';
-    document.body.appendChild(cursor);
-    document.addEventListener('mousemove', e => {
-      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-    });
-
-    /* ===== Sound effects ===== */
-    const uiClick = new Howl({ src:['click.mp3'], volume:0.1 });
-    function playUiSound(){ uiClick.play(); }
-    document.querySelectorAll('a.btn, button').forEach(el=>el.addEventListener('click', playUiSound));
-
-    /* ===== Community counter (mock) ===== */
-    const totalSubs = 158437; // <- заменить API fetch
-    const countEl = document.getElementById('community-count');
-    let displayed = 0;
-    const anim = setInterval(()=>{
-      displayed += Math.ceil(totalSubs/100);
-      if(displayed>=totalSubs){displayed=totalSubs; clearInterval(anim);}
-      countEl.textContent = displayed.toLocaleString('ru-RU');
-    }, 30);
-
-    /* ===== Swiper testimonials ===== */
-    new Swiper('.swiper', { loop:true, autoplay:{delay:3500,disableOnInteraction:false}, effect:'fade', fadeEffect:{crossFade:true} });
-
-    /* ===== Avatar Skeleton & blur‑in ===== */
+    /* ===== Avatar fade‑in ===== */
     const avatar = document.querySelector('.avatar');
     avatar.addEventListener('load', () => {
       avatar.classList.add('loaded');
       avatar.parentElement.classList.remove('loading');
     });
 
-    /* ===== Konami code → Terminal overlay ===== */
-    const konami = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-    let kIndex = 0;
-    document.addEventListener('keydown', e=>{
-      if(e.key===konami[kIndex]){ kIndex++; if(kIndex===konami.length){ showTerminal(); kIndex=0; } }
-      else kIndex = 0;
+    /* ===== Cursor follower ===== */
+    const cursor = document.querySelector('.cursor-follower');
+    document.addEventListener('mousemove', e => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
     });
-    function showTerminal(){
-      const term = document.getElementById('terminal-overlay');
-      term.hidden = false; term.classList.add('open');
-      const lines = ["handshake complete", "entropy sync…", "access granted", "welcome to /omega/"]; let i=0;
-      const out = document.getElementById('terminal-text');
-      const int = setInterval(()=>{ out.textContent += "\n"+lines[i++]; if(i===lines.length) clearInterval(int); }, 800);
-    }
   </script>
 </body>
 </html>
