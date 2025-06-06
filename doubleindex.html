@@ -96,10 +96,17 @@
     <div id="roulette-result"></div>
   </div>
 
-  <audio autoplay loop>
-    <source src="omega.m4a" type="audio/mp4">
-    Your browser does not support the audio element.
-  </audio>
+  <audio id="myAudio" autoplay loop>
+  <source src="omega.m4a" type="audio/mp4">
+  Ваш браузер не поддерживает аудиоэлемент.
+</audio>
+
+<script>
+  const audio = document.getElementById("myAudio");
+  audio.addEventListener("loadedmetadata", function() {
+    audio.currentTime = 28; // начать с 28-й секунды
+  });
+</script>
 
   <script>
     const dropCount = 60;
@@ -119,10 +126,12 @@
 
     setTimeout(() => {
       window.location.href = "roulet.html";
-    }, 10000);
+    }, 100000);
 
     const outcomes = [
       "Ты уже проиграл.",
+      "Ты слеп.",
+      "Узри.",
       "Скоро всё изменится.",
       "Ты нашёл глиф: /sigil",
       "Наблюдай...",
