@@ -101,15 +101,9 @@
   Ваш браузер не поддерживает аудиоэлемент.
 </audio>
 
-<script>
-  const audio = document.getElementById("myAudio");
-  audio.addEventListener("loadedmetadata", function() {
-    audio.currentTime = 28; // начать с 28-й секунды
-  });
-</script>
 
   <script>
-    const dropCount = 60;
+    const dropCount = 6000;
     for (let i = 0; i < dropCount; i++) {
       const drop = document.createElement('div');
       const size = 6 + Math.random() * 18;
