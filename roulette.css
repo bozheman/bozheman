@@ -1,5 +1,5 @@
 /* ==============================================
-   BOZHEMAN ROULETTE  ‖  Casino Stylesheet
+   BOZHEMAN ROULETTE  ‖  Casino Stylesheet (обновлён)
    ============================================== */
 
 /* ---------- Переменные (цвета, шрифты, размеры) ---------- */
@@ -121,25 +121,27 @@ body {
   z-index: 2;
 }
 
-/* Мячик */
+/* Мячик (уменьшили размер) */
 .ball {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 18px;
-  height: 18px;
+  width: 12px;   /* было 18px */
+  height: 12px;  /* было 18px */
   background: var(--clr-white);
-  border: 3px solid var(--clr-accent);
+  border: 2px solid var(--clr-accent); /* чуть потоньше */
   border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(0deg) translateY(-110px);
-  transition: transform var(--transition) linear;
+  transform: translate(-50%, -50%) rotate(0deg) translateY(-100px);
+  /* сместили на 100px вместо 110, чтобы подогнать изображение */
+  transition: transform 0.25s linear; /* плавность, но ускорили */
   z-index: 1;
 }
 @media (min-width: 800px) {
   .ball {
-    width: 22px;
-    height: 22px;
-    transform: translate(-50%, -50%) rotate(0deg) translateY(-130px);
+    width: 16px;    /* было 22px */
+    height: 16px;   /* было 22px */
+    transform: translate(-50%, -50%) rotate(0deg) translateY(-120px);
+    /* смещено на 120px вместо 130px */
   }
 }
 
@@ -180,8 +182,6 @@ body {
   color: #000;
 }
 
-/* Для отдельных типов ячеек (CSS-классы будут устанавливаться JS через data-choice) */
-
 /* Дюжины (span 3) */
 .bet-cell[data-choice="1st12"],
 .bet-cell[data-choice="2nd12"],
@@ -206,11 +206,9 @@ body {
 
 /* Цветовые обозначения: */
 .bet-cell[data-choice="0"] {
-  background: var(--clr-green);
+  background: #008000; /* зелёное */
   color: #000;
 }
-
-/* Нижний «RED» и «BLACK» */
 .bet-cell[data-choice="redbottom"] {
   background: var(--clr-red);
 }
@@ -218,7 +216,7 @@ body {
   background: var(--clr-black);
 }
 
-/* Mini-chip (вставляется JS внутрь ячейки) */
+/* Mini-chip (показывает сумму ставки) */
 .mini-chip {
   position: absolute;
   bottom: 4px;
@@ -356,9 +354,9 @@ body {
     border-bottom: 20px solid var(--clr-highlight);
   }
   .ball {
-    width: 16px;
-    height: 16px;
-    transform: translate(-50%, -50%) rotate(0deg) translateY(-90px);
+    width: 12px;   /* уменьшенный к 12px на мобильном */
+    height: 12px;  /* соответственно */
+    transform: translate(-50%, -50%) rotate(0deg) translateY(-75px);
   }
 }
 
