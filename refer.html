@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мои Рефералки</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0f0f0f;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ref-container {
+      width: 100%;
+      max-width: 600px;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .ref-header {
+      padding: 1rem;
+      background-color: #2c2c2c;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .ref-content {
+      display: none;
+      padding: 1rem;
+      background-color: #1e1e1e;
+      font-size: 1rem;
+    }
+
+    .ref-link {
+      color: #4fc3f7;
+      text-decoration: underline;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .active .ref-content {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👑 Мои реферальные ссылки</h1>
+
+  <div class="ref-container" onclick="toggleRef(this)">
+    <div class="ref-header">🛒 DMarket</div>
+    <div class="ref-content">
+      <p>
+        Данным маркетом пользуюсь я. Если не зарегистрированы, то можете зарегаться, чтобы получать вместе со мной бонусы от трейдов.
+      </p>
+      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank">
+        Перейти на DMarket
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function toggleRef(container) {
+      container.classList.toggle('active');
+    }
+  </script>
+
+</body>
+</html>
