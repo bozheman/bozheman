@@ -47,6 +47,7 @@
       text-decoration: underline;
       display: inline-block;
       margin-top: 0.5rem;
+      word-break: break-all;
     }
 
     .active .ref-content {
@@ -56,33 +57,38 @@
 </head>
 <body>
 
-  <h1>👑 Мои реферальные ссылки</h1>
+  <h1>👑 Мои реферальные ссылки и донаты</h1>
 
   <div class="ref-container" onclick="toggleRef(this)">
     <div class="ref-header">🛒 DMarket</div>
     <div class="ref-content">
-      <p>
-        Данным маркетом пользуюсь я. Если не зарегистрированы, то можете зарегаться, чтобы получать вместе со мной бонусы от трейдов.
-      </p>
-      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank">
-        Перейти на DMarket
-      </a>
-      <a class="ref-link" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank">
-        Купить у меня скины.
-      </a>
+      <p>Данным маркетом пользуюсь я. Если не зарегистрированы, то можете зарегаться, чтобы получать вместе со мной бонусы от трейдов.</p>
+      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank">Перейти на DMarket</a> <br>
+      <a class="ref-link" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank">Купить у меня скины</a>
     </div>
   </div>
- <div class="ref-container" onclick="toggleRef(this)">
-    <div class="ref-header">Трейд URL steam</div>
+
+  <div class="ref-container" onclick="toggleRef(this)">
+    <div class="ref-header">🎁 Трейд URL Steam</div>
     <div class="ref-content">
-      <p>
-        Скинуть скинов, если есть лишние)
-      </p>
-      <a class="ref-link" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank">
-       *тык*
-      </a>
+      <p>Скинуть скинов, если есть лишние 😇</p>
+      <a class="ref-link" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank">*тык*</a>
     </div>
   </div>
+
+  <div class="ref-container" onclick="toggleRef(this)">
+    <div class="ref-header">💸 Пополнить криптой</div>
+    <div class="ref-content">
+      <p>Если хочешь поддержать — вот мои кошельки:</p>
+      <ul>
+        <li><strong>USDT (TRC20):</strong> <span class="ref-link">666</span></li>
+        <li><strong>BTC (Bitcoin):</strong> <span class="ref-link">666</span></li>
+        <li><strong>ETH (Ethereum):</strong> <span class="ref-link">666</span></li>
+        <li><strong>BNB (BEP20):</strong> <span class="ref-link">666</span></li>
+      </ul>
+    </div>
+  </div>
+
   <script>
     function toggleRef(container) {
       container.classList.toggle('active');
