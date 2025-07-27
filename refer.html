@@ -6,66 +6,112 @@
   <title>Мои Рефералы и Донаты</title>
   <style>
     :root {
-      --bg-color: #0f0f0f;
-      --card-bg: #1e1e1e;
-      --header-bg: #2c2c2c;
-      --border-color: #333;
-      --accent-color: #4fc3f7;
-      --success-color: #0f0;
+      color-scheme: light dark;
+      --bg-light: #f4f4f4;
+      --bg-dark: #0f0f0f;
+      --text-light: #000;
+      --text-dark: #fff;
+      --card-light: #fff;
+      --card-dark: #1e1e1e;
+      --header-light: #ddd;
+      --header-dark: #2c2c2c;
+      --border-light: #ccc;
+      --border-dark: #333;
+      --accent-light: #007acc;
+      --accent-dark: #4fc3f7;
+      --success: #00c853;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
       margin: 0;
       padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    @media (prefers-color-scheme: light) {
+      body {
+        background-color: var(--bg-light);
+        color: var(--text-light);
+      }
+      .ref-container {
+        background-color: var(--card-light);
+        border-color: var(--border-light);
+      }
+      .ref-header {
+        background-color: var(--header-light);
+      }
+      .ref-link, .qr-toggle {
+        color: var(--accent-light);
+      }
     }
 
     h1 {
-      font-size: 2rem;
+      font-size: 2.5rem;
       margin-bottom: 2rem;
       text-align: center;
+      background: linear-gradient(to right, #4fc3f7, #00e676);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .ref-container {
       width: 100%;
-      max-width: 600px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      margin-bottom: 1rem;
+      max-width: 700px;
+      background-color: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
       overflow: hidden;
-      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transition: all 0.4s ease;
+    }
+
+    .ref-container:hover {
+      transform: scale(1.02);
     }
 
     .ref-header {
-      padding: 1rem;
-      background-color: var(--header-bg);
+      padding: 1.2rem;
+      background-color: var(--header-dark);
       cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: bold;
+      font-size: 1.4rem;
+      font-weight: 600;
       text-align: center;
       user-select: none;
+      transition: background 0.3s;
+    }
+
+    .ref-header:hover {
+      background-color: #3a3a3a;
     }
 
     .ref-content {
       display: none;
-      padding: 1rem;
-      background-color: var(--card-bg);
-      font-size: 1rem;
+      padding: 1.2rem;
+      background-color: inherit;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      animation: fadeIn 0.5s ease;
     }
 
     .ref-link {
-      color: var(--accent-color);
+      color: var(--accent-dark);
       text-decoration: underline;
       display: inline-block;
       margin-top: 0.5rem;
       word-break: break-word;
       cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .ref-link:hover {
+      color: #00e5ff;
     }
 
     .qr-img {
@@ -77,17 +123,22 @@
 
     .qr-toggle {
       margin-left: 0.5rem;
-      background-color: var(--border-color);
+      background-color: var(--border-dark);
       border: none;
-      color: var(--accent-color);
+      color: var(--accent-dark);
       cursor: pointer;
-      padding: 0.3rem 0.7rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .qr-toggle:hover {
+      background-color: #444;
     }
 
     .copied {
-      color: var(--success-color);
+      color: var(--success);
     }
 
     .active .ref-content {
@@ -100,9 +151,15 @@
     }
 
     li {
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
 
@@ -124,26 +181,26 @@
         <li>
           <strong>USDT (TRC20):</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
-          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
-          <img src="USDT.jpg" alt="QR USDT" class="qr-img">
+          <button class="qr-toggle" onclick="generateQR(this, 'TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa')">QR</button>
+          <canvas class="qr-img"></canvas>
         </li>
         <li>
           <strong>BTC:</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
-          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
-          <img src="BTC.jpg" alt="QR BTC" class="qr-img">
+          <button class="qr-toggle" onclick="generateQR(this, '125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH')">QR</button>
+          <canvas class="qr-img"></canvas>
         </li>
         <li>
           <strong>ETH:</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
-          <img src="ETH.jpg" alt="QR ETH" class="qr-img">
+          <button class="qr-toggle" onclick="generateQR(this, '0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+          <canvas class="qr-img"></canvas>
         </li>
         <li>
           <strong>BNB (BEP20):</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
-          <img src="BNB.jpg" alt="QR BNB" class="qr-img">
+          <button class="qr-toggle" onclick="generateQR(this, '0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+          <canvas class="qr-img"></canvas>
         </li>
       </ul>
     </div>
@@ -185,11 +242,20 @@
       }).catch(err => alert("Ошибка копирования: " + err));
     }
 
-    function toggleQR(button) {
-      const img = button.nextElementSibling;
-      if (img) {
-        img.style.display = img.style.display === 'block' ? 'none' : 'block';
+    function generateQR(button, address) {
+      const canvas = button.nextElementSibling;
+      if (canvas.style.display === 'block') {
+        canvas.style.display = 'none';
+        return;
       }
+      canvas.style.display = 'block';
+      const qr = new QRious({
+        element: canvas,
+        value: address,
+        size: 150,
+        background: 'white',
+        foreground: 'black'
+      });
     }
   </script>
 
