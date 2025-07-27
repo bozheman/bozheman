@@ -2,11 +2,21 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Мои Рефералки</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мои Рефералы и Донаты</title>
   <style>
+    :root {
+      --bg-color: #0f0f0f;
+      --card-bg: #1e1e1e;
+      --header-bg: #2c2c2c;
+      --border-color: #333;
+      --accent-color: #4fc3f7;
+      --success-color: #0f0;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background-color: #0f0f0f;
+      background-color: var(--bg-color);
       color: #fff;
       margin: 0;
       padding: 2rem;
@@ -15,11 +25,17 @@
       align-items: center;
     }
 
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
     .ref-container {
       width: 100%;
       max-width: 600px;
-      background-color: #1e1e1e;
-      border: 1px solid #333;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       margin-bottom: 1rem;
       overflow: hidden;
@@ -28,7 +44,7 @@
 
     .ref-header {
       padding: 1rem;
-      background-color: #2c2c2c;
+      background-color: var(--header-bg);
       cursor: pointer;
       font-size: 1.2rem;
       font-weight: bold;
@@ -39,16 +55,16 @@
     .ref-content {
       display: none;
       padding: 1rem;
-      background-color: #1e1e1e;
+      background-color: var(--card-bg);
       font-size: 1rem;
     }
 
     .ref-link {
-      color: #4fc3f7;
+      color: var(--accent-color);
       text-decoration: underline;
       display: inline-block;
       margin-top: 0.5rem;
-      word-break: break-all;
+      word-break: break-word;
       cursor: pointer;
     }
 
@@ -60,10 +76,10 @@
     }
 
     .qr-toggle {
-      margin-left: 1rem;
-      background-color: #333;
+      margin-left: 0.5rem;
+      background-color: var(--border-color);
       border: none;
-      color: #4fc3f7;
+      color: var(--accent-color);
       cursor: pointer;
       padding: 0.3rem 0.7rem;
       border-radius: 6px;
@@ -71,11 +87,20 @@
     }
 
     .copied {
-      color: #0f0;
+      color: var(--success-color);
     }
 
     .active .ref-content {
       display: block;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 1rem;
     }
   </style>
 </head>
@@ -83,13 +108,11 @@
 
   <h1>👑 Мои реферальные ссылки и донаты</h1>
 
-  
-
   <div class="ref-container">
     <div class="ref-header" onclick="toggleRef(this)">🎁 Трейд URL Steam</div>
     <div class="ref-content">
       <p>Скинуть скинов, если есть лишние 😇</p>
-      <a class="ref-link" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank">*тык*</a>
+      <a class="ref-link" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer">*тык*</a>
     </div>
   </div>
 
@@ -101,72 +124,74 @@
         <li>
           <strong>USDT (TRC20):</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
-          <button class="qr-toggle" onclick="toggleQR(this, 'USDT')">QR</button>
+          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
           <img src="USDT.jpg" alt="QR USDT" class="qr-img">
         </li>
         <li>
           <strong>BTC:</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
-          <button class="qr-toggle" onclick="toggleQR(this, 'BTC')">QR</button>
+          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
           <img src="BTC.jpg" alt="QR BTC" class="qr-img">
         </li>
         <li>
           <strong>ETH:</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="toggleQR(this, 'ETH')">QR</button>
+          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
           <img src="ETH.jpg" alt="QR ETH" class="qr-img">
         </li>
         <li>
           <strong>BNB (BEP20):</strong>
           <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="toggleQR(this, 'BNB')">QR</button>
+          <button class="qr-toggle" onclick="toggleQR(this)">QR</button>
           <img src="BNB.jpg" alt="QR BNB" class="qr-img">
         </li>
       </ul>
     </div>
   </div>
 
+  <div class="ref-container">
+    <div class="ref-header" onclick="toggleRef(this)">🛒 DMarket</div>
+    <div class="ref-content">
+      <p>Пользуюсь этим маркетом. Зарегистрируйтесь, чтобы получать бонусы вместе со мной.</p>
+      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank" rel="noopener noreferrer">Перейти на DMarket</a>
+      <br>
+      <a class="ref-link" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer">Купить у меня скины</a>
+    </div>
+  </div>
+
+  <div class="ref-container">
+    <div class="ref-header" onclick="toggleRef(this)">🎰 CSGOEmpire</div>
+    <div class="ref-content">
+      <p>Регайтесь, будут микро-бонусы :)</p>
+      <a class="ref-link" href="https://csgoempire.com/r/bozheman" target="_blank" rel="noopener noreferrer">*тык*</a>
+    </div>
+  </div>
+
   <script>
-    function toggleRef(headerElement) {
-      const container = headerElement.parentElement;
+    function toggleRef(header) {
+      const container = header.parentElement;
       container.classList.toggle('active');
     }
 
     function copyToClipboard(element) {
-      const text = element.innerText;
-      navigator.clipboard.writeText(text).then(() => {
+      const original = element.innerText;
+      navigator.clipboard.writeText(original).then(() => {
         element.classList.add('copied');
         element.innerText = 'Скопировано!';
         setTimeout(() => {
           element.classList.remove('copied');
-          element.innerText = text;
-        }, 500);
-      });
+          element.innerText = original;
+        }, 1000);
+      }).catch(err => alert("Ошибка копирования: " + err));
     }
 
-    function toggleQR(button, label) {
+    function toggleQR(button) {
       const img = button.nextElementSibling;
-      img.style.display = img.style.display === 'block' ? 'none' : 'block';
+      if (img) {
+        img.style.display = img.style.display === 'block' ? 'none' : 'block';
+      }
     }
   </script>
-  <div class="ref-container">
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">🛒 DMarket</div>
-    <div class="ref-content">
-      <p>Данным маркетом пользуюсь я. Если не зарегистрированы, то можете зарегаться, чтобы получать вместе со мной бонусы от трейдов.</p>
-      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank">Перейти на DMarket</a>
-      <br>
-      <a class="ref-link" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank">Купить у меня скины</a>
-    </div>
-  </div>
 
-<div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">Казик CSGOempire</div>
-    <div class="ref-content">
-      <p>Можете зарегатться, микро бонусы</p>
-      <a class="ref-link" href="https://csgoempire.com/r/bozheman" target="_blank">*тык*</a>
-    </div>
-  </div>
-</div>
 </body>
 </html>
