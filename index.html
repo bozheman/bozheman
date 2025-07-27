@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>BOZHEMAN</title>
   <link rel="icon" type="image/png" href="gg.png" />
   <link rel="stylesheet" href="styles.css" />
@@ -14,28 +14,30 @@
   </header>
 
   <!-- ===== Main content ===== -->
-  <main class="container">
+  <main class="container" role="main">
     <div class="avatar-wrapper loading">
-      <img src="avatar.png" alt="BOZHEMAN avatar" class="avatar" loading="lazy" />
+      <img src="avatar.png" alt="Аватар BOZHEMAN" class="avatar" loading="lazy" />
     </div>
     <h1 class="brand glitch" data-text="BOZHEMAN">BOZHEMAN</h1>
 
-    <nav class="links">
-      <a href="https://t.me/bozheman" class="btn" target="_blank">Telegram</a>
+    <nav class="links" aria-label="Ссылки на соцсети и проекты">
+      <a href="https://t.me/bozheman" class="btn" target="_blank" rel="noopener noreferrer">Telegram</a>
+      
       <div class="row-buttons">
         <a href="https://t.me/protocol_0zero" class="btn half-btn" target="_blank">Нулевой протокол</a>
         <a href="https://t.me/vidpovnac" class="btn half-btn" target="_blank">Відповідальна Нація</a>
       </div>
+
       <a href="https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw" class="btn" target="_blank">YouTube</a>
       <a href="https://www.tiktok.com/@bozheman_" class="btn" target="_blank">TikTok</a>
       <a href="https://www.instagram.com/bozheman" class="btn" target="_blank">Instagram</a>
       <a href="https://discord.gg/jNFZTsBz8j" class="btn" target="_blank">Discord</a>
-  </div>
       <a href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" class="btn" target="_blank">Donate (Steam Items)</a>
-      <a  href="refer.html" class="btn special" target="_blank">💰 DONATION<br><span>спонсируй будущее!</span></a>
+      
+      <a href="refer.html" class="btn special" target="_blank">💰 DONATION<br><span>спонсируй будущее!</span></a>
     </nav>
 
-    <section class="stats" aria-label="Community size">
+    <section class="stats" aria-label="Community stats">
       <div class="stat-item">
         <span id="community-count" class="count">1300</span>
         <p>подписчиков во всех соцсетях</p>
@@ -44,41 +46,57 @@
   </main>
 
   <!-- ===== Secret content ===== -->
-  <div id="secret-content" class="secret">
+  <div id="secret-content" class="secret" aria-hidden="true">
     <a href="doubleindex.html" class="btn">BOZHEMAN не существует. Но ты нашёл меня</a>
   </div>
 
   <!-- ===== Cursor follower ===== -->
-  <div class="cursor-follower"></div>
+  <div class="cursor-follower" aria-hidden="true"></div>
 
+  <!-- ===== Scripts ===== -->
   <script>
-    /* ===== Theme toggle & secret reveal ===== */
     const toggleBtn = document.getElementById('theme-toggle');
     let secretCounter = 0;
-    function applyTheme(mode){
-      document.body.classList.toggle('light', mode==='light');
-      toggleBtn.textContent = mode==='light' ? '☀️' : '🌙';
+    let easterBuffer = [];
+
+    function applyTheme(mode) {
+      document.body.classList.toggle('light', mode === 'light');
+      toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
       localStorage.setItem('theme', mode);
     }
+
     toggleBtn.addEventListener('click', () => {
       const isLight = document.body.classList.contains('light');
       const newTheme = isLight ? 'dark' : 'light';
       applyTheme(newTheme);
-      if(!isLight && ++secretCounter === 3){
+
+      if (!isLight && ++secretCounter === 3) {
         document.getElementById('secret-content').classList.add('revealed');
       }
     });
-    applyTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
-    document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='t'){ toggleBtn.click(); }});
 
-    /* ===== Avatar fade‑in ===== */
+    applyTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+
+    document.addEventListener('keydown', e => {
+      const key = e.key.toLowerCase();
+      if (key === 't') toggleBtn.click();
+      if (key === 's') document.getElementById('secret-content').classList.add('revealed');
+
+      // Easter Egg: b + z + n
+      easterBuffer.push(key);
+      if (easterBuffer.join('').includes('bzn')) {
+        document.querySelector('.terminal')?.classList.add('open');
+        easterBuffer = [];
+      }
+      if (easterBuffer.length > 3) easterBuffer.shift();
+    });
+
     const avatar = document.querySelector('.avatar');
     avatar.addEventListener('load', () => {
       avatar.classList.add('loaded');
       avatar.parentElement.classList.remove('loading');
     });
 
-    /* ===== Cursor follower ===== */
     const cursor = document.querySelector('.cursor-follower');
     document.addEventListener('mousemove', e => {
       cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
