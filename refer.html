@@ -3,267 +3,294 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мои Рефералы и Донаты</title>
+  <title>BOZHEMAN ≡ SUPPORT</title>
+  <link rel="icon" type="image/png" href="gg.png" />
+  <!-- Подключаем основной файл стилей -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Дополнительные стили для этой страницы -->
   <style>
-    :root {
-      color-scheme: light dark;
-      --bg-light: #f4f4f4;
-      --bg-dark: #0f0f0f;
-      --text-light: #000;
-      --text-dark: #fff;
-      --card-light: #fff;
-      --card-dark: #1e1e1e;
-      --header-light: #ddd;
-      --header-dark: #2c2c2c;
-      --border-light: #ccc;
-      --border-dark: #333;
-      --accent-light: #007acc;
-      --accent-dark: #4fc3f7;
-      --success: #00c853;
+    .container {
+        width: 100%;
+        max-width: 900px;
+        padding: 2rem 1rem 4rem 1rem; /* Больше отступ снизу */
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-dark);
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: background-color 0.5s ease, color 0.5s ease;
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #ff3333;
+        transition: all 0.3s ease;
+        position: relative;
+        text-decoration: none;
+    }
+    .page-title:hover {
+        color: #fff;
+        text-shadow: 
+            0 0 5px #fff,
+            0 0 10px #fff,
+            0 0 20px #ff00de,
+            0 0 30px #ff00de;
     }
 
-    @media (prefers-color-scheme: light) {
-      body {
-        background-color: var(--bg-light);
-        color: var(--text-light);
-      }
-      .ref-container {
-        background-color: var(--card-light);
-        border-color: var(--border-light);
-      }
-      .ref-header {
-        background-color: var(--header-light);
-      }
-      .ref-link, .qr-toggle {
-        color: var(--accent-light);
-      }
+    .support-block {
+        border: 2px solid rgba(255, 51, 51, 0.3);
+        background: rgba(10, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        padding: 1.5rem;
     }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-align: center;
-      background: linear-gradient(to right, #4fc3f7, #00e676);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .support-block h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 51, 51, 0.5);
+        padding-bottom: 0.5rem;
     }
 
-    .ref-container {
-      width: 100%;
-      max-width: 700px;
-      background-color: var(--card-dark);
-      border: 1px solid var(--border-dark);
-      border-radius: 16px;
-      margin-bottom: 1.5rem;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      transition: all 0.4s ease;
+    .wallet-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
-    .ref-container:hover {
-      transform: scale(1.02);
+    .wallet-entry {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
     }
 
-    .ref-header {
-      padding: 1.2rem;
-      background-color: var(--header-dark);
-      cursor: pointer;
-      font-size: 1.4rem;
-      font-weight: 600;
-      text-align: center;
-      user-select: none;
-      transition: background 0.3s;
+    .wallet-entry strong {
+        color: #fff;
+        min-width: 120px;
     }
 
-    .ref-header:hover {
-      background-color: #3a3a3a;
+    .wallet-address {
+        color: #ff8a8a;
+        word-break: break-all;
+        flex-grow: 1;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    .wallet-address:hover {
+        color: #fff;
+    }
+    
+    .copy-feedback {
+        color: #00ff88;
+        font-weight: bold;
     }
 
-    .ref-content {
-      display: none;
-      padding: 1.2rem;
-      background-color: inherit;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      animation: fadeIn 0.5s ease;
+    .qr-btn {
+        background: transparent;
+        border: 1px solid #a30000;
+        color: #ff3333;
+        font-family: 'Fira Code', monospace;
+        padding: 0.3rem 0.6rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .qr-btn:hover {
+        background: #a30000;
+        color: #fff;
+    }
+    
+    .referral-links {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
-    .ref-link {
-      color: var(--accent-dark);
-      text-decoration: underline;
-      display: inline-block;
-      margin-top: 0.5rem;
-      word-break: break-word;
-      cursor: pointer;
-      transition: color 0.3s ease;
+    /* --- QR Modal --- */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .modal-overlay.visible {
+        opacity: 1;
+        pointer-events: all;
+    }
+    #qr-modal {
+        background: #111;
+        padding: 2rem;
+        border: 2px solid #ff3333;
+        text-align: center;
+    }
+    #qr-canvas {
+        display: block;
+        background: white;
+        padding: 1rem;
+    }
+    #qr-address {
+        margin-top: 1rem;
+        word-break: break-all;
+        max-width: 256px; /* Ширина QR кода */
     }
 
-    .ref-link:hover {
-      color: #00e5ff;
-    }
-
-    .qr-img {
-      display: none;
-      margin-top: 0.5rem;
-      max-width: 100%;
-      border-radius: 8px;
-    }
-
-    .qr-toggle {
-      margin-left: 0.5rem;
-      background-color: var(--border-dark);
-      border: none;
-      color: var(--accent-dark);
-      cursor: pointer;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .qr-toggle:hover {
-      background-color: #444;
-    }
-
-    .copied {
-      color: var(--success);
-    }
-
-    .active .ref-content {
-      display: block;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin-bottom: 1.2rem;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-10px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
 
-  <h1>👑 Мои реферальные ссылки и донаты</h1>
+  <canvas id="matrix-canvas"></canvas>
+  
+  <main class="container">
+    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ SUPPORT">BOZHEMAN ≡ SUPPORT</a>
 
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">🎁 Трейд URL Steam</div>
-    <div class="ref-content">
-      <p>Скинуть скинов, если есть лишние 😇</p>
-      <a class="ref-link" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer">*тык*</a>
-    </div>
-  </div>
+    <!-- Блок крипто-шлюзов -->
+    <section class="support-block">
+        <h2 data-text="КРИПТО-ШЛЮЗЫ">КРИПТО-ШЛЮЗЫ</h2>
+        <div class="wallet-list">
+            <!-- USDT -->
+            <div class="wallet-entry">
+                <strong>USDT (TRC20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
+                <button class="qr-btn" onclick="showQR('TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa')">QR</button>
+            </div>
+            <!-- BTC -->
+            <div class="wallet-entry">
+                <strong>BTC:</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
+                <button class="qr-btn" onclick="showQR('125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH')">QR</button>
+            </div>
+            <!-- ETH -->
+            <div class="wallet-entry">
+                <strong>ETH (ERC20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+            </div>
+            <!-- BNB -->
+            <div class="wallet-entry">
+                <strong>BNB (BEP20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+            </div>
+        </div>
+    </section>
 
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">💸 Для донатов криптой</div>
-    <div class="ref-content">
-      <p>Если хочешь поддержать — вот мои кошельки (клик — скопировать):</p>
-      <ul>
-        <li>
-          <strong>USDT (TRC20):</strong>
-          <span class="ref-link" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
-          <button class="qr-toggle" onclick="generateQR(this, 'TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa')">QR</button>
-          <canvas class="qr-img"></canvas>
-        </li>
-        <li>
-          <strong>BTC:</strong>
-          <span class="ref-link" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
-          <button class="qr-toggle" onclick="generateQR(this, '125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH')">QR</button>
-          <canvas class="qr-img"></canvas>
-        </li>
-        <li>
-          <strong>ETH:</strong>
-          <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="generateQR(this, '0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
-          <canvas class="qr-img"></canvas>
-        </li>
-        <li>
-          <strong>BNB (BEP20):</strong>
-          <span class="ref-link" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-          <button class="qr-toggle" onclick="generateQR(this, '0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
-          <canvas class="qr-img"></canvas>
-        </li>
-      </ul>
-    </div>
-  </div>
+    <!-- Блок Steam -->
+    <section class="support-block">
+        <h2 data-text="ПРОТОКОЛ STEAM">ПРОТОКОЛ STEAM</h2>
+        <a class="btn-glitch" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer" data-text="ОТПРАВИТЬ ПРЕДМЕТЫ">ОТПРАВИТЬ ПРЕДМЕТЫ</a>
+    </section>
 
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">🛒 DMarket</div>
-    <div class="ref-content">
-      <p>Пользуюсь этим маркетом. Зарегистрируйтесь, чтобы получать бонусы вместе со мной.</p>
-      <a class="ref-link" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank" rel="noopener noreferrer">Перейти на DMarket</a>
-      <br>
-      <a class="ref-link" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer">Купить у меня скины</a>
-    </div>
-  </div>
+    <!-- Блок реферальных систем -->
+    <section class="support-block">
+        <h2 data-text="РЕФЕРАЛЬНЫЕ СИСТЕМЫ">РЕФЕРАЛЬНЫЕ СИСТЕМЫ</h2>
+        <div class="referral-links">
+             <a class="btn-glitch" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank" rel="noopener noreferrer" data-text="DMarket: Регистрация">DMarket: Регистрация</a>
+             <a class="btn-glitch" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer" data-text="DMarket: Мои скины">DMarket: Мои скины</a>
+             <a class="btn-glitch" href="https://csgoempire.com/r/bozheman" target="_blank" rel="noopener noreferrer" data-text="CSGOEmpire">CSGOEmpire</a>
+             <a class="btn-glitch" href="https://swap.gg/?r=uqOV9EAMXC" target="_blank" rel="noopener noreferrer" data-text="SWAP.GG">SWAP.GG</a>
+        </div>
+    </section>
 
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">🎰 CSGOEmpire</div>
-    <div class="ref-content">
-      <p>Регайтесь, будут микро-бонусы :)</p>
-      <a class="ref-link" href="https://csgoempire.com/r/bozheman" target="_blank" rel="noopener noreferrer">*тык*</a>
-    </div>
-  </div>
+    <a href="index.html" class="btn-glitch special" data-text="< НАЗАД К ПРОТОКОЛУ">< НАЗАД К ПРОТОКОЛУ</a>
 
-  <div class="ref-container">
-    <div class="ref-header" onclick="toggleRef(this)">SWAP.GG</div>
-    <div class="ref-content">
-      <p>Моя рефералка на обменник, так же можно осмотреть скины прямо с телефона</p>
-      <a class="ref-link" href="https://swap.gg/?r=uqOV9EAMXC" target="_blank" rel="noopener noreferrer">*тык*</a>
-    </div>
+  </main>
+  
+  <!-- Модальное окно для QR -->
+  <div id="modal-overlay" class="modal-overlay" onclick="hideQR()">
+      <div id="qr-modal" onclick="event.stopPropagation()">
+          <canvas id="qr-canvas"></canvas>
+          <p id="qr-address"></p>
+      </div>
   </div>
 
   <script>
-    function toggleRef(header) {
-      const container = header.parentElement;
-      container.classList.toggle('active');
-    }
+    // --- Матрица на фоне ---
+    function setupMatrix() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const chars = "BOZHEMAN01";
+      const font_size = 14;
+      const columns = canvas.width / font_size;
+      const drops = Array.from({ length: columns }).fill(1);
 
-    function copyToClipboard(element) {
-      const original = element.innerText;
-      navigator.clipboard.writeText(original).then(() => {
-        element.classList.add('copied');
-        element.innerText = 'Скопировано!';
-        setTimeout(() => {
-          element.classList.remove('copied');
-          element.innerText = original;
-        }, 1000);
-      }).catch(err => alert("Ошибка копирования: " + err));
-    }
-
-    function generateQR(button, address) {
-      const canvas = button.nextElementSibling;
-      if (canvas.style.display === 'block') {
-        canvas.style.display = 'none';
-        return;
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#600000';
+        ctx.font = font_size + 'px Fira Code';
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * font_size, drops[i] * font_size);
+          if (drops[i] * font_size > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
       }
-      canvas.style.display = 'block';
-      const qr = new QRious({
-        element: canvas,
-        value: address,
-        size: 150,
-        background: 'white',
-        foreground: 'black'
+      setInterval(draw, 50);
+      window.addEventListener('resize', () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
       });
+    }
+    setupMatrix();
+
+    // --- Функционал страницы ---
+    function copyToClipboard(element) {
+      const originalText = element.innerText;
+      navigator.clipboard.writeText(originalText).then(() => {
+        element.classList.add('copy-feedback');
+        element.innerText = 'СКОПИРОВАНО!';
+        setTimeout(() => {
+          element.classList.remove('copy-feedback');
+          element.innerText = originalText;
+        }, 1500);
+      }).catch(err => {
+        console.error("Ошибка копирования: ", err);
+        element.innerText = 'ОШИБКА';
+         setTimeout(() => {
+          element.innerText = originalText;
+        }, 1500);
+      });
+    }
+
+    const modalOverlay = document.getElementById('modal-overlay');
+    const qrCanvas = document.getElementById('qr-canvas');
+    const qrAddress = document.getElementById('qr-address');
+    let qrInstance = null;
+
+    function showQR(address) {
+        qrAddress.textContent = address;
+        if(qrInstance) {
+            qrInstance.set({ value: address });
+        } else {
+            qrInstance = new QRious({
+                element: qrCanvas,
+                value: address,
+                size: 256,
+                background: 'white',
+                foreground: 'black'
+            });
+        }
+        modalOverlay.classList.add('visible');
+    }
+
+    function hideQR() {
+        modalOverlay.classList.remove('visible');
     }
   </script>
 

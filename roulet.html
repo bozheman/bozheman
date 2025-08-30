@@ -3,74 +3,214 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOZHEMAN ROULETTE</title>
+  <title>BOZHEMAN ≡ ROULETTE</title>
+  <link rel="icon" type="image/png" href="gg.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Дополнительные стили для страницы рулетки */
+    body {
+        justify-content: flex-start;
+    }
+    .roulette-container {
+        width: 100%;
+        max-width: 1200px;
+        padding: 6rem 1rem 2rem 1rem;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+    .game-layout {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        width: 100%;
+    }
+    .wheel-section {
+        position: relative;
+        width: 350px;
+        height: 350px;
+    }
+    .wheel-image {
+        width: 100%;
+        height: 100%;
+        transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .pointer {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 30px solid #ff3333;
+    }
+    .betting-section {
+        max-width: 600px;
+        flex-grow: 1;
+    }
+    .bet-board {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 4px;
+        margin-bottom: 1rem;
+    }
+    .bet-cell {
+        position: relative;
+        aspect-ratio: 1/1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        cursor: pointer;
+        border: 1px solid rgba(255, 51, 51, 0.3);
+        transition: background-color 0.2s;
+    }
+    .bet-cell:hover {
+        background-color: rgba(255, 51, 51, 0.3);
+    }
+    .bet-cell.number-0 { grid-column: 1 / 13; background-color: #006400;}
+    .bet-cell.red { background-color: #8B0000; }
+    .bet-cell.black { background-color: #222; }
+    .bet-cell.special {
+        aspect-ratio: auto;
+        padding: 0.5rem;
+    }
+    [data-bet-type="1-12"], [data-bet-type="13-24"], [data-bet-type="25-36"] { grid-column: span 4; }
+    [data-bet-type="1-18"], [data-bet-type="19-36"] { grid-column: span 3; }
+    [data-bet-type="even"], [data-bet-type="odd"] { grid-column: span 2; }
+    [data-bet-type="red"], [data-bet-type="black"] { grid-column: span 2; }
+    
+    .chip-on-cell {
+        position: absolute;
+        width: 60%;
+        height: 60%;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.8em;
+        pointer-events: none;
+    }
 
-  <!-- Подключаем шрифт Fira Code -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- Стили рулетки -->
-  <link rel="stylesheet" href="roulette.css" />
+    .controls-section, .info-section {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid rgba(255, 51, 51, 0.3);
+        background: rgba(10, 0, 0, 0.2);
+        backdrop-filter: blur(5px);
+    }
+    .chips-selector, .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+    .chip {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        cursor: pointer;
+        border: 2px solid;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .chip.active {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px;
+    }
+    .info-section {
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <!-- ================= HEADER (Top Bar) ================= -->
-  <header class="top-bar" role="banner">
-    <h1 class="title">ROULETTE OF BOZHEMAN</h1>
-    <div class="balance" aria-live="polite">
-      Баланс: <span id="balance">0</span> BMAN
-    </div>
-  </header>
+  <canvas id="matrix-canvas"></canvas>
 
-  <!-- ================= MAIN LAYOUT ================= -->
-  <main class="layout">
-    <!-- ===== LEFT: Wheel Area (PNG-изображение) ===== -->
-    <section class="wheel-container" aria-label="Рулетка">
-      <!-- Указатель (pointer) -->
-      <div class="pointer" id="pointer" aria-hidden="true"></div>
-      <!-- Картинка колеса со всеми цифрами (wheel.png) -->
-      <img
-        src="wheel.png"
-        alt="Рулетка"
-        class="wheel-image"
-        id="wheel"
-      />
+  <main class="roulette-container">
+    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ ROULETTE">BOZHEMAN ≡ ROULETTE</a>
+
+    <section class="info-section">
+        <div>
+            <h3>БАЛАНС</h3>
+            <p id="balance-display">1000</p>
+        </div>
+        <div>
+            <h3>СТАВКА</h3>
+            <p id="total-bet-display">0</p>
+        </div>
+        <div>
+            <h3>ПОСЛЕДНЕЕ ЧИСЛО</h3>
+            <p id="last-number-display">-</p>
+        </div>
     </section>
 
-    <!-- ===== RIGHT: Bet Board ===== -->
-    <aside class="bet-board" id="bet-board" aria-label="Таблица ставок">
-      <!-- JS динамически сформирует структуру -->
-    </aside>
+    <div class="game-layout">
+        <div class="wheel-section">
+            <div class="pointer"></div>
+            <img src="wheel.png" alt="Колесо рулетки" class="wheel-image" id="wheel">
+        </div>
+        <div class="betting-section">
+            <div class="bet-board" id="bet-board"></div>
+            <div class="controls-section">
+                <div class="chips-selector" id="chips-selector"></div>
+                <div class="actions">
+                    <button class="btn-glitch" id="spin-button" data-text="КРУТИТЬ">КРУТИТЬ</button>
+                    <button class="btn-glitch" id="clear-button" data-text="ОЧИСТИТЬ">ОЧИСТИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
   </main>
 
-  <!-- ================= RESULT & MESSAGE ================= -->
-  <section class="result-block" aria-live="polite">
-    <div id="result-display" class="number-display"></div>
-    <div id="message" class="message"></div>
-    <button id="buy-access" class="buy-access" aria-hidden="true">
-      💎 КУПИТЬ ПРОХОД
-    </button>
-  </section>
-
-  <!-- ================= CONTROLS (Chips + Spin) ================= -->
-  <section class="controls" aria-label="Управление">
-    <div class="chip-row" role="group" aria-label="Выберите номинал ставки">
-      <button class="chip" data-value="1" aria-label="Ставка 1 BMAN">1</button>
-      <button class="chip" data-value="5" aria-label="Ставка 5 BMAN">5</button>
-      <button class="chip" data-value="10" aria-label="Ставка 10 BMAN">10</button>
-      <button class="chip" data-value="50" aria-label="Ставка 50 BMAN">50</button>
-      <button class="chip" data-value="250" aria-label="Ставка 250 BMAN">250</button>
-    </div>
-    <button id="spin-btn" class="spin-btn" aria-label="Крутить рулетку">
-      🎰 КРУТИТЬ
-    </button>
-  </section>
-
-  <!-- ================= HISTORY LOG ================= -->
-  <section id="history-log" class="history" aria-label="История результатов"></section>
-
-  <!-- ================= JavaScript (логика) ================= -->
   <script src="roulette.js"></script>
+  <script>
+    // Скрипт для фона "Матрица"
+    function setupMatrix() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const chars = "BOZHEMAN01";
+      const font_size = 14;
+      const columns = canvas.width / font_size;
+      const drops = Array.from({ length: columns }).fill(1);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#600000';
+        ctx.font = font_size + 'px Fira Code';
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * font_size, drops[i] * font_size);
+          if (drops[i] * font_size > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+      setInterval(draw, 50);
+      window.addEventListener('resize', () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+      });
+    }
+    setupMatrix();
+  </script>
 </body>
 </html>

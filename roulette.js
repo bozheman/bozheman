@@ -1,214 +1,242 @@
-(function () {
-  /* ================= STATE ================= */
-  let balance = parseInt(localStorage.getItem("bman_balance")) || 100;
-  let isSpinning = false;
-  let currentRotation = 0;
-  let spinCount = 0;
-  const history = [];
-  let selectedChip = 1;
-  let placedBet = null;
+document.addEventListener('DOMContentLoaded', () => {
+    // --- GAME STATE & CONFIG ---
+    let balance = 1000;
+    let currentBets = {}; // { 'bet_type': amount }
+    let selectedChipValue = 1;
+    let isSpinning = false;
 
-  // Последовательность секторов по часовой, начиная с «0» (сектор «0» находится вверху)
-  const sectors = [
-    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8,
-    23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12,
-    35, 3, 26
-  ];
+    const CHIP_VALUES = [1, 5, 10, 25, 100];
+    const CHIP_COLORS = {
+        1: '#c0c0c0',
+        5: '#ff4d4d',
+        10: '#4d94ff',
+        25: '#33cc33',
+        100: '#e6e600'
+    };
 
-  /* ========= HTML REFERENCES ========= */
-  const balanceSpan = document.getElementById("balance");
-  const wheelImage   = document.getElementById("wheel");
-  const pointer      = document.getElementById("pointer");
-  const msgBox       = document.getElementById("message");
-  const resultBox    = document.getElementById("result-display");
-  const historyLog   = document.getElementById("history-log");
-  const betBoard     = document.getElementById("bet-board");
-  const spinBtn      = document.getElementById("spin-btn");
-  const buyAccessBtn = document.getElementById("buy-access");
-
-  /* ========= ИНИЦИАЛИЗАЦИЯ ========= */
-  updateBalance();
-  buildBetBoard();
-  initChips();
-  spinBtn.addEventListener("click", spin);
-
-  /* ========= ФУНКЦИИ ========= */
-
-  function updateBalance() {
-    balanceSpan.textContent = balance;
-    localStorage.setItem("bman_balance", balance);
-    buyAccessBtn.style.display = (balance >= 1000 ? "inline-block" : "none");
-    if (balance <= 0) {
-      spinBtn.disabled = true;
-      msgBox.textContent = "Баланс на нуле. Пополните счёт.";
-    } else {
-      spinBtn.disabled = false;
-    }
-  }
-
-  function buildBetBoard() {
-    const numbers = [...Array(37).keys()];
-    numbers.forEach((n) => {
-      const cell = document.createElement("div");
-      cell.className       = "bet-cell";
-      cell.dataset.choice  = n.toString();
-      cell.textContent     = n;
-      betBoard.appendChild(cell);
-    });
-
-    ["1st12", "2nd12", "3rd12"].forEach((label) => {
-      const cell = document.createElement("div");
-      cell.className      = "bet-cell";
-      cell.dataset.choice = label;
-      cell.textContent    = label.toUpperCase();
-      cell.style.gridColumn = "span 3";
-      betBoard.appendChild(cell);
-    });
-
-    const bottom = [
-      { choice: "1to18",     label: "1 to 18" },
-      { choice: "even",      label: "EVEN" },
-      { choice: "redbottom", label: "RED" },
-      { choice: "blackbottom", label: "BLACK" },
-      { choice: "odd",       label: "ODD" },
-      { choice: "19to36",    label: "19 to 36" },
+    // [number, color]
+    const WHEEL_NUMBERS = [
+        [0, 'green'], [32, 'red'], [15, 'black'], [19, 'red'], [4, 'black'],
+        [21, 'red'], [2, 'black'], [25, 'red'], [17, 'black'], [34, 'red'],
+        [6, 'black'], [27, 'red'], [13, 'black'], [36, 'red'], [11, 'black'],
+        [30, 'red'], [8, 'black'], [23, 'red'], [10, 'black'], [5, 'red'],
+        [24, 'black'], [16, 'red'], [33, 'black'], [1, 'red'], [20, 'black'],
+        [14, 'red'], [31, 'black'], [9, 'red'], [22, 'black'], [18, 'red'],
+        [29, 'black'], [7, 'red'], [28, 'black'], [12, 'red'], [35, 'black'],
+        [3, 'red'], [26, 'black']
     ];
-    bottom.forEach((item) => {
-      const cell = document.createElement("div");
-      cell.className      = "bet-cell";
-      cell.dataset.choice = item.choice;
-      cell.textContent    = item.label.toUpperCase();
-      betBoard.appendChild(cell);
-    });
 
-    betBoard.addEventListener("click", (e) => {
-      const cell = e.target.closest(".bet-cell");
-      if (!cell || isSpinning) return;
-      placeBet(cell);
-    });
-  }
+    const PAYOUTS = {
+        'single': 36,
+        'dozen': 3,
+        'column': 3,
+        'half': 2,
+        'even_odd': 2,
+        'color': 2
+    };
 
-  function initChips() {
-    document.querySelectorAll(".chip").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
-        btn.classList.add("active");
-        selectedChip = parseInt(btn.dataset.value, 10);
-      });
-    });
-    document.querySelector('.chip[data-value="1"]').classList.add("active");
-  }
+    // --- DOM ELEMENTS ---
+    const balanceDisplay = document.getElementById('balance-display');
+    const totalBetDisplay = document.getElementById('total-bet-display');
+    const lastNumberDisplay = document.getElementById('last-number-display');
+    const wheelImage = document.getElementById('wheel');
+    const betBoard = document.getElementById('bet-board');
+    const chipsSelector = document.getElementById('chips-selector');
+    const spinButton = document.getElementById('spin-button');
+    const clearButton = document.getElementById('clear-button');
 
-  function placeBet(cell) {
-    const choice = cell.dataset.choice;
-    if (balance < selectedChip) {
-      msgBox.textContent = "Недостаточно BMAN";
-      return;
-    }
-    resetBoard();
-    cell.classList.add("chosen");
-    placedBet = { choice, amount: selectedChip };
-    cell.innerHTML = `<strong>${cell.textContent}</strong><span class="mini-chip">${selectedChip}</span>`;
-    msgBox.textContent = `Ставка: ${selectedChip} BMAN на ${cell.textContent}`;
-  }
-
-  function resetBoard() {
-    document.querySelectorAll(".bet-cell").forEach((c) => {
-      c.classList.remove("chosen");
-      c.innerHTML = c.dataset.choice.toString().toUpperCase();
-    });
-    placedBet = null;
-  }
-
-  function spin() {
-    if (isSpinning) return;
-    if (!placedBet) {
-      msgBox.textContent = "Выберите ставку!";
-      return;
-    }
-    const { choice, amount } = placedBet;
-    if (amount > balance) {
-      msgBox.textContent = "Недостаточно BMAN";
-      return;
+    // --- INITIALIZATION ---
+    function init() {
+        createBetBoard();
+        createChips();
+        updateDisplays();
+        
+        spinButton.addEventListener('click', spin);
+        clearButton.addEventListener('click', clearBets);
+        betBoard.addEventListener('click', placeBet);
+        chipsSelector.addEventListener('click', selectChip);
     }
 
-    balance -= amount;
-    updateBalance();
-    isSpinning = true;
-    spinCount++;
-    resultBox.textContent = "";
-    msgBox.textContent    = "Крутится...";
+    function createBetBoard() {
+        betBoard.innerHTML = '';
+        // Zero
+        const zero = createCell('0', 'number-0');
+        zero.dataset.betType = 'single_0';
+        betBoard.appendChild(zero);
 
-    // выбираем случайный номер из sectors
-    const resultNum = sectors[Math.floor(Math.random() * sectors.length)];
-    animateWheel(resultNum);
+        // Numbers 1-36
+        for (let i = 1; i <= 36; i++) {
+            const numInfo = WHEEL_NUMBERS.find(n => n[0] === i);
+            const cell = createCell(i.toString(), numInfo[1]);
+            cell.dataset.betType = `single_${i}`;
+            cell.style.gridColumn = 'span 1';
+            betBoard.appendChild(cell);
+        }
+        
+        // Special bets
+        const specialBets = [
+            { text: '1-12', type: '1-12' }, { text: '13-24', type: '13-24' }, { text: '25-36', type: '25-36' },
+            { text: '1-18', type: '1-18' }, { text: 'EVEN', type: 'even' }, { text: 'RED', type: 'red' },
+            { text: 'BLACK', type: 'black' }, { text: 'ODD', type: 'odd' }, { text: '19-36', type: '19-36' }
+        ];
 
-    // после ~6.2 секунд анимации объявляем результат
-    setTimeout(() => {
-      const reds = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
-      const color = resultNum === 0 ? "green"
-                  : reds.includes(resultNum)   ? "red"
-                                               : "black";
+        specialBets.forEach(bet => {
+            const cell = createCell(bet.text, 'special');
+            cell.dataset.betType = bet.type;
+            betBoard.appendChild(cell);
+        });
+    }
 
-      resultBox.textContent = `Выпало: ${resultNum} (${color.toUpperCase()})`;
-      const win = evaluateBet(choice, amount, resultNum, color);
-      if (win > 0) {
-        balance += win;
-        msgBox.textContent = `Поздравляем! Вы выиграли ${win} BMAN!`;
-      } else {
-        msgBox.textContent = "Увы, вы проиграли.";
-      }
-      logHistory(resultNum, color, win, amount);
-      updateBalance();
-      resetBoard();
-      isSpinning = false;
-    }, 6200);
-  }
+    function createCell(text, className) {
+        const cell = document.createElement('div');
+        cell.className = `bet-cell ${className}`;
+        cell.textContent = text;
+        return cell;
+    }
 
-  function evaluateBet(choice, bet, num, color) {
-    let payout = 0;
-    if (choice === "redbottom" && color === "red")          payout = bet * 2;
-    else if (choice === "blackbottom" && color === "black") payout = bet * 2;
-    else if (choice === "even" && num !== 0 && num % 2 === 0) payout = bet * 2;
-    else if (choice === "odd" && num % 2 === 1)              payout = bet * 2;
-    else if (choice === "1st12" && num >= 1 && num <= 12)   payout = bet * 3;
-    else if (choice === "2nd12" && num >= 13 && num <= 24)  payout = bet * 3;
-    else if (choice === "3rd12" && num >= 25 && num <= 36)  payout = bet * 3;
-    else if (choice === "1to18" && num >= 1 && num <= 18)   payout = bet * 2;
-    else if (choice === "19to36" && num >= 19 && num <= 36) payout = bet * 2;
-    else if (parseInt(choice, 10) === num)                   payout = bet * 36;
-    return payout;
-  }
+    function createChips() {
+        chipsSelector.innerHTML = '';
+        CHIP_VALUES.forEach(value => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = value;
+            chip.dataset.value = value;
+            chip.style.backgroundColor = CHIP_COLORS[value];
+            chip.style.borderColor = CHIP_COLORS[value];
+            if (value === selectedChipValue) chip.classList.add('active');
+            chipsSelector.appendChild(chip);
+        });
+    }
 
-  function logHistory(num, color, win, bet) {
-    const sign = win > 0 ? `+${win}` : `-${bet}`;
-    const entry = `#${spinCount}: ${num} (${color.toUpperCase()}) — ${sign} BMAN`;
-    history.unshift(entry);
-    if (history.length > 5) history.pop();
-    historyLog.innerHTML = history.map(h => `<div>${h}</div>`).join("");
-  }
+    // --- GAME LOGIC ---
+    function selectChip(event) {
+        const chip = event.target.closest('.chip');
+        if (!chip) return;
+        selectedChipValue = parseInt(chip.dataset.value);
+        document.querySelector('.chip.active').classList.remove('active');
+        chip.classList.add('active');
+    }
 
-  function animateWheel(resultNum) {
-    const sectorCount = sectors.length;
-    const sectorAngle = 360 / sectorCount;
-    const index = sectors.indexOf(resultNum);
-    const extraSpins = 8 * 360;
+    function placeBet(event) {
+        if (isSpinning) return;
+        const cell = event.target.closest('.bet-cell');
+        if (!cell) return;
+        
+        if (balance < selectedChipValue) {
+            alert("Недостаточно средств!");
+            return;
+        }
 
-    // добавляем половинный угол сектора, чтобы центр выбранного сектора точно встал под указатель
-    const halfSector = sectorAngle / 2;
+        balance -= selectedChipValue;
+        const betType = cell.dataset.betType;
+        currentBets[betType] = (currentBets[betType] || 0) + selectedChipValue;
 
-    // «стартовый» угол для этого сектора:
-    // pointer у нас расположен сверху и указывает вниз (0° соответствует сектору 0),
-    // поэтому конечный угол таков: 360 – (index * sectorAngle) – halfSector
-    const stopAngle = (360 - index * sectorAngle - halfSector + 360) % 360;
+        updateCellChip(cell, betType);
+        updateDisplays();
+    }
 
-    // накапливаем всё смещение с предыдущих вращений:
-    currentRotation = (currentRotation + extraSpins + stopAngle) % 360;
+    function spin() {
+        if (isSpinning || Object.keys(currentBets).length === 0) return;
+        isSpinning = true;
+        spinButton.disabled = true;
 
-    wheelImage.style.transition = "transform 6s cubic-bezier(0.33,1,0.68,1)";
-    wheelImage.style.transform  = `rotate(${currentRotation}deg)`;
+        const randomIndex = Math.floor(Math.random() * WHEEL_NUMBERS.length);
+        const winningNumberInfo = WHEEL_NUMBERS[randomIndex];
+        const winningNumber = winningNumberInfo[0];
+        const numberIndexOnWheel = WHEEL_NUMBERS.findIndex(n => n[0] === winningNumber);
 
-    pointer.classList.add("spinning");
-    setTimeout(() => pointer.classList.remove("spinning"), 6200);
-  }
-})();
+        const baseRotation = 360 * 5; // 5 full spins
+        const sectorAngle = 360 / WHEEL_NUMBERS.length;
+        const finalAngle = baseRotation - (numberIndexOnWheel * sectorAngle);
+        
+        wheelImage.style.transform = `rotate(${finalAngle}deg)`;
+
+        setTimeout(() => {
+            calculateWinnings(winningNumberInfo);
+            lastNumberDisplay.textContent = `${winningNumber} (${winningNumberInfo[1].toUpperCase()})`;
+            clearBets(false); // Clear bets but keep balance
+            isSpinning = false;
+            spinButton.disabled = false;
+        }, 6500); // Wait for animation to finish
+    }
+
+    function calculateWinnings(winningNumberInfo) {
+        let totalWinnings = 0;
+        const [number, color] = winningNumberInfo;
+
+        for (const betType in currentBets) {
+            const betAmount = currentBets[betType];
+            let win = 0;
+
+            if (betType.startsWith('single_')) {
+                if (parseInt(betType.split('_')[1]) === number) win = betAmount * PAYOUTS.single;
+            } else {
+                if ( (betType === '1-12' && number >= 1 && number <= 12) ||
+                     (betType === '13-24' && number >= 13 && number <= 24) ||
+                     (betType === '25-36' && number >= 25 && number <= 36) ) {
+                    win = betAmount * PAYOUTS.dozen;
+                }
+                if ( (betType === '1-18' && number >= 1 && number <= 18) ||
+                     (betType === '19-36' && number >= 19 && number <= 36) ) {
+                    win = betAmount * PAYOUTS.half;
+                }
+                if ( (betType === 'even' && number % 2 === 0 && number !== 0) ||
+                     (betType === 'odd' && number % 2 !== 0) ) {
+                    win = betAmount * PAYOUTS.even_odd;
+                }
+                if (betType === color) {
+                    win = betAmount * PAYOUTS.color;
+                }
+            }
+            totalWinnings += win;
+        }
+        
+        balance += totalWinnings;
+        updateDisplays();
+        if (totalWinnings > 0) {
+            alert(`Выигрыш: ${totalWinnings}`);
+        }
+    }
+    
+    function clearBets(refund = true) {
+        if (isSpinning) return;
+        if (refund) {
+            const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
+            balance += totalBet;
+        }
+        currentBets = {};
+        document.querySelectorAll('.chip-on-cell').forEach(chip => chip.remove());
+        updateDisplays();
+    }
+
+    // --- UI UPDATES ---
+    function updateDisplays() {
+        balanceDisplay.textContent = balance;
+        const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
+        totalBetDisplay.textContent = totalBet;
+    }
+
+    function updateCellChip(cell, betType) {
+        let chipOnCell = cell.querySelector('.chip-on-cell');
+        if (!chipOnCell) {
+            chipOnCell = document.createElement('div');
+            chipOnCell.className = 'chip-on-cell';
+            const highestChipValue = getHighestChipForAmount(currentBets[betType]);
+            chipOnCell.style.backgroundColor = CHIP_COLORS[highestChipValue];
+            cell.appendChild(chipOnCell);
+        }
+        chipOnCell.textContent = currentBets[betType];
+    }
+    
+    function getHighestChipForAmount(amount) {
+        let highestChip = 1;
+        for (const value of CHIP_VALUES) {
+            if (amount >= value) {
+                highestChip = value;
+            }
+        }
+        return highestChip;
+    }
+
+    init();
+});
