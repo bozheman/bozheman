@@ -22,6 +22,7 @@ function init() {
 
     updateBalanceDisplay();
     spinButton.addEventListener('click', handleSpin);
+    spinButton.addEventListener('touchend', handleSpin); // ДОБАВЛЕНО ДЛЯ МОБИЛЬНЫХ
     modalCloseButton.addEventListener('click', hideModal);
     modalOverlay.addEventListener('click', hideModal);
 
@@ -124,5 +125,6 @@ function handleSpin() {
 
     init();
 });
+
 
 
