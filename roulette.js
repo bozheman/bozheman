@@ -1,8 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- GAME STATE & CONFIG ---
-    let balance = 1000;
-    let isSpinning = false;
-    const MIN_NUMBER = 1;
+// --- GAME STATE & CONFIG ---
+let balance = parseInt(localStorage.getItem('b777_balance')) || 1000;
+let isSpinning = false;
+const MIN_NUMBER = 1;
     const MAX_NUMBER = 7;
 
     // --- DOM ELEMENTS ---
@@ -16,16 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalText = document.getElementById('modal-text');
     const modalCloseButton = document.getElementById('modal-close-button');
 
-    // --- INITIALIZATION ---
-    function init() {
-        updateBalanceDisplay();
-        spinButton.addEventListener('click', handleSpin);
-        modalCloseButton.addEventListener('click', hideModal);
-        modalOverlay.addEventListener('click', hideModal);
-    }
+// --- INITIALIZATION ---
+function init() {
+    guessInput.value = localStorage.getItem('b777_lastGuess') || '';
+    betInput.value = localStorage.getItem('b777_lastBet') || '';
 
-    // --- GAME LOGIC ---
-    function handleSpin() {
+    updateBalanceDisplay();
+    spinButton.addEventListener('click', handleSpin);
+    modalCloseButton.addEventListener('click', hideModal);
+    modalOverlay.addEventListener('click', hideModal);
+
+    guessInput.addEventListener('change', () => localStorage.setItem('b777_lastGuess', guessInput.value));
+    betInput.addEventListener('change', () => localStorage.setItem('b777_lastBet', betInput.value));
+}
+
+// --- GAME LOGIC ---
+function handleSpin() {
         if (isSpinning) return;
 
         const guess = parseInt(guessInput.value);
@@ -64,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             updateBalanceDisplay();
-            guessInput.value = '';
-            betInput.value = '';
+            // guessInput.value = '';
+            // betInput.value = '';
             isSpinning = false;
             spinButton.disabled = false;
         });
@@ -105,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateBalanceDisplay() {
         balanceDisplay.textContent = balance;
+        localStorage.setItem('b777_balance', balance);
     }
 
     function showModal(message) {
@@ -118,4 +124,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
+
 
