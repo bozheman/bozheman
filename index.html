@@ -12,29 +12,35 @@
 </head>
 <body>
 
+  <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="preloader">
     <div id="preloader-text"></div>
   </div>
 
+  <!-- ФОНОВАЯ АНИМАЦИЯ (МАТРИЦА) -->
   <canvas id="matrix-canvas"></canvas>
   
+  <!-- 3D СЦЕНА -->
   <canvas id="scene-canvas"></canvas>
 
+  <!-- ИНТЕРФЕЙС -->
   <div id="ui-container">
     <div id="brand-title">BOZHEMAN</div>
     <button id="sound-toggle" aria-label="Переключить звук">🔇</button>
   </div>
   <div id="link-label"></div>
 
+  <!-- АУДИО -->
   <audio id="ambient-audio" loop preload="auto">
     <source src="omega.m4a" type="audio/mp4" />
   </audio>
 
+  <!-- СКРИПТЫ -->
   <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
       }
     }
   </script>
@@ -43,6 +49,7 @@
     // Импорт необходимых библиотек
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { TWEEN } from 'three/addons/libs/tween.module.min.js';
 
     // --- НАСТРОЙКИ ---
     const PRELOADER_LINES = [
@@ -62,6 +69,10 @@
       { name: 'Discord', url: 'https://discord.gg/jNFZTsBz8j', position: new THREE.Vector3(0, 0, 1.8) },
       { name: '💰 DONATION', url: 'refer.html', position: new THREE.Vector3(0, 0, -1.8) }
     ];
+    
+    const SECRET_CLICK_COUNT = 5;
+    const SECRET_LINK_URL = 'doubleindex.html';
+    const SECRET_LINK_NAME = 'PROTOCOL_NULL';
 
     // --- ИНИЦИАЛИЗАЦИЯ ---
     const preloader = document.getElementById('preloader');
@@ -73,9 +84,10 @@
     const linkLabel = document.getElementById('link-label');
 
     let scene, camera, renderer, controls, raycaster;
-    let mainObject, hotspotsGroup;
+    let mainObject, hotspotsGroup, secretHotspotMesh;
     const mouse = new THREE.Vector2();
     let activeLink = null;
+    let clickTracker = { hotspot: null, count: 0, timer: null };
 
     init();
     runPreloader();
@@ -113,7 +125,6 @@
       const ctx = matrixCanvas.getContext('2d');
       matrixCanvas.width = window.innerWidth;
       matrixCanvas.height = window.innerHeight;
-
       const chars = "BOZHEMAN01";
       const font_size = 14;
       const columns = matrixCanvas.width / font_size;
@@ -139,45 +150,29 @@
 
     // 3. Настройка 3D-сцены
     function init() {
-      // Сцена
       scene = new THREE.Scene();
-
-      // Камера
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.z = 5;
-
-      // Рендерер
       renderer = new THREE.WebGLRenderer({ canvas: sceneCanvas, antialias: true, alpha: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      // Свет
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
       const pointLight = new THREE.PointLight(0xff0000, 100, 100);
       pointLight.position.set(5, 5, 5);
       scene.add(pointLight);
-      
-      // Контроллер вращения
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.enableZoom = false;
       controls.enablePan = false;
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.5;
-
-      // Raycaster для отслеживания мыши
       raycaster = new THREE.Raycaster();
-
-      // Создание объектов
       createMainObject();
       createHotspots();
-      
-      // Запуск анимации
+      createSecretHotspot();
       setupMatrix();
       animate();
-
-      // Обработчики событий
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('click', onClick);
@@ -188,7 +183,9 @@
     function createMainObject() {
       const geometry = new THREE.IcosahedronGeometry(1, 0);
       const material = new THREE.MeshStandardMaterial({
-        color: 0x600000,
+        color: 0xcc0000,
+        emissive: 0xcc0000,
+        emissiveIntensity: 0.5,
         metalness: 0.8,
         roughness: 0.2,
         wireframe: true
@@ -209,13 +206,20 @@
       });
       scene.add(hotspotsGroup);
     }
+    
+    function createSecretHotspot() {
+        const geometry = new THREE.SphereGeometry(0.2, 16, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0, visible: false });
+        secretHotspotMesh = new THREE.Mesh(geometry, material);
+        secretHotspotMesh.position.set(0, 0, 0);
+        secretHotspotMesh.userData = { url: SECRET_LINK_URL, name: SECRET_LINK_NAME, isSecret: true };
+        hotspotsGroup.add(secretHotspotMesh);
+    }
 
     // 5. Цикл анимации
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
-      
-      // Обновление raycaster'а
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(hotspotsGroup.children);
 
@@ -223,21 +227,23 @@
         const intersectedObject = intersects[0].object;
         activeLink = intersectedObject.userData;
         document.body.style.cursor = 'pointer';
-        
         linkLabel.style.display = 'block';
         linkLabel.textContent = activeLink.name;
-        
+        if (!activeLink.isSecret) {
+          mainObject.material.emissiveIntensity = 0.5 + Math.sin(Date.now() * 0.005) * 0.2;
+        }
       } else {
         activeLink = null;
         document.body.style.cursor = 'default';
         linkLabel.style.display = 'none';
+        mainObject.material.emissiveIntensity = 0.5;
       }
 
-      // Вращаем объекты вместе
       const rotationSpeed = 0.001;
       mainObject.rotation.y += rotationSpeed;
       hotspotsGroup.rotation.y += rotationSpeed;
-
+      
+      TWEEN.update();
       renderer.render(scene, camera);
     }
 
@@ -259,8 +265,56 @@
 
     function onClick() {
       if (activeLink) {
-        window.open(activeLink.url, '_blank');
+        if (!activeLink.isSecret) {
+          if (clickTracker.hotspot === activeLink.url) {
+            clickTracker.count++;
+          } else {
+            clickTracker.hotspot = activeLink.url;
+            clickTracker.count = 1;
+          }
+
+          clearTimeout(clickTracker.timer);
+          clickTracker.timer = setTimeout(() => {
+            clickTracker.count = 0;
+            clickTracker.hotspot = null;
+          }, 1500);
+
+          if (clickTracker.count >= SECRET_CLICK_COUNT) {
+            activateSecretProtocol();
+            clickTracker.count = 0;
+            clickTracker.hotspot = null;
+            clearTimeout(clickTracker.timer);
+            return;
+          }
+          
+          window.open(activeLink.url, '_blank');
+        } else {
+          window.open(activeLink.url, '_blank');
+        }
       }
+    }
+    
+    function activateSecretProtocol() {
+      console.log("SECRET PROTOCOL ACTIVATED!");
+      secretHotspotMesh.material.visible = true;
+      new TWEEN.Tween(secretHotspotMesh.material).to({ opacity: 0.8 }, 1000).start();
+      
+      const originalEmissive = mainObject.material.emissiveIntensity;
+      const tween = new TWEEN.Tween({ intensity: originalEmissive })
+        .to({ intensity: 2.0 }, 200)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate((obj) => {
+          mainObject.material.emissiveIntensity = obj.intensity;
+        });
+
+      const tweenBack = new TWEEN.Tween({ intensity: 2.0 })
+        .to({ intensity: originalEmissive }, 800)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate((obj) => {
+          mainObject.material.emissiveIntensity = obj.intensity;
+        });
+
+      tween.chain(tweenBack).start();
     }
     
     function toggleSound() {
