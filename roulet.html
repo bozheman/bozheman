@@ -11,9 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Дополнительные стили для страницы рулетки */
-    body {
-        justify-content: flex-start;
-    }
+    body { justify-content: flex-start; }
     .roulette-container {
         width: 100%;
         max-width: 1200px;
@@ -28,22 +26,25 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: flex-start;
         gap: 2rem;
         width: 100%;
     }
     .wheel-section {
         position: relative;
-        width: 350px;
-        height: 350px;
+        width: 380px;
+        height: 380px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    .wheel-image {
+    #wheel-canvas {
         width: 100%;
         height: 100%;
-        transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
     }
     .pointer {
         position: absolute;
-        top: -10px;
+        top: 0px;
         left: 50%;
         transform: translateX(-50%);
         width: 0;
@@ -51,6 +52,7 @@
         border-left: 15px solid transparent;
         border-right: 15px solid transparent;
         border-top: 30px solid #ff3333;
+        filter: drop-shadow(0 0 5px #ff3333);
     }
     .betting-section {
         max-width: 600px;
@@ -72,26 +74,19 @@
         cursor: pointer;
         border: 1px solid rgba(255, 51, 51, 0.3);
         transition: background-color 0.2s;
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
     }
-    .bet-cell:hover {
-        background-color: rgba(255, 51, 51, 0.3);
-    }
+    .bet-cell:hover { background-color: rgba(255, 51, 51, 0.3); }
     .bet-cell.number-0 { grid-column: 1 / 13; background-color: #006400;}
     .bet-cell.red { background-color: #8B0000; }
     .bet-cell.black { background-color: #222; }
-    .bet-cell.special {
-        aspect-ratio: auto;
-        padding: 0.5rem;
-    }
+    .bet-cell.special { aspect-ratio: auto; padding: 0.5rem; }
     [data-bet-type="1-12"], [data-bet-type="13-24"], [data-bet-type="25-36"] { grid-column: span 4; }
     [data-bet-type="1-18"], [data-bet-type="19-36"] { grid-column: span 3; }
-    [data-bet-type="even"], [data-bet-type="odd"] { grid-column: span 2; }
-    [data-bet-type="red"], [data-bet-type="black"] { grid-column: span 2; }
-    
+    [data-bet-type="even"], [data-bet-type="odd"], [data-bet-type="red"], [data-bet-type="black"] { grid-column: span 2; }
     .chip-on-cell {
         position: absolute;
-        width: 60%;
-        height: 60%;
+        width: 60%; height: 60%;
         border-radius: 50%;
         color: white;
         display: flex;
@@ -99,43 +94,48 @@
         align-items: center;
         font-size: 0.8em;
         pointer-events: none;
+        text-shadow: 1px 1px 2px black;
     }
-
     .controls-section, .info-section {
-        width: 100%;
-        padding: 1rem;
+        width: 100%; padding: 1rem;
         border: 2px solid rgba(255, 51, 51, 0.3);
         background: rgba(10, 0, 0, 0.2);
         backdrop-filter: blur(5px);
     }
     .chips-selector, .actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
+        display: flex; flex-wrap: wrap;
+        justify-content: center; align-items: center;
         gap: 1rem;
     }
     .chip {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: bold;
-        cursor: pointer;
+        display: flex; justify-content: center; align-items: center;
+        font-weight: bold; cursor: pointer;
         border: 2px solid;
         transition: transform 0.2s, box-shadow 0.2s;
     }
-    .chip.active {
-        transform: scale(1.1);
-        box-shadow: 0 0 15px;
+    .chip.active { transform: scale(1.1); box-shadow: 0 0 15px; }
+    .info-section { display: flex; justify-content: space-around; text-align: center; }
+    
+    /* Стили для модального окна пасхалки */
+    .modal-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000; display: flex;
+        justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.5s ease;
     }
-    .info-section {
-        display: flex;
-        justify-content: space-around;
-        text-align: center;
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .sigil-modal {
+        background: #111; padding: 2rem;
+        border: 2px solid #ff3333;
+        text-align: center; max-width: 500px;
     }
+    .sigil-modal h2 { font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 10px #ff00de;}
+    .sigil-modal p { font-size: 1.2rem; line-height: 1.6; color: #fff;}
+    .sigil-modal code { color: #00ff88; background: #222; padding: 0.2rem 0.5rem;}
   </style>
 </head>
 <body>
@@ -145,24 +145,15 @@
     <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ ROULETTE">BOZHEMAN ≡ ROULETTE</a>
 
     <section class="info-section">
-        <div>
-            <h3>БАЛАНС</h3>
-            <p id="balance-display">1000</p>
-        </div>
-        <div>
-            <h3>СТАВКА</h3>
-            <p id="total-bet-display">0</p>
-        </div>
-        <div>
-            <h3>ПОСЛЕДНЕЕ ЧИСЛО</h3>
-            <p id="last-number-display">-</p>
-        </div>
+        <div><h3>БАЛАНС</h3><p id="balance-display">1000</p></div>
+        <div><h3>СТАВКА</h3><p id="total-bet-display">0</p></div>
+        <div><h3>ПОСЛЕДНЕЕ</h3><p id="last-number-display">-</p></div>
     </section>
 
     <div class="game-layout">
         <div class="wheel-section">
             <div class="pointer"></div>
-            <img src="wheel.png" alt="Колесо рулетки" class="wheel-image" id="wheel">
+            <canvas id="wheel-canvas" width="380" height="380"></canvas>
         </div>
         <div class="betting-section">
             <div class="bet-board" id="bet-board"></div>
@@ -177,11 +168,21 @@
     </div>
   </main>
 
+  <div class="modal-overlay" id="sigil-modal-overlay">
+      <div class="sigil-modal">
+          <h2 data-text="ПРОТОКОЛ РАСКРЫТ">ПРОТОКОЛ РАСКРЫТ</h2>
+          <p>Ты превзошел азарт и достиг просветления. Жизнь — не случайность, а путь.</p>
+          <p>Чтобы получить ответы, отправь кодовую фразу в личные сообщения:</p>
+          <p><code>t.me/bozheman SIGIL</code></p>
+      </div>
+  </div>
+
   <script src="roulette.js"></script>
   <script>
     // Скрипт для фона "Матрица"
     function setupMatrix() {
       const canvas = document.getElementById('matrix-canvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -214,3 +215,4 @@
   </script>
 </body>
 </html>
+

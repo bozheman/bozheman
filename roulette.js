@@ -1,52 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- GAME STATE & CONFIG ---
     let balance = 1000;
-    let currentBets = {}; // { 'bet_type': amount }
+    let currentBets = {};
     let selectedChipValue = 1;
     let isSpinning = false;
+    let sigilUnlocked = false;
 
+    const WHEEL_NUMBERS_IN_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    const NUMBER_COLORS = { 0: '#008000', 32: '#c00', 15: '#222', 19: '#c00', 4: '#222', 21: '#c00', 2: '#222', 25: '#c00', 17: '#222', 34: '#c00', 6: '#222', 27: '#c00', 13: '#222', 36: '#c00', 11: '#222', 30: '#c00', 8: '#222', 23: '#c00', 10: '#222', 5: '#c00', 24: '#222', 16: '#c00', 33: '#222', 1: '#c00', 20: '#222', 14: '#c00', 31: '#222', 9: '#c00', 22: '#222', 18: '#c00', 29: '#222', 7: '#c00', 28: '#222', 12: '#c00', 35: '#222', 3: '#c00', 26: '#222' };
+    const NUMBER_TYPE = { 0: 'green', 32: 'red', 15: 'black', 19: 'red', 4: 'black', 21: 'red', 2: 'black', 25: 'red', 17: 'black', 34: 'red', 6: 'black', 27: 'red', 13: 'black', 36: 'red', 11: 'black', 30: 'red', 8: 'black', 23: 'red', 10: 'black', 5: 'red', 24: 'black', 16: 'red', 33: 'black', 1: 'red', 20: 'black', 14: 'red', 31: 'black', 9: 'red', 22: 'black', 18: 'red', 29: 'black', 7: 'red', 28: 'black', 12: 'red', 35: 'black', 3: 'red', 26: 'black' };
+    
     const CHIP_VALUES = [1, 5, 10, 25, 100];
-    const CHIP_COLORS = {
-        1: '#c0c0c0',
-        5: '#ff4d4d',
-        10: '#4d94ff',
-        25: '#33cc33',
-        100: '#e6e600'
-    };
+    const CHIP_COLORS = { 1: '#c0c0c0', 5: '#ff4d4d', 10: '#4d94ff', 25: '#33cc33', 100: '#e6e600' };
+    const PAYOUTS = { single: 36, dozen: 3, half: 2, even_odd: 2, color: 2 };
 
-    // [number, color]
-    const WHEEL_NUMBERS = [
-        [0, 'green'], [32, 'red'], [15, 'black'], [19, 'red'], [4, 'black'],
-        [21, 'red'], [2, 'black'], [25, 'red'], [17, 'black'], [34, 'red'],
-        [6, 'black'], [27, 'red'], [13, 'black'], [36, 'red'], [11, 'black'],
-        [30, 'red'], [8, 'black'], [23, 'red'], [10, 'black'], [5, 'red'],
-        [24, 'black'], [16, 'red'], [33, 'black'], [1, 'red'], [20, 'black'],
-        [14, 'red'], [31, 'black'], [9, 'red'], [22, 'black'], [18, 'red'],
-        [29, 'black'], [7, 'red'], [28, 'black'], [12, 'red'], [35, 'black'],
-        [3, 'red'], [26, 'black']
-    ];
-
-    const PAYOUTS = {
-        'single': 36,
-        'dozen': 3,
-        'column': 3,
-        'half': 2,
-        'even_odd': 2,
-        'color': 2
-    };
+    // --- CANVAS & DRAWING ---
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const arc = Math.PI * 2 / WHEEL_NUMBERS_IN_ORDER.length;
+    let currentAngle = 0;
+    let spinVelocity = 0;
+    let isDecelerating = false;
 
     // --- DOM ELEMENTS ---
     const balanceDisplay = document.getElementById('balance-display');
     const totalBetDisplay = document.getElementById('total-bet-display');
     const lastNumberDisplay = document.getElementById('last-number-display');
-    const wheelImage = document.getElementById('wheel');
     const betBoard = document.getElementById('bet-board');
     const chipsSelector = document.getElementById('chips-selector');
     const spinButton = document.getElementById('spin-button');
     const clearButton = document.getElementById('clear-button');
+    const sigilModal = document.getElementById('sigil-modal-overlay');
 
     // --- INITIALIZATION ---
     function init() {
+        drawWheel();
         createBetBoard();
         createChips();
         updateDisplays();
@@ -57,29 +45,56 @@ document.addEventListener('DOMContentLoaded', () => {
         chipsSelector.addEventListener('click', selectChip);
     }
 
+    function drawWheel() {
+        const radius = canvas.width / 2;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(currentAngle);
+
+        for (let i = 0; i < WHEEL_NUMBERS_IN_ORDER.length; i++) {
+            const num = WHEEL_NUMBERS_IN_ORDER[i];
+            const startAngle = i * arc - arc / 2;
+            
+            // Draw sector
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius - 10, startAngle, startAngle + arc);
+            ctx.closePath();
+            ctx.fillStyle = NUMBER_COLORS[num];
+            ctx.fill();
+            ctx.strokeStyle = '#444';
+            ctx.stroke();
+
+            // Draw number
+            ctx.save();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Fira Code';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.rotate(startAngle + arc / 2);
+            ctx.fillText(num, radius - 30, 0);
+            ctx.restore();
+        }
+        ctx.restore();
+    }
+
     function createBetBoard() {
         betBoard.innerHTML = '';
-        // Zero
         const zero = createCell('0', 'number-0');
         zero.dataset.betType = 'single_0';
         betBoard.appendChild(zero);
-
-        // Numbers 1-36
         for (let i = 1; i <= 36; i++) {
-            const numInfo = WHEEL_NUMBERS.find(n => n[0] === i);
-            const cell = createCell(i.toString(), numInfo[1]);
+            const colorClass = NUMBER_TYPE[i];
+            const cell = createCell(i.toString(), colorClass);
             cell.dataset.betType = `single_${i}`;
-            cell.style.gridColumn = 'span 1';
             betBoard.appendChild(cell);
         }
-        
-        // Special bets
         const specialBets = [
             { text: '1-12', type: '1-12' }, { text: '13-24', type: '13-24' }, { text: '25-36', type: '25-36' },
             { text: '1-18', type: '1-18' }, { text: 'EVEN', type: 'even' }, { text: 'RED', type: 'red' },
             { text: 'BLACK', type: 'black' }, { text: 'ODD', type: 'odd' }, { text: '19-36', type: '19-36' }
         ];
-
         specialBets.forEach(bet => {
             const cell = createCell(bet.text, 'special');
             cell.dataset.betType = bet.type;
@@ -87,83 +102,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function createCell(text, className) {
-        const cell = document.createElement('div');
-        cell.className = `bet-cell ${className}`;
-        cell.textContent = text;
-        return cell;
-    }
-
-    function createChips() {
-        chipsSelector.innerHTML = '';
-        CHIP_VALUES.forEach(value => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.textContent = value;
-            chip.dataset.value = value;
-            chip.style.backgroundColor = CHIP_COLORS[value];
-            chip.style.borderColor = CHIP_COLORS[value];
-            if (value === selectedChipValue) chip.classList.add('active');
-            chipsSelector.appendChild(chip);
-        });
-    }
-
+    function createChips() { chipsSelector.innerHTML = ''; CHIP_VALUES.forEach(value => { const chip = document.createElement('div'); chip.className = 'chip'; chip.textContent = value; chip.dataset.value = value; chip.style.backgroundColor = CHIP_COLORS[value]; chip.style.borderColor = CHIP_COLORS[value]; if (value === selectedChipValue) chip.classList.add('active'); chipsSelector.appendChild(chip); }); }
+    
     // --- GAME LOGIC ---
-    function selectChip(event) {
-        const chip = event.target.closest('.chip');
-        if (!chip) return;
-        selectedChipValue = parseInt(chip.dataset.value);
-        document.querySelector('.chip.active').classList.remove('active');
-        chip.classList.add('active');
-    }
-
-    function placeBet(event) {
-        if (isSpinning) return;
-        const cell = event.target.closest('.bet-cell');
-        if (!cell) return;
-        
-        if (balance < selectedChipValue) {
-            alert("Недостаточно средств!");
-            return;
-        }
-
-        balance -= selectedChipValue;
-        const betType = cell.dataset.betType;
-        currentBets[betType] = (currentBets[betType] || 0) + selectedChipValue;
-
-        updateCellChip(cell, betType);
-        updateDisplays();
-    }
+    function selectChip(event) { const chip = event.target.closest('.chip'); if (!chip) return; selectedChipValue = parseInt(chip.dataset.value); document.querySelector('.chip.active').classList.remove('active'); chip.classList.add('active'); }
+    
+    function placeBet(event) { if (isSpinning) return; const cell = event.target.closest('.bet-cell'); if (!cell) return; if (balance < selectedChipValue) { return; } balance -= selectedChipValue; const betType = cell.dataset.betType; currentBets[betType] = (currentBets[betType] || 0) + selectedChipValue; updateCellChip(cell, betType); updateDisplays(); }
 
     function spin() {
         if (isSpinning || Object.keys(currentBets).length === 0) return;
         isSpinning = true;
-        spinButton.disabled = true;
 
-        const randomIndex = Math.floor(Math.random() * WHEEL_NUMBERS.length);
-        const winningNumberInfo = WHEEL_NUMBERS[randomIndex];
-        const winningNumber = winningNumberInfo[0];
-        const numberIndexOnWheel = WHEEL_NUMBERS.findIndex(n => n[0] === winningNumber);
-
-        const baseRotation = 360 * 5; // 5 full spins
-        const sectorAngle = 360 / WHEEL_NUMBERS.length;
-        const finalAngle = baseRotation - (numberIndexOnWheel * sectorAngle);
+        const targetIndex = Math.floor(Math.random() * WHEEL_NUMBERS_IN_ORDER.length);
+        const targetAngle = targetIndex * arc;
         
-        wheelImage.style.transform = `rotate(${finalAngle}deg)`;
+        const fullSpins = Math.PI * 2 * (Math.floor(Math.random() * 5) + 5); // 5-9 full spins
+        const finalAngle = fullSpins + targetAngle;
 
-        setTimeout(() => {
-            calculateWinnings(winningNumberInfo);
-            lastNumberDisplay.textContent = `${winningNumber} (${winningNumberInfo[1].toUpperCase()})`;
-            clearBets(false); // Clear bets but keep balance
-            isSpinning = false;
-            spinButton.disabled = false;
-        }, 6500); // Wait for animation to finish
+        let start = null;
+        const duration = 6000; // 6 seconds spin
+
+        function animate(timestamp) {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const easeOutProgress = 1 - Math.pow(1 - Math.min(progress / duration, 1), 4);
+            
+            currentAngle = easeOutProgress * finalAngle;
+            drawWheel();
+
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                currentAngle = finalAngle; // Ensure it lands perfectly
+                drawWheel();
+                endSpin(WHEEL_NUMBERS_IN_ORDER[targetIndex]);
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    function endSpin(winningNumber) {
+        const winningColor = NUMBER_TYPE[winningNumber];
+        lastNumberDisplay.textContent = `${winningNumber} (${winningColor.toUpperCase()})`;
+        calculateWinnings(winningNumber, winningColor);
+        clearBets(false);
+        isSpinning = false;
+        
+        if (balance >= 5000 && !sigilUnlocked) {
+            sigilUnlocked = true;
+            setTimeout(() => sigilModal.classList.add('visible'), 500);
+        }
     }
 
-    function calculateWinnings(winningNumberInfo) {
+    function calculateWinnings(number, color) {
         let totalWinnings = 0;
-        const [number, color] = winningNumberInfo;
-
         for (const betType in currentBets) {
             const betAmount = currentBets[betType];
             let win = 0;
@@ -171,17 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (betType.startsWith('single_')) {
                 if (parseInt(betType.split('_')[1]) === number) win = betAmount * PAYOUTS.single;
             } else {
-                if ( (betType === '1-12' && number >= 1 && number <= 12) ||
-                     (betType === '13-24' && number >= 13 && number <= 24) ||
-                     (betType === '25-36' && number >= 25 && number <= 36) ) {
+                if ((betType === '1-12' && number >= 1 && number <= 12) ||
+                    (betType === '13-24' && number >= 13 && number <= 24) ||
+                    (betType === '25-36' && number >= 25 && number <= 36)) {
                     win = betAmount * PAYOUTS.dozen;
                 }
-                if ( (betType === '1-18' && number >= 1 && number <= 18) ||
-                     (betType === '19-36' && number >= 19 && number <= 36) ) {
+                if ((betType === '1-18' && number >= 1 && number <= 18) ||
+                    (betType === '19-36' && number >= 19 && number <= 36)) {
                     win = betAmount * PAYOUTS.half;
                 }
-                if ( (betType === 'even' && number % 2 === 0 && number !== 0) ||
-                     (betType === 'odd' && number % 2 !== 0) ) {
+                if ((betType === 'even' && number % 2 === 0 && number !== 0) ||
+                    (betType === 'odd' && number % 2 !== 0 && number !== 0)) {
                     win = betAmount * PAYOUTS.even_odd;
                 }
                 if (betType === color) {
@@ -193,50 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         balance += totalWinnings;
         updateDisplays();
-        if (totalWinnings > 0) {
-            alert(`Выигрыш: ${totalWinnings}`);
-        }
     }
     
-    function clearBets(refund = true) {
-        if (isSpinning) return;
-        if (refund) {
-            const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
-            balance += totalBet;
-        }
-        currentBets = {};
-        document.querySelectorAll('.chip-on-cell').forEach(chip => chip.remove());
-        updateDisplays();
-    }
-
+    function clearBets(refund = true) { if (isSpinning) return; if (refund) { const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0); balance += totalBet; } currentBets = {}; document.querySelectorAll('.chip-on-cell').forEach(chip => chip.remove()); updateDisplays(); }
+    
     // --- UI UPDATES ---
-    function updateDisplays() {
-        balanceDisplay.textContent = balance;
-        const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
-        totalBetDisplay.textContent = totalBet;
-    }
-
-    function updateCellChip(cell, betType) {
-        let chipOnCell = cell.querySelector('.chip-on-cell');
-        if (!chipOnCell) {
-            chipOnCell = document.createElement('div');
-            chipOnCell.className = 'chip-on-cell';
-            const highestChipValue = getHighestChipForAmount(currentBets[betType]);
-            chipOnCell.style.backgroundColor = CHIP_COLORS[highestChipValue];
-            cell.appendChild(chipOnCell);
-        }
-        chipOnCell.textContent = currentBets[betType];
-    }
-    
-    function getHighestChipForAmount(amount) {
-        let highestChip = 1;
-        for (const value of CHIP_VALUES) {
-            if (amount >= value) {
-                highestChip = value;
-            }
-        }
-        return highestChip;
-    }
+    function updateDisplays() { balanceDisplay.textContent = balance; const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0); totalBetDisplay.textContent = totalBet; }
+    function updateCellChip(cell, betType) { let chipOnCell = cell.querySelector('.chip-on-cell'); if (!chipOnCell) { chipOnCell = document.createElement('div'); chipOnCell.className = 'chip-on-cell'; cell.appendChild(chipOnCell); } const highestChipValue = getHighestChipForAmount(currentBets[betType]); chipOnCell.style.backgroundColor = CHIP_COLORS[highestChipValue]; chipOnCell.textContent = currentBets[betType]; }
+    function getHighestChipForAmount(amount) { let highestChip = 1; for (const value of CHIP_VALUES) { if (amount >= value) { highestChip = value; } } return highestChip; }
+    function createCell(text, className) { const cell = document.createElement('div'); cell.className = `bet-cell ${className}`; cell.textContent = text; return cell; }
 
     init();
 });
+
