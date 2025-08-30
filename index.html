@@ -2,103 +2,276 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>BOZHEMAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOZHEMAN ≡ PROTOCOL</title>
   <link rel="icon" type="image/png" href="gg.png" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- ===== Theme toggle ===== -->
-  <header class="theme-bar">
-    <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">🌙</button>
-  </header>
 
-  <!-- ===== Main content ===== -->
-  <main class="container" role="main">
-    <div class="avatar-wrapper loading">
-      <img src="avatar.png" alt="Аватар BOZHEMAN" class="avatar" loading="lazy" />
-    </div>
-    <h1 class="brand glitch" data-text="BOZHEMAN">BOZHEMAN</h1>
-
-    <nav class="links" aria-label="Ссылки на соцсети и проекты">
-      <a href="https://t.me/bozheman" class="btn" target="_blank" rel="noopener noreferrer">Telegram</a>
-      
-      <div class="row-buttons">
-        <a href="https://t.me/protocol_0zero" class="btn half-btn" target="_blank">Нулевой протокол</a>
-        <a href="https://t.me/vidpovnac" class="btn half-btn" target="_blank">Відповідальна Нація</a>
-      </div>
-
-      <a href="https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw" class="btn" target="_blank">YouTube</a>
-      <a href="https://www.tiktok.com/@bozheman_" class="btn" target="_blank">TikTok</a>
-      <a href="https://www.instagram.com/bozheman" class="btn" target="_blank">Instagram</a>
-      <a href="https://discord.gg/jNFZTsBz8j" class="btn" target="_blank">Discord</a>
-      <a href="refer.html" class="btn special" target="_blank">💰 DONATION<br><span>спонсируй будущее!</span></a>
-    </nav>
-
-    <section class="stats" aria-label="Community stats">
-      <div class="stat-item">
-        <span id="community-count" class="count">1600</span>
-        <p>подписчиков во всех соцсетях</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===== Secret content ===== -->
-  <div id="secret-content" class="secret" aria-hidden="true">
-    <a href="doubleindex.html" class="btn">BOZHEMAN не существует. Но ты нашёл меня</a>
+  <div id="preloader">
+    <div id="preloader-text"></div>
   </div>
 
-  <!-- ===== Cursor follower ===== -->
-  <div class="cursor-follower" aria-hidden="true"></div>
+  <canvas id="matrix-canvas"></canvas>
+  
+  <canvas id="scene-canvas"></canvas>
 
-  <!-- ===== Scripts ===== -->
-  <script>
-    const toggleBtn = document.getElementById('theme-toggle');
-    let secretCounter = 0;
-    let easterBuffer = [];
+  <div id="ui-container">
+    <div id="brand-title">BOZHEMAN</div>
+    <button id="sound-toggle" aria-label="Переключить звук">🔇</button>
+  </div>
+  <div id="link-label"></div>
 
-    function applyTheme(mode) {
-      document.body.classList.toggle('light', mode === 'light');
-      toggleBtn.textContent = mode === 'light' ? '☀️' : '🌙';
-      localStorage.setItem('theme', mode);
+  <audio id="ambient-audio" loop preload="auto">
+    <source src="omega.m4a" type="audio/mp4" />
+  </audio>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    // Импорт необходимых библиотек
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // --- НАСТРОЙКИ ---
+    const PRELOADER_LINES = [
+      { text: '> INIT_CONNECTION...', delay: 1500 },
+      { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 1000 },
+      { text: '> LOADING_PROTOCOL_0ZERO...', delay: 1500 },
+      { text: '> ACCESS GRANTED', delay: 800 }
+    ];
+
+    const LINKS = [
+      { name: 'Telegram', url: 'https://t.me/bozheman', position: new THREE.Vector3(0, 1.8, 0) },
+      { name: 'Нулевой протокол', url: 'https://t.me/protocol_0zero', position: new THREE.Vector3(1.8, 0.5, 0) },
+      { name: 'Відповідальна Нація', url: 'https://t.me/vidpovnac', position: new THREE.Vector3(1.8, -0.5, 0) },
+      { name: 'YouTube', url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw', position: new THREE.Vector3(0, -1.8, 0) },
+      { name: 'TikTok', url: 'https://www.tiktok.com/@bozheman_', position: new THREE.Vector3(-1.8, -0.5, 0) },
+      { name: 'Instagram', url: 'https://www.instagram.com/bozheman', position: new THREE.Vector3(-1.8, 0.5, 0) },
+      { name: 'Discord', url: 'https://discord.gg/jNFZTsBz8j', position: new THREE.Vector3(0, 0, 1.8) },
+      { name: '💰 DONATION', url: 'refer.html', position: new THREE.Vector3(0, 0, -1.8) }
+    ];
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    const preloader = document.getElementById('preloader');
+    const preloaderText = document.getElementById('preloader-text');
+    const matrixCanvas = document.getElementById('matrix-canvas');
+    const sceneCanvas = document.getElementById('scene-canvas');
+    const soundToggle = document.getElementById('sound-toggle');
+    const ambientAudio = document.getElementById('ambient-audio');
+    const linkLabel = document.getElementById('link-label');
+
+    let scene, camera, renderer, controls, raycaster;
+    let mainObject, hotspotsGroup;
+    const mouse = new THREE.Vector2();
+    let activeLink = null;
+
+    init();
+    runPreloader();
+
+    // --- ОСНОВНЫЕ ФУНКЦИИ ---
+    
+    // 1. Анимация прелоадера
+    async function runPreloader() {
+      for (const line of PRELOADER_LINES) {
+        await typeLine(line.text, 50);
+        await new Promise(resolve => setTimeout(resolve, line.delay));
+      }
+      preloader.classList.add('hidden');
+      setTimeout(() => preloader.style.display = 'none', 1000);
     }
 
-    toggleBtn.addEventListener('click', () => {
-      const isLight = document.body.classList.contains('light');
-      const newTheme = isLight ? 'dark' : 'light';
-      applyTheme(newTheme);
+    function typeLine(text, speed) {
+      return new Promise(resolve => {
+        let i = 0;
+        preloaderText.innerHTML = '';
+        const typing = setInterval(() => {
+          if (i < text.length) {
+            preloaderText.innerHTML += text.charAt(i);
+            i++;
+          } else {
+            clearInterval(typing);
+            resolve();
+          }
+        }, speed);
+      });
+    }
 
-      if (!isLight && ++secretCounter === 3) {
-        document.getElementById('secret-content').classList.add('revealed');
+    // 2. Анимация фона "Матрица"
+    function setupMatrix() {
+      const ctx = matrixCanvas.getContext('2d');
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+
+      const chars = "BOZHEMAN01";
+      const font_size = 14;
+      const columns = matrixCanvas.width / font_size;
+      const drops = Array.from({ length: columns }).fill(1);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+        ctx.fillStyle = '#600000';
+        ctx.font = font_size + 'px Fira Code';
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * font_size, drops[i] * font_size);
+          if (drops[i] * font_size > matrixCanvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
       }
-    });
+      setInterval(draw, 33);
+    }
 
-    applyTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+    // 3. Настройка 3D-сцены
+    function init() {
+      // Сцена
+      scene = new THREE.Scene();
 
-    document.addEventListener('keydown', e => {
-      const key = e.key.toLowerCase();
-      if (key === 't') toggleBtn.click();
-      if (key === 's') document.getElementById('secret-content').classList.add('revealed');
+      // Камера
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 5;
 
-      // Easter Egg: b + z + n
-      easterBuffer.push(key);
-      if (easterBuffer.join('').includes('bzn')) {
-        document.querySelector('.terminal')?.classList.add('open');
-        easterBuffer = [];
+      // Рендерер
+      renderer = new THREE.WebGLRenderer({ canvas: sceneCanvas, antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Свет
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const pointLight = new THREE.PointLight(0xff0000, 100, 100);
+      pointLight.position.set(5, 5, 5);
+      scene.add(pointLight);
+      
+      // Контроллер вращения
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.5;
+
+      // Raycaster для отслеживания мыши
+      raycaster = new THREE.Raycaster();
+
+      // Создание объектов
+      createMainObject();
+      createHotspots();
+      
+      // Запуск анимации
+      setupMatrix();
+      animate();
+
+      // Обработчики событий
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('click', onClick);
+      soundToggle.addEventListener('click', toggleSound);
+    }
+
+    // 4. Создание 3D-объектов
+    function createMainObject() {
+      const geometry = new THREE.IcosahedronGeometry(1, 0);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x600000,
+        metalness: 0.8,
+        roughness: 0.2,
+        wireframe: true
+      });
+      mainObject = new THREE.Mesh(geometry, material);
+      scene.add(mainObject);
+    }
+
+    function createHotspots() {
+      hotspotsGroup = new THREE.Group();
+      LINKS.forEach(link => {
+        const geometry = new THREE.SphereGeometry(0.2, 16, 16);
+        const material = new THREE.MeshBasicMaterial({ visible: false });
+        const hotspot = new THREE.Mesh(geometry, material);
+        hotspot.position.copy(link.position);
+        hotspot.userData = { url: link.url, name: link.name };
+        hotspotsGroup.add(hotspot);
+      });
+      scene.add(hotspotsGroup);
+    }
+
+    // 5. Цикл анимации
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      
+      // Обновление raycaster'а
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(hotspotsGroup.children);
+
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        activeLink = intersectedObject.userData;
+        document.body.style.cursor = 'pointer';
+        
+        linkLabel.style.display = 'block';
+        linkLabel.textContent = activeLink.name;
+        
+      } else {
+        activeLink = null;
+        document.body.style.cursor = 'default';
+        linkLabel.style.display = 'none';
       }
-      if (easterBuffer.length > 3) easterBuffer.shift();
-    });
 
-    const avatar = document.querySelector('.avatar');
-    avatar.addEventListener('load', () => {
-      avatar.classList.add('loaded');
-      avatar.parentElement.classList.remove('loading');
-    });
+      // Вращаем объекты вместе
+      const rotationSpeed = 0.001;
+      mainObject.rotation.y += rotationSpeed;
+      hotspotsGroup.rotation.y += rotationSpeed;
 
-    const cursor = document.querySelector('.cursor-follower');
-    document.addEventListener('mousemove', e => {
-      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-    });
+      renderer.render(scene, camera);
+    }
+
+    // 6. Обработчики событий
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+    }
+
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      linkLabel.style.left = (event.clientX + 15) + 'px';
+      linkLabel.style.top = (event.clientY + 15) + 'px';
+    }
+
+    function onClick() {
+      if (activeLink) {
+        window.open(activeLink.url, '_blank');
+      }
+    }
+    
+    function toggleSound() {
+        if (ambientAudio.paused) {
+            ambientAudio.play().catch(e => console.error("Audio play failed:", e));
+            soundToggle.textContent = '🔊';
+        } else {
+            ambientAudio.pause();
+            soundToggle.textContent = '🔇';
+        }
+    }
   </script>
 </body>
 </html>
