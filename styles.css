@@ -1,5 +1,5 @@
 /* =============================================
-   BOZHEMAN ≡ PROTOCOL  ‖  Master Stylesheet v3.0
+   BOZHEMAN ≡ PROTOCOL  ‖  Master Stylesheet v4.0
    SYMB IOSIS: AI & HUMAN
    ============================================= */
 
@@ -47,24 +47,33 @@ body {
 #scene-canvas {
   width: 100%;
   height: 100%;
-  cursor: pointer; /* Changed from grab to pointer */
+  cursor: pointer;
 }
 
 /* ---------- Preloader ---------- */
 #preloader {
   position: fixed; inset: 0;
   background: #000; z-index: 1000;
-  display: flex; justify-content: center; align-items: center;
+  display: flex; 
+  /* MODIFIED: Align to the left like a terminal */
+  justify-content: flex-start; 
+  align-items: center;
+  padding: 2rem;
   transition: opacity 1s ease;
 }
 #preloader.hidden { opacity: 0; pointer-events: none; }
 #preloader-text {
-  font-size: 1.2rem; color: #ff3333;
+  font-size: 1.2rem; 
+  color: #ff3333;
   text-shadow: 0 0 10px rgba(255, 51, 51, 0.8);
-  white-space: pre-wrap; position: relative;
+  white-space: pre-wrap; 
+  position: relative;
+  /* MODIFIED: Align text to the left inside the block */
+  text-align: left;
 }
 #preloader-text::after {
-  content: '_'; animation: blink 1s step-end infinite;
+  content: '_'; 
+  animation: blink 1s step-end infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
 
@@ -73,7 +82,7 @@ body {
   position: fixed; 
   top: 1rem; 
   width: 100%;
-  max-width: 900px; /* To align with links container */
+  max-width: 900px;
   left: 50%;
   transform: translateX(-50%);
   padding: 0 1rem; 
@@ -89,21 +98,38 @@ body {
   letter-spacing: 0.1em;
   text-shadow: 0 0 12px rgba(255, 51, 51, 0.9);
 }
+
+/* NEW STYLES FOR SVG SOUND BUTTON */
 #sound-toggle {
   background: transparent; 
   border: 2px solid #a30000;
-  color: #ff3333; 
-  font-size: 1.5rem;
-  padding: 0.2rem 0.5rem; 
+  color: #ff3333;
+  padding: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease; 
   pointer-events: all;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #sound-toggle:hover {
   background: #a30000; 
   color: #fff; 
   border-color: #ff3333;
+  transform: scale(1.1);
 }
+.sound-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+.sound-off-icon { display: none; }
+#sound-toggle.muted .sound-on-icon { display: none; }
+#sound-toggle.muted .sound-off-icon { display: block; }
+
 
 /* ---------- Links Container (Human Interface) ---------- */
 #links-container {
@@ -116,7 +142,7 @@ body {
     z-index: 5;
 }
 
-/* ---------- Glitch Button Styling ---------- */
+/* ---------- NEW "HOTLINE MIAMI" BUTTON ANIMATION ---------- */
 .btn-glitch {
     position: relative;
     display: block;
@@ -129,7 +155,8 @@ body {
     background: rgba(10, 0, 0, 0.3);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    transition: color 0.3s ease, border-color 0.3s ease;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
 }
 
 .btn-glitch:hover {
@@ -145,36 +172,36 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(10, 0, 0, 0.3);
-    overflow: hidden;
+    background: transparent;
     color: #fff;
     opacity: 0;
+    padding: 1rem;
 }
 
 .btn-glitch:hover::before {
-    top: 2px;
-    left: 4px;
-    text-shadow: -2px 0 #00ffff;
-    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
-    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+    text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+    animation: hotline-glitch-1 0.1s linear infinite;
 }
 
 .btn-glitch:hover::after {
-    top: -2px;
-    left: -4px;
-    text-shadow: -2px 0 #ff00ff, 2px 2px #00ffff;
-    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
-    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+    text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff;
+    animation: hotline-glitch-2 0.1s linear infinite;
 }
 
-@keyframes glitch-anim-1 {
-    0% { opacity: 1; transform: translate(0, 0); clip-path: polygon(0 2%, 100% 2%, 100% 52%, 0 52%); }
-    100% { opacity: 1; transform: translate(0.05em, -0.025em); clip-path: polygon(0 48%, 100% 48%, 100% 98%, 0 98%); }
+@keyframes hotline-glitch-1 {
+    0% { opacity: 1; transform: translate(2px, -2px); clip-path: inset(30% 0 30% 0); }
+    25% { clip-path: inset(10% 0 80% 0); }
+    50% { clip-path: inset(50% 0 10% 0); }
+    75% { clip-path: inset(80% 0 5% 0); }
+    100% { opacity: 1; transform: translate(-2px, 2px); clip-path: inset(40% 0 45% 0); }
 }
 
-@keyframes glitch-anim-2 {
-    0% { opacity: 1; transform: translate(0, 0); clip-path: polygon(0 53%, 100% 53%, 100% 98%, 0 98%); }
-    100% { opacity: 1; transform: translate(-0.05em, 0.025em); clip-path: polygon(0 2%, 100% 2%, 100% 52%, 0 52%); }
+@keyframes hotline-glitch-2 {
+    0% { opacity: 1; transform: translate(-2px, 2px); clip-path: inset(70% 0 10% 0); }
+    25% { clip-path: inset(90% 0 5% 0); }
+    50% { clip-path: inset(20% 0 60% 0); }
+    75% { clip-path: inset(40% 0 15% 0); }
+    100% { opacity: 1; transform: translate(2px, -2px); clip-path: inset(60% 0 30% 0); }
 }
 
 .btn-glitch.special {
@@ -210,11 +237,11 @@ body.glitch-out::after {
 /* ---------- Responsive Design for Mobile ---------- */
 @media (max-width: 768px) {
     #scene-container {
-        height: 35vh; /* Less height on mobile */
+        height: 35vh;
     }
 
     #links-container {
-        grid-template-columns: 1fr; /* Stack buttons vertically */
+        grid-template-columns: 1fr;
         padding: 1rem;
     }
 
