@@ -3,147 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOZHEMAN ≡ ROULETTE</title>
+  <title>BOZHEMAN ≡ 777</title>
   <link rel="icon" type="image/png" href="gg.png" />
-  <!-- Подключаем только шрифты, основной стиль больше не нужен -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
-    /* =============================================
-       BOZHEMAN ≡ ROULETTE ‖ ADAPTIVE STYLES
-       ============================================= */
     :root {
       --base-color: #ff3333;
       --bg-color: #000;
       --surface-color: rgba(10, 0, 0, 0.3);
       --border-color: rgba(255, 51, 51, 0.3);
-      --green-color: #008000;
-      --red-color: #8B0000;
-      --black-color: #222;
+      --success-color: #00ff88;
+      --glow-color: #ff00de;
     }
-    
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background-color: var(--bg-color);
       color: var(--base-color);
       font-family: 'Fira Code', monospace;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 1rem;
     }
+    #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
-    #matrix-canvas {
-      position: fixed; top: 0; left: 0;
-      z-index: -1; pointer-events: none;
+    .slot-machine {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      border: 2px solid var(--border-color);
+      background: var(--surface-color);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      text-align: center;
     }
 
     .page-title {
-        font-size: clamp(1.5rem, 5vw, 2rem);
-        margin: 2rem 0;
-        text-decoration: none;
-        color: var(--base-color);
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 5px var(--base-color), 0 0 10px var(--glow-color);
     }
     
-    .roulette-container {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+    .info-display {
+        margin-bottom: 2rem;
     }
-    
-    .info-section {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        width: 100%;
-        padding: 1rem;
+    .info-display h3 { font-size: 1rem; opacity: 0.7; }
+    .info-display p { font-size: 2rem; font-weight: bold; color: #fff; }
+
+    .reel-container {
+        height: 150px;
+        width: 150px;
+        margin: 0 auto 2rem auto;
         border: 2px solid var(--border-color);
-        background: var(--surface-color);
-        backdrop-filter: blur(5px);
-        text-align: center;
-    }
-    .info-section h3 { font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.7; }
-    .info-section p { font-size: 1.2rem; font-weight: bold; }
-
-    .game-layout {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .wheel-section {
+        overflow: hidden;
         position: relative;
+        background: rgba(0,0,0,0.5);
+    }
+    #reel {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-width: 380px;
-        aspect-ratio: 1 / 1;
-        margin: 0 auto;
+        transition: top 1s cubic-bezier(0.7, 0, 0.3, 1);
     }
-    #wheel-canvas { width: 100%; height: 100%; }
-    .pointer {
-        position: absolute; top: -5px; left: 50%;
-        transform: translateX(-50%);
-        width: 0; height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 30px solid var(--base-color);
-        filter: drop-shadow(0 0 5px var(--base-color));
+    .reel-number {
+        height: 150px;
+        font-size: 100px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        text-shadow: 0 0 10px var(--base-color);
     }
-
-    .bet-board {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 4px;
-    }
-    .bet-cell {
-        position: relative; aspect-ratio: 1 / 1;
-        display: flex; justify-content: center; align-items: center;
-        font-weight: bold; cursor: pointer;
+    
+    .controls { display: flex; flex-direction: column; gap: 1.5rem; }
+    .input-group { display: flex; gap: 1rem; }
+    .input-field {
+        background: transparent;
         border: 1px solid var(--border-color);
-        transition: background-color 0.2s;
-        font-size: clamp(0.7rem, 2vw, 1rem);
+        color: #fff;
+        font-family: 'Fira Code', monospace;
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 0.8rem;
+        width: 100%;
     }
-    .bet-cell:hover { background-color: rgba(255, 51, 51, 0.3); }
-    .number-0 { grid-column: 1 / 13; background-color: var(--green-color); }
-    .red { background-color: var(--red-color); }
-    .black { background-color: var(--black-color); color: white; }
-    .special { aspect-ratio: auto; padding: 0.5rem; }
-    [data-bet-type="1-12"], [data-bet-type="13-24"], [data-bet-type="25-36"] { grid-column: span 4; }
-    [data-bet-type="1-18"], [data-bet-type="19-36"] { grid-column: span 6; }
-    [data-bet-type="even"], [data-bet-type="odd"] { grid-column: span 3; }
-    [data-bet-type="red-bet"], [data-bet-type="black-bet"] { grid-column: span 3; }
-
-    .chip-on-cell {
-        position: absolute; width: 70%; height: 70%;
-        border-radius: 50%; color: white;
-        display: flex; justify-content: center; align-items: center;
-        font-size: 0.8em; pointer-events: none;
-        text-shadow: 1px 1px 2px black;
-    }
-
-    .controls-section {
-        margin-top: 1rem; padding: 1rem;
-        border: 2px solid var(--border-color);
-        background: var(--surface-color);
-        backdrop-filter: blur(5px);
-        display: flex; flex-direction: column; gap: 1rem;
-    }
-    .chips-selector, .actions {
-        display: flex; flex-wrap: wrap; justify-content: center;
-        align-items: center; gap: 0.5rem;
-    }
-    .chip {
-        width: 40px; height: 40px; border-radius: 50%;
-        display: flex; justify-content: center; align-items: center;
-        font-weight: bold; cursor: pointer; border: 2px solid;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .chip.active { transform: scale(1.1); box-shadow: 0 0 15px; }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+    .input-field:focus { outline: none; border-color: var(--base-color); }
     
     .btn-glitch { /* Стили из styles.css для кнопок */
         position: relative; display: block; padding: 1rem;
@@ -151,55 +102,97 @@
         font-size: 1.1rem; border: 2px solid var(--border-color);
         background: rgba(10, 0, 0, 0.3); backdrop-filter: blur(5px);
         transition: all 0.3s ease; overflow: hidden;
+        cursor: pointer;
     }
+    .btn-glitch:disabled { cursor: not-allowed; opacity: 0.5; }
 
-    /* Медиа-запрос для больших экранов */
-    @media (min-width: 1024px) {
-        .game-layout {
-            grid-template-columns: 380px 1fr;
-            align-items: flex-start;
-        }
+    .rules { margin-top: 2rem; opacity: 0.6; }
+    
+    /* Модальное окно для сообщений */
+    .modal-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000; display: flex;
+        justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.3s ease;
     }
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    .message-modal {
+        background: #111; padding: 2rem;
+        border: 2px solid var(--base-color);
+        text-align: center; max-width: 300px;
+    }
+    .message-modal p { font-size: 1.2rem; line-height: 1.6; color: #fff; margin-bottom: 1.5rem; }
   </style>
 </head>
 <body>
   <canvas id="matrix-canvas"></canvas>
 
-  <div class="roulette-container">
-    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ ROULETTE">BOZHEMAN ≡ ROULETTE</a>
+  <div class="slot-machine">
+    <h1 class="page-title" data-text="BOZHEMAN ≡ 777">BOZHEMAN ≡ 777</h1>
 
-    <section class="info-section">
-        <div><h3>БАЛАНС</h3><p id="balance-display">1000</p></div>
-        <div><h3>СТАВКА</h3><p id="total-bet-display">0</p></div>
-        <div><h3>ПОСЛЕДНЕЕ</h3><p id="last-number-display">-</p></div>
-    </section>
+    <div class="info-display">
+        <h3>БАЛАНС</h3>
+        <p id="balance-display">1000</p>
+    </div>
 
-    <div class="game-layout">
-        <div class="wheel-section">
-            <div class="pointer"></div>
-            <canvas id="wheel-canvas" width="380" height="380"></canvas>
-        </div>
-        
-        <div class="betting-section">
-            <div class="bet-board" id="bet-board"></div>
-            <div class="controls-section">
-                <div class="chips-selector" id="chips-selector"></div>
-                <div class="actions">
-                    <button class="btn-glitch" id="spin-button" data-text="КРУТИТЬ">КРУТИТЬ</button>
-                    <button class="btn-glitch" id="clear-button" data-text="ОЧИСТИТЬ">ОЧИСТИТЬ</button>
-                </div>
-            </div>
+    <div class="reel-container">
+        <div id="reel">
+            <div class="reel-number">7</div>
         </div>
     </div>
+
+    <div class="controls">
+        <div class="input-group">
+            <input type="number" id="guess-input" class="input-field" placeholder="ЧИСЛО (1-7)">
+            <input type="number" id="bet-input" class="input-field" placeholder="СТАВКА">
+        </div>
+        <button class="btn-glitch" id="spin-button" data-text="КРУТИТЬ">КРУТИТЬ</button>
+    </div>
+
+    <p class="rules">Угадай одно из семи чисел и получи x2</p>
   </div>
 
-  <!-- Модальное окно (остается без изменений) -->
-  <div class="modal-overlay" id="sigil-modal-overlay"> ... </div>
+  <div class="modal-overlay" id="message-modal-overlay">
+      <div class="message-modal">
+          <p id="modal-text"></p>
+          <button class="btn-glitch" id="modal-close-button" data-text="OK">OK</button>
+      </div>
+  </div>
 
   <script src="roulette.js"></script>
   <script>
-    // Скрипт для фона "Матрица"
-    function setupMatrix() { /* ... */ }
+    function setupMatrix() {
+        const canvas = document.getElementById('matrix-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const chars = "BOZHEMAN01";
+        const font_size = 14;
+        const columns = canvas.width / font_size;
+        const drops = Array.from({ length: columns }).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#600000';
+            ctx.font = font_size + 'px Fira Code';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * font_size, drops[i] * font_size);
+                if (drops[i] * font_size > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 50);
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    }
     setupMatrix();
   </script>
 </body>
