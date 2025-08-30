@@ -21,8 +21,9 @@ function init() {
     betInput.value = localStorage.getItem('b777_lastBet') || '';
 
     updateBalanceDisplay();
-    spinButton.addEventListener('click', handleSpin);
-    spinButton.addEventListener('touchend', handleSpin); // ДОБАВЛЕНО ДЛЯ МОБИЛЬНЫХ
+    // ИЗМЕНЕНО: Добавляем (e) для передачи события
+    spinButton.addEventListener('click', (e) => handleSpin(e));
+    spinButton.addEventListener('touchend', (e) => handleSpin(e));
     modalCloseButton.addEventListener('click', hideModal);
     modalOverlay.addEventListener('click', hideModal);
 
@@ -31,7 +32,11 @@ function init() {
 }
 
 // --- GAME LOGIC ---
-function handleSpin() {
+function handleSpin(event) {
+        // ИЗМЕНЕНО: Предотвращаем случайные двойные клики на мобильных
+        if (event) {
+            event.preventDefault();
+        }
         if (isSpinning) return;
 
         const guess = parseInt(guessInput.value);
@@ -70,8 +75,6 @@ function handleSpin() {
             }
             
             updateBalanceDisplay();
-            // guessInput.value = '';
-            // betInput.value = '';
             isSpinning = false;
             spinButton.disabled = false;
         });
@@ -81,31 +84,32 @@ function handleSpin() {
     function animateReel(winningNumber) {
         return new Promise(resolve => {
             let reelStripHTML = '';
-            // Генерируем длинную ленту случайных чисел для убедительного вращения
             for (let i = 0; i < 30; i++) {
                  const randomNum = Math.floor(Math.random() * MAX_NUMBER) + MIN_NUMBER;
                  reelStripHTML += `<div class="reel-number">${randomNum}</div>`;
             }
-            // Добавляем выигрышное число в конец
             reelStripHTML += `<div class="reel-number">${winningNumber}</div>`;
             reel.innerHTML = reelStripHTML;
             
-            // Сбрасываем позицию без перехода, чтобы подготовиться к вращению
             reel.style.transition = 'none';
             reel.style.top = '0';
 
-            // Заставляем браузер применить сброс мгновенно
-            setTimeout(() => {
-                const reelHeight = reel.querySelector('.reel-number').offsetHeight;
+            // ИЗМЕНЕНО: Используем requestAnimationFrame для надежности
+            requestAnimationFrame(() => {
+                const firstReelNumber = reel.querySelector('.reel-number');
+                if (!firstReelNumber) {
+                    console.error("Ошибка отрисовки барабана.");
+                    resolve(); // Завершаем, чтобы не блокировать кнопку
+                    return;
+                }
+                const reelHeight = firstReelNumber.offsetHeight;
                 const finalPosition = -(reel.children.length - 1) * reelHeight;
                 
-                // Используем красивый ease-out переход
                 reel.style.transition = 'top 3s cubic-bezier(0.25, 1, 0.5, 1)'; 
                 reel.style.top = `${finalPosition}px`;
 
-                // Разрешаем Promise после завершения анимации + небольшой буфер
                 setTimeout(resolve, 3100); 
-            }, 50);
+            });
         });
     }
 
@@ -125,6 +129,4 @@ function handleSpin() {
 
     init();
 });
-
-
 
