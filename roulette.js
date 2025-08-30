@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let sigilUnlocked = false;
 
     const WHEEL_NUMBERS_IN_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-    const NUMBER_COLORS = { 0: '#008000', 32: '#c00', 15: '#222', 19: '#c00', 4: '#222', 21: '#c00', 2: '#222', 25: '#c00', 17: '#222', 34: '#c00', 6: '#222', 27: '#c00', 13: '#222', 36: '#c00', 11: '#222', 30: '#c00', 8: '#222', 23: '#c00', 10: '#222', 5: '#c00', 24: '#222', 16: '#c00', 33: '#222', 1: '#c00', 20: '#222', 14: '#c00', 31: '#222', 9: '#c00', 22: '#222', 18: '#c00', 29: '#222', 7: '#c00', 28: '#222', 12: '#c00', 35: '#222', 3: '#c00', 26: '#222' };
+    const NUMBER_COLORS = { 0: '#008000', 32: '#8B0000', 15: '#222', 19: '#8B0000', 4: '#222', 21: '#8B0000', 2: '#222', 25: '#8B0000', 17: '#222', 34: '#8B0000', 6: '#222', 27: '#8B0000', 13: '#222', 36: '#8B0000', 11: '#222', 30: '#8B0000', 8: '#222', 23: '#8B0000', 10: '#222', 5: '#8B0000', 24: '#222', 16: '#8B0000', 33: '#222', 1: '#8B0000', 20: '#222', 14: '#8B0000', 31: '#222', 9: '#8B0000', 22: '#222', 18: '#8B0000', 29: '#222', 7: '#8B0000', 28: '#222', 12: '#8B0000', 35: '#222', 3: '#8B0000', 26: '#222' };
     const NUMBER_TYPE = { 0: 'green', 32: 'red', 15: 'black', 19: 'red', 4: 'black', 21: 'red', 2: 'black', 25: 'red', 17: 'black', 34: 'red', 6: 'black', 27: 'red', 13: 'black', 36: 'red', 11: 'black', 30: 'red', 8: 'black', 23: 'red', 10: 'black', 5: 'red', 24: 'black', 16: 'red', 33: 'black', 1: 'red', 20: 'black', 14: 'red', 31: 'black', 9: 'red', 22: 'black', 18: 'red', 29: 'black', 7: 'red', 28: 'black', 12: 'red', 35: 'black', 3: 'red', 26: 'black' };
     
     const CHIP_VALUES = [1, 5, 10, 25, 100];
@@ -19,8 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
     const arc = Math.PI * 2 / WHEEL_NUMBERS_IN_ORDER.length;
     let currentAngle = 0;
-    let spinVelocity = 0;
-    let isDecelerating = false;
 
     // --- DOM ELEMENTS ---
     const balanceDisplay = document.getElementById('balance-display');
@@ -56,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const num = WHEEL_NUMBERS_IN_ORDER[i];
             const startAngle = i * arc - arc / 2;
             
-            // Draw sector
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.arc(0, 0, radius - 10, startAngle, startAngle + arc);
@@ -66,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.strokeStyle = '#444';
             ctx.stroke();
 
-            // Draw number
             ctx.save();
             ctx.fillStyle = 'white';
             ctx.font = 'bold 16px Fira Code';
@@ -84,17 +80,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const zero = createCell('0', 'number-0');
         zero.dataset.betType = 'single_0';
         betBoard.appendChild(zero);
+
         for (let i = 1; i <= 36; i++) {
             const colorClass = NUMBER_TYPE[i];
             const cell = createCell(i.toString(), colorClass);
             cell.dataset.betType = `single_${i}`;
             betBoard.appendChild(cell);
         }
+        
         const specialBets = [
-            { text: '1-12', type: '1-12' }, { text: '13-24', type: '13-24' }, { text: '25-36', type: '25-36' },
-            { text: '1-18', type: '1-18' }, { text: 'EVEN', type: 'even' }, { text: 'RED', type: 'red' },
-            { text: 'BLACK', type: 'black' }, { text: 'ODD', type: 'odd' }, { text: '19-36', type: '19-36' }
+            { text: '1-12', type: '1-12' }, 
+            { text: '13-24', type: '13-24' }, 
+            { text: '25-36', type: '25-36' },
+            { text: '1-18', type: '1-18' }, 
+            { text: '19-36', type: '19-36' },
+            { text: 'EVEN', type: 'even' }, 
+            { text: 'RED', type: 'red-bet' },
+            { text: 'BLACK', type: 'black-bet' },
+            { text: 'ODD', type: 'odd' }
         ];
+
         specialBets.forEach(bet => {
             const cell = createCell(bet.text, 'special');
             cell.dataset.betType = bet.type;
@@ -102,12 +107,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function createChips() { chipsSelector.innerHTML = ''; CHIP_VALUES.forEach(value => { const chip = document.createElement('div'); chip.className = 'chip'; chip.textContent = value; chip.dataset.value = value; chip.style.backgroundColor = CHIP_COLORS[value]; chip.style.borderColor = CHIP_COLORS[value]; if (value === selectedChipValue) chip.classList.add('active'); chipsSelector.appendChild(chip); }); }
+    function createChips() {
+        chipsSelector.innerHTML = '';
+        CHIP_VALUES.forEach(value => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = value;
+            chip.dataset.value = value;
+            chip.style.backgroundColor = CHIP_COLORS[value];
+            chip.style.borderColor = CHIP_COLORS[value];
+            if (value === selectedChipValue) chip.classList.add('active');
+            chipsSelector.appendChild(chip);
+        });
+    }
     
-    // --- GAME LOGIC ---
-    function selectChip(event) { const chip = event.target.closest('.chip'); if (!chip) return; selectedChipValue = parseInt(chip.dataset.value); document.querySelector('.chip.active').classList.remove('active'); chip.classList.add('active'); }
+    function selectChip(event) {
+        const chip = event.target.closest('.chip');
+        if (!chip) return;
+        selectedChipValue = parseInt(chip.dataset.value);
+        document.querySelector('.chip.active').classList.remove('active');
+        chip.classList.add('active');
+    }
     
-    function placeBet(event) { if (isSpinning) return; const cell = event.target.closest('.bet-cell'); if (!cell) return; if (balance < selectedChipValue) { return; } balance -= selectedChipValue; const betType = cell.dataset.betType; currentBets[betType] = (currentBets[betType] || 0) + selectedChipValue; updateCellChip(cell, betType); updateDisplays(); }
+    function placeBet(event) {
+        if (isSpinning) return;
+        const cell = event.target.closest('.bet-cell');
+        if (!cell) return;
+        if (balance < selectedChipValue) { return; }
+        balance -= selectedChipValue;
+        const betType = cell.dataset.betType;
+        currentBets[betType] = (currentBets[betType] || 0) + selectedChipValue;
+        updateCellChip(cell, betType);
+        updateDisplays();
+    }
 
     function spin() {
         if (isSpinning || Object.keys(currentBets).length === 0) return;
@@ -116,11 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetIndex = Math.floor(Math.random() * WHEEL_NUMBERS_IN_ORDER.length);
         const targetAngle = targetIndex * arc;
         
-        const fullSpins = Math.PI * 2 * (Math.floor(Math.random() * 5) + 5); // 5-9 full spins
-        const finalAngle = fullSpins + targetAngle;
+        const fullSpins = Math.PI * 2 * (Math.floor(Math.random() * 5) + 5);
+        const finalAngle = fullSpins - targetAngle;
 
         let start = null;
-        const duration = 6000; // 6 seconds spin
+        const duration = 6000;
 
         function animate(timestamp) {
             if (!start) start = timestamp;
@@ -133,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (progress < duration) {
                 requestAnimationFrame(animate);
             } else {
-                currentAngle = finalAngle; // Ensure it lands perfectly
+                currentAngle = finalAngle;
                 drawWheel();
                 endSpin(WHEEL_NUMBERS_IN_ORDER[targetIndex]);
             }
@@ -150,7 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (balance >= 5000 && !sigilUnlocked) {
             sigilUnlocked = true;
-            setTimeout(() => sigilModal.classList.add('visible'), 500);
+            setTimeout(() => {
+                if(sigilModal) sigilModal.classList.add('visible');
+            }, 500);
         }
     }
 
@@ -173,10 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     win = betAmount * PAYOUTS.half;
                 }
                 if ((betType === 'even' && number % 2 === 0 && number !== 0) ||
-                    (betType === 'odd' && number % 2 !== 0 && number !== 0)) {
+                    (betType === 'odd' && number % 2 !== 0)) {
                     win = betAmount * PAYOUTS.even_odd;
                 }
-                if (betType === color) {
+                if ((betType === 'red-bet' && color === 'red') || (betType === 'black-bet' && color === 'black')) {
                     win = betAmount * PAYOUTS.color;
                 }
             }
@@ -187,13 +221,51 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplays();
     }
     
-    function clearBets(refund = true) { if (isSpinning) return; if (refund) { const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0); balance += totalBet; } currentBets = {}; document.querySelectorAll('.chip-on-cell').forEach(chip => chip.remove()); updateDisplays(); }
+    function clearBets(refund = true) {
+        if (isSpinning) return;
+        if (refund) {
+            const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
+            balance += totalBet;
+        }
+        currentBets = {};
+        document.querySelectorAll('.chip-on-cell').forEach(chip => chip.remove());
+        updateDisplays();
+    }
     
-    // --- UI UPDATES ---
-    function updateDisplays() { balanceDisplay.textContent = balance; const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0); totalBetDisplay.textContent = totalBet; }
-    function updateCellChip(cell, betType) { let chipOnCell = cell.querySelector('.chip-on-cell'); if (!chipOnCell) { chipOnCell = document.createElement('div'); chipOnCell.className = 'chip-on-cell'; cell.appendChild(chipOnCell); } const highestChipValue = getHighestChipForAmount(currentBets[betType]); chipOnCell.style.backgroundColor = CHIP_COLORS[highestChipValue]; chipOnCell.textContent = currentBets[betType]; }
-    function getHighestChipForAmount(amount) { let highestChip = 1; for (const value of CHIP_VALUES) { if (amount >= value) { highestChip = value; } } return highestChip; }
-    function createCell(text, className) { const cell = document.createElement('div'); cell.className = `bet-cell ${className}`; cell.textContent = text; return cell; }
+    function updateDisplays() {
+        balanceDisplay.textContent = balance;
+        const totalBet = Object.values(currentBets).reduce((sum, amount) => sum + amount, 0);
+        totalBetDisplay.textContent = totalBet;
+    }
+
+    function updateCellChip(cell, betType) {
+        let chipOnCell = cell.querySelector('.chip-on-cell');
+        if (!chipOnCell) {
+            chipOnCell = document.createElement('div');
+            chipOnCell.className = 'chip-on-cell';
+            cell.appendChild(chipOnCell);
+        }
+        const highestChipValue = getHighestChipForAmount(currentBets[betType]);
+        chipOnCell.style.backgroundColor = CHIP_COLORS[highestChipValue];
+        chipOnCell.textContent = currentBets[betType];
+    }
+
+    function getHighestChipForAmount(amount) {
+        let highestChip = 1;
+        for (const value of CHIP_VALUES) {
+            if (amount >= value) {
+                highestChip = value;
+            }
+        }
+        return highestChip;
+    }
+
+    function createCell(text, className) {
+        const cell = document.createElement('div');
+        cell.className = `bet-cell ${className}`;
+        cell.textContent = text;
+        return cell;
+    }
 
     init();
 });
