@@ -28,7 +28,6 @@
   <!-- ИНТЕРФЕЙС -->
   <header id="ui-header">
     <div id="brand-title">BOZHEMAN</div>
-    <!-- ОБНОВЛЕННАЯ КНОПКА ЗВУКА С SVG -->
     <button id="sound-toggle" aria-label="Переключить звук">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="sound-icon">
         <path class="sound-on-icon" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
@@ -38,7 +37,7 @@
   </header>
   
   <!-- КНОПКИ (ИНТЕРФЕЙС ЧЕЛОВЕКА) -->
-  <nav id="links-container"></nav>
+  <nav id="links-container" class="scanlines-effect"></nav>
 
   <!-- АУДИО -->
   <audio id="ambient-audio" loop preload="auto">
@@ -65,11 +64,12 @@
     import TWEEN from 'three/addons/libs/tween.module.js';
 
     // --- НАСТРОЙКИ ---
+    // УСКОРЕННЫЕ ЗАДЕРЖКИ
     const PRELOADER_LINES = [
-      { text: '> INIT_CONNECTION...', delay: 1500 },
-      { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 1000 },
-      { text: '> LOADING_PROTOCOL_0ZERO...', delay: 1500 },
-      { text: '> ACCESS GRANTED', delay: 800 }
+      { text: '> INIT_CONNECTION...', delay: 800 },
+      { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 500 },
+      { text: '> LOADING_PROTOCOL_0ZERO...', delay: 800 },
+      { text: '> ACCESS GRANTED', delay: 500 }
     ];
 
     const LINKS = [
@@ -86,7 +86,8 @@
     const SECRET_CLICK_COUNT = 6;
     const SECRET_LINK_URL = 'doubleindex.html';
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
+    // ... (остальной код JS остается без изменений)
+
     const preloader = document.getElementById('preloader');
     const preloaderText = document.getElementById('preloader-text');
     const matrixCanvas = document.getElementById('matrix-canvas');
@@ -103,8 +104,6 @@
 
     init();
     runPreloader();
-
-    // --- ОСНОВНЫЕ ФУНКЦИИ ---
     
     async function runPreloader() {
       for (const line of PRELOADER_LINES) {
@@ -154,7 +153,6 @@
           drops[i]++;
         }
       }
-      // ИЗМЕНЕНА СКОРОСТЬ: было 33, стало 50
       setInterval(draw, 50);
     }
 

@@ -55,7 +55,8 @@ body {
   position: fixed; inset: 0;
   background: #000; z-index: 1000;
   display: flex; 
-  justify-content: flex-start; 
+  /* По умолчанию для мобильных */
+  justify-content: center; 
   align-items: center;
   padding: 2rem;
   transition: opacity 1s ease;
@@ -74,6 +75,16 @@ body {
   animation: blink 1s step-end infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
+
+/* Позиционирование прелоадера на ПК */
+@media (min-width: 1024px) {
+    #preloader {
+        justify-content: flex-start;
+    }
+    #preloader-text {
+        margin-left: 35%;
+    }
+}
 
 /* ---------- UI Header ---------- */
 #ui-header {
@@ -96,7 +107,6 @@ body {
   letter-spacing: 0.1em;
   text-shadow: 0 0 12px rgba(255, 51, 51, 0.9);
 }
-
 #sound-toggle {
   background: transparent; 
   border: 2px solid #a30000;
@@ -127,7 +137,6 @@ body {
 #sound-toggle.muted .sound-on-icon { display: none; }
 #sound-toggle.muted .sound-off-icon { display: block; }
 
-
 /* ---------- Links Container (Human Interface) ---------- */
 #links-container {
     display: grid;
@@ -137,9 +146,26 @@ body {
     max-width: 900px;
     padding: 2rem 1rem;
     z-index: 5;
+    position: relative;
 }
 
-/* ---------- НОВАЯ АНИМАЦИЯ "ЖИДКИЙ НЕОН" ---------- */
+/* Эффект "ряби" (Scanlines) */
+.scanlines-effect::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+    animation: scanline 15s linear infinite;
+}
+
+@keyframes scanline {
+    from { background-position: 0 0; }
+    to { background-position: 0 -100vh; }
+}
+
+/* Анимация "Жидкий неон" */
 .btn-glitch {
     position: relative;
     display: block;
@@ -155,19 +181,15 @@ body {
     transition: all 0.3s ease;
     overflow: hidden;
 }
-
 .btn-glitch:hover {
     border-color: #ff4d4d;
     color: #fff;
-    /* Neon glow effect */
     text-shadow: 
         0 0 5px #fff,
         0 0 10px #fff,
         0 0 20px #ff00de,
-        0 0 30px #ff00de,
-        0 0 40px #ff00de;
+        0 0 30px #ff00de;
 }
-
 .btn-glitch::before,
 .btn-glitch::after {
     content: attr(data-text);
@@ -179,45 +201,35 @@ body {
     padding: 1rem;
     background: transparent;
     color: #fff;
-    /* Hide the pseudo-elements by default */
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-
 .btn-glitch:hover::before,
 .btn-glitch:hover::after {
     opacity: 1;
 }
-
-/* Top wave layer */
 .btn-glitch:hover::before {
     clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
     animation: liquid-wave-top 2s ease-in-out infinite;
 }
-
-/* Bottom wave layer */
 .btn-glitch:hover::after {
     clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
     animation: liquid-wave-bottom 2s ease-in-out infinite;
 }
-
 @keyframes liquid-wave-top {
     0%, 100% { transform: translateX(0) skewX(0); }
     50% { transform: translateX(-5px) skewX(2deg); }
 }
-
 @keyframes liquid-wave-bottom {
     0%, 100% { transform: translateX(0) skewX(0); }
     50% { transform: translateX(5px) skewX(-2deg); }
 }
-
-
 .btn-glitch.special {
     background: linear-gradient(45deg, #600000, #000);
     font-weight: bold;
 }
 
-/* Fullscreen Glitch for Easter Egg */
+/* Fullscreen Glitch для пасхалки */
 body.glitch-out::after {
     content: '';
     position: fixed;
@@ -226,7 +238,6 @@ body.glitch-out::after {
     z-index: 9999;
     animation: fullscreen-glitch 1.5s steps(2, end) forwards;
 }
-
 @keyframes fullscreen-glitch {
     0% { clip-path: polygon(0 2%, 100% 2%, 100% 98%, 0 98%); transform: translateX(-5%); }
     10% { clip-path: polygon(0 75%, 100% 75%, 100% 100%, 0 100%); transform: translateX(5%); }
@@ -241,18 +252,15 @@ body.glitch-out::after {
     100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translateX(0); opacity: 1; }
 }
 
-
-/* ---------- Responsive Design for Mobile ---------- */
+/* Адаптивность для мобильных */
 @media (max-width: 768px) {
     #scene-container {
         height: 35vh;
     }
-
     #links-container {
         grid-template-columns: 1fr;
         padding: 1rem;
     }
-
     #brand-title {
         font-size: 1.2rem;
     }
