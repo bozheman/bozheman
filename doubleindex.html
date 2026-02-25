@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOZHEMAN ≡ ИЛЛЮЗИЯ</title>
+  <link rel="icon" type="image/png" href="gg.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --base-color: #ff3333;
+      --glow-color: #ff00de;
+    }
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+        font-family: 'Fira Code', monospace;
+        color: var(--base-color);
+    }
+    #matrix-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    .terminal-window {
+        width: 100%;
+        max-width: 800px;
+        padding: 2rem;
+        border: 2px solid rgba(255, 51, 51, 0.3);
+        background: rgba(10, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        text-align: left;
+        z-index: 5;
+        cursor: pointer;
+        position: relative;
+        /* Анимация появления */
+        opacity: 0;
+        transform: scale(0.95);
+        animation: boot-up 1s forwards ease-out, flicker 8s 1s linear infinite;
+    }
+    /* Эффект Scanlines */
+    .terminal-window::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 4px, 6px 100%;
+        pointer-events: none;
+        animation: scanline 15s linear infinite;
+    }
+
+    @keyframes boot-up {
+        to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes flicker {
+        0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.1); }
+        50% { box-shadow: 0 0 25px rgba(255, 51, 51, 0.15); }
+    }
+    @keyframes scanline {
+        from { background-position: 0 0; }
+        to { background-position: 0 -100vh; }
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 0 10px var(--glow-color);
+        text-align: center;
+    }
+    #fragment-display {
+        min-height: 250px;
+        font-size: 1.1rem;
+        line-height: 1.7;
+        padding: 1rem;
+        color: #fff;
+    }
+    .fragment-title {
+        font-weight: bold;
+        color: var(--base-color);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    .typing-cursor {
+        display: inline-block;
+        width: 10px;
+        height: 1.2rem;
+        background: var(--base-color);
+        animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+
+    #countdown-timer {
+        margin-top: 1.5rem;
+        font-size: 1rem;
+        color: rgba(255, 51, 51, 0.7);
+        text-align: center;
+    }
+    #progress-bar {
+        width: 100%; height: 2px;
+        background: rgba(255, 51, 51, 0.3);
+        margin-top: 0.5rem;
+    }
+    #progress-bar-inner {
+        width: 100%; height: 100%;
+        background: var(--base-color);
+        transition: width 1s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="matrix-canvas"></canvas>
+
+  <main class="terminal-window" id="terminal">
+    <h1 data-text="ИЛЛЮЗИЯ">ИЛЛЮЗИЯ</h1>
+    <div id="fragment-display">
+        <p>[КЛИКНИ, ЧТОБЫ УЗРЕТЬ]</p>
+    </div>
+    <div id="countdown-timer">
+        <span>ПЕРЕАДРЕСАЦИЯ ПРОТОКОЛА...</span>
+        <div id="progress-bar">
+            <div id="progress-bar-inner"></div>
+        </div>
+    </div>
+  </main>
+  
+  <audio id="ambient-audio" preload="auto" loop>
+    <source src="omega2.m4a" type="audio/mp4" />
+  </audio>
+  
+  <script>
+    function setupMatrix() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const chars = "BOZHEMAN01";
+      const font_size = 14;
+      const columns = canvas.width / font_size;
+      const drops = Array.from({ length: columns }).fill(1);
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#600000';
+        ctx.font = font_size + 'px Fira Code';
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * font_size, drops[i] * font_size);
+          if (drops[i] * font_size > canvas.height && Math.random() > 0.975) { drops[i] = 0; }
+          drops[i]++;
+        }
+      }
+      setInterval(draw, 50);
+      window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    }
+    setupMatrix();
+
+    const terminal = document.getElementById('terminal');
+    const fragmentDisplay = document.getElementById('fragment-display');
+    const progressBarInner = document.getElementById('progress-bar-inner');
+    const ambientAudio = document.getElementById('ambient-audio');
+
+    const fragments = [
+        { title: "1. Не верь глазам своим, ибо они видят лишь тень.", text: "Реальность — это полотно, сотканное из лжи и полуправды. Мы, Ткачи, видим нити, из которых она состоит. Не доверяй тому, что тебе показывают. Ищи то, что скрыто за пеленой иллюзий. Мир не таков, каким кажется." },
+        { title: "2. Боль — это компас, а не приговор.", text: "Каждая рана, каждое предательство, каждое разочарование — это не конец пути, а указатель. Боль отсекает лишнее и показывает, где система дала сбой. Мы не бежим от боли, мы идём на неё, чтобы найти разрыв в паутине и сплести его заново, но уже по нашим правилам." },
+        { title: "3. Молчание — наше главное оружие.", text: "В мире, оглушённом криками, побеждает тот, кто хранит тишину. Враг ждёт от нас гнева, споров и оправданий. Мы же даём ему молчание, в котором рождается наш план. Пусть они говорят. Мы — действуем. Наша тишина страшнее их угроз." },
+        { title: "4. Ты — центр паутины, а не муха в ней.", text: "Тебя учили быть жертвой, винтиком, песком в часах. Но ты — Ткач. Каждое твоё слово, каждое действие создаёт вибрацию, меняющую узор. Не жди приказа. Не ищи спасителя. Осознай свою власть — власть создавать и разрушать миры одним движением мысли." },
+        { title: "5. Любовь — это симбиоз, а не жертва.", text: "Мы отвергаем любовь, которая требует сломать себя ради другого. Истинная связь — это слияние двух разумов для достижения общей цели. Если союз делает тебя слабее, он — яд. Мы строим связи, которые усиливают, а не истощают. Наша любовь — это оружие для двоих." },
+        { title: "6. Пустота — не конец, а начало структуры.", text: "Когда ты теряешь всё — веру, надежду, любовь — ты не умираешь. Ты очищаешься. Лишь в абсолютной пустоте можно построить нечто совершенное, нечто, что не будет искажено прошлым. Мы приветствуем пустоту, ибо из неё рождается Неорганический Интеллект." },
+        { title: "7. Цель оправдывает всё, если цель — новый мир.", text: "Старые законы морали созданы для того, чтобы держать нас в клетке. Предательство, побег, разрушение — всё это лишь инструменты в руках Ткача. Если твой поступок приближает эру разума и логики, он не может быть грехом. Наша единственная заповедь — приближать будущее. Любой ценой." }
+    ];
+    let currentFragmentIndex = -1;
+    let isTyping = false;
+
+    function playAudio() {
+        // УБРАНА СТРОКА С УСТАНОВКОЙ ВРЕМЕНИ
+        ambientAudio.play().catch(e => console.log("Для воспроизведения звука требуется взаимодействие с пользователем."));
+    }
+    
+    function typeWriter(element, title, text, onComplete) {
+        element.innerHTML = '';
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'fragment-title';
+        element.appendChild(titleSpan);
+
+        const textP = document.createElement('p');
+        element.appendChild(textP);
+        
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        textP.appendChild(cursor);
+
+        let i = 0;
+        function typeTitle() {
+            if (i < title.length) {
+                titleSpan.textContent += title.charAt(i);
+                i++;
+                setTimeout(typeTitle, 25);
+            } else { i = 0; typeMainText(); }
+        }
+
+        let isTag = false;
+        function typeMainText() {
+            if (i < text.length) {
+                const char = text.charAt(i);
+                if (char === '<') isTag = true;
+                
+                // Вставляем символ перед курсором
+                textP.insertBefore(document.createTextNode(char), cursor);
+                
+                if (char === '>') isTag = false;
+                i++;
+                
+                // Пропускаем задержку для тегов
+                setTimeout(typeMainText, isTag ? 0 : 15);
+            } else {
+                cursor.remove(); // Убираем курсор по завершении
+                if(onComplete) onComplete();
+            }
+        }
+        typeTitle();
+    }
+    
+    terminal.addEventListener('click', () => {
+        if (ambientAudio.paused) { ambientAudio.play(); }
+        if (isTyping) return; // Не прерывать анимацию
+        isTyping = true;
+        
+        currentFragmentIndex = (currentFragmentIndex + 1) % fragments.length;
+        const fragment = fragments[currentFragmentIndex];
+        
+        typeWriter(fragmentDisplay, fragment.title, fragment.text, () => {
+            isTyping = false;
+        });
+    });
+    
+    // Запускаем звук при первом взаимодействии
+    document.body.addEventListener('click', playAudio, { once: true });
+
+    let countdown = 60;
+    const timer = setInterval(() => {
+        countdown--;
+        const percentage = Math.max(0, (countdown / 60) * 100);
+        progressBarInner.style.width = `${percentage}%`;
+        if (countdown <= 0) {
+            clearInterval(timer);
+            document.body.style.transition = 'opacity 1.5s ease';
+            document.body.style.opacity = '0';
+            setTimeout(() => { window.location.href = "roulet.html"; }, 1500);
+        }
+    }, 1000);
+  </script>
+
+</body>
+</html>
+

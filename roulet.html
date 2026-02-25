@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOZHEMAN ≡ 777</title>
+  <link rel="icon" type="image/png" href="gg.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =============================================
+       BOZHEMAN ≡ 777  —  Slot Machine Stylesheet
+       ============================================= */
+    :root {
+      --clr-bg:          #000000;
+      --clr-surface:     rgba(8, 0, 0, 0.55);
+      --clr-border:      rgba(255, 51, 51, 0.28);
+      --clr-primary:     #ff3333;
+      --clr-primary-dim: #a30000;
+      --clr-white:       #ffffff;
+      --clr-success:     #00ff88;
+      --clr-glow:        #ff00de;
+      --clr-gold:        #ffd700;
+      --clr-matrix:      #600000;
+
+      --font-mono: 'Fira Code', monospace;
+
+      --radius-none: 0;
+      --shadow-glow: 0 0 8px var(--clr-primary), 0 0 20px rgba(255,51,51,0.4);
+      --transition-fast: 0.2s ease;
+      --transition-med:  0.35s ease;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--clr-bg);
+      color: var(--clr-primary);
+      font-family: var(--font-mono);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1rem 1rem 3rem;
+      position: relative;
+    }
+
+    /* ---- Background Canvas ---- */
+    #matrix-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---- Page Scanlines Overlay ---- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.18) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.01), rgba(0,0,255,0.04));
+      background-size: 100% 4px, 6px 100%;
+      animation: scanline 20s linear infinite;
+    }
+    @keyframes scanline {
+      from { background-position: 0 0; }
+      to   { background-position: 0 -200vh; }
+    }
+
+    /* ---- Layout ---- */
+    .machine-wrapper {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      max-width: 640px;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* ---- Title ---- */
+    .page-title {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.12em;
+      text-shadow: 0 0 6px var(--clr-primary), 0 0 18px var(--clr-glow);
+      animation: title-pulse 4s ease-in-out infinite;
+    }
+    @keyframes title-pulse {
+      0%, 100% { text-shadow: 0 0 6px var(--clr-primary), 0 0 18px var(--clr-glow); }
+      50%       { text-shadow: 0 0 12px var(--clr-primary), 0 0 35px var(--clr-glow), 0 0 60px var(--clr-glow); }
+    }
+
+    /* ---- Stats Bar ---- */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      border: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      backdrop-filter: blur(10px);
+      padding: 0.9rem 1rem;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      opacity: 0.55;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--clr-white);
+      transition: color var(--transition-fast);
+    }
+    .stat-value.flash-win  { color: var(--clr-success); }
+    .stat-value.flash-loss { color: var(--clr-primary); }
+
+    /* ---- Machine Cabinet ---- */
+    .machine-cabinet {
+      border: 2px solid var(--clr-border);
+      background: var(--clr-surface);
+      backdrop-filter: blur(14px);
+      padding: 1.5rem 1.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Corner accents */
+    .machine-cabinet::before,
+    .machine-cabinet::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--clr-primary);
+      border-style: solid;
+    }
+    .machine-cabinet::before {
+      top: -1px; left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    .machine-cabinet::after {
+      bottom: -1px; right: -1px;
+      border-width: 0 2px 2px 0;
+    }
+
+    /* ---- Reels Area ---- */
+    .reels-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.4rem;
+      position: relative;
+    }
+
+    /* Center win-line indicator */
+    .win-line {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--clr-primary-dim) 10%,
+        var(--clr-primary) 50%,
+        var(--clr-primary-dim) 90%,
+        transparent 100%
+      );
+      pointer-events: none;
+      opacity: 0.55;
+      z-index: 2;
+    }
+    .win-line.active {
+      opacity: 1;
+      box-shadow: 0 0 10px var(--clr-primary), 0 0 25px var(--clr-glow);
+      animation: line-flash 0.3s ease-in-out 4;
+    }
+    @keyframes line-flash {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* Individual canvas reel */
+    .reel-wrap {
+      position: relative;
+      width: clamp(90px, 26vw, 140px);
+      height: clamp(110px, 31vw, 168px);
+      border: 1px solid var(--clr-border);
+      overflow: hidden;
+      background: rgba(0,0,0,0.7);
+      flex-shrink: 0;
+    }
+    .reel-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Top/bottom fade masks on each reel */
+    .reel-wrap::before,
+    .reel-wrap::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 35%;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .reel-wrap::before {
+      top: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+    }
+    .reel-wrap::after {
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    }
+
+    /* ---- Multiplier Table ---- */
+    .pay-table {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem 1rem;
+      margin-bottom: 1.4rem;
+      font-size: 0.72rem;
+      opacity: 0.7;
+      border-top: 1px solid var(--clr-border);
+      padding-top: 0.8rem;
+    }
+    .pay-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .pay-symbol { color: var(--clr-white); }
+    .pay-mult   { color: var(--clr-gold); font-weight: 700; }
+
+    /* ---- Bet Controls ---- */
+    .controls-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .bet-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: stretch;
+    }
+
+    .bet-label {
+      display: flex;
+      align-items: center;
+      font-size: 0.7rem;
+      opacity: 0.55;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      padding: 0 0.4rem;
+    }
+
+    .input-field {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--clr-border);
+      color: var(--clr-white);
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.75rem 0.5rem;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      -moz-appearance: textfield;
+    }
+    .input-field::-webkit-inner-spin-button,
+    .input-field::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .input-field::placeholder { color: rgba(255,255,255,0.22); font-weight: 400; }
+    .input-field:focus {
+      border-color: var(--clr-primary);
+      box-shadow: 0 0 8px rgba(255,51,51,0.35);
+    }
+    .input-field:invalid { border-color: var(--clr-primary-dim); }
+
+    /* Quick-bet chips */
+    .chip-row {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .chip {
+      flex: 1;
+      min-width: 44px;
+      padding: 0.35rem 0.3rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: 1px solid var(--clr-border);
+      background: rgba(163,0,0,0.12);
+      color: var(--clr-primary);
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.04em;
+    }
+    .chip:hover:not(:disabled) {
+      background: var(--clr-primary-dim);
+      color: var(--clr-white);
+      box-shadow: 0 0 8px rgba(255,51,51,0.4);
+    }
+    .chip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Spin button */
+    .btn-spin {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 1.1rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 2px solid rgba(255,51,51,0.5);
+      background: rgba(10,0,0,0.4);
+      color: var(--clr-primary);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all var(--transition-med);
+    }
+    .btn-spin::before,
+    .btn-spin::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--clr-white);
+      opacity: 0;
+      transition: opacity var(--transition-med);
+    }
+    .btn-spin:hover:not(:disabled) {
+      border-color: var(--clr-primary);
+      color: var(--clr-white);
+      text-shadow: 0 0 6px #fff, 0 0 14px var(--clr-glow);
+      box-shadow: 0 0 16px rgba(255,51,51,0.3), inset 0 0 14px rgba(255,0,222,0.08);
+    }
+    .btn-spin:hover:not(:disabled)::before {
+      opacity: 1;
+      clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+      animation: liquid-wave-top 2s ease-in-out infinite;
+    }
+    .btn-spin:hover:not(:disabled)::after {
+      opacity: 1;
+      clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+      animation: liquid-wave-bottom 2s ease-in-out infinite;
+    }
+    .btn-spin:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+    .btn-spin.spinning {
+      animation: btn-pulse 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes btn-pulse {
+      from { box-shadow: 0 0 4px rgba(255,51,51,0.2); }
+      to   { box-shadow: 0 0 18px rgba(255,51,51,0.6), 0 0 30px rgba(255,0,222,0.2); }
+    }
+    @keyframes liquid-wave-top {
+      0%, 100% { transform: translateX(0) skewX(0deg); }
+      50%       { transform: translateX(-4px) skewX(1.5deg); }
+    }
+    @keyframes liquid-wave-bottom {
+      0%, 100% { transform: translateX(0) skewX(0deg); }
+      50%       { transform: translateX(4px) skewX(-1.5deg); }
+    }
+
+    /* ---- Particle Canvas (Win FX) ---- */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #particle-canvas.active { opacity: 1; }
+
+    /* ---- Screen Shake ---- */
+    @keyframes screen-shake {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      10%  { transform: translate(-4px, 2px) rotate(-0.4deg); }
+      20%  { transform: translate(4px,-3px) rotate(0.4deg); }
+      30%  { transform: translate(-3px, 4px) rotate(0deg); }
+      40%  { transform: translate(3px, -2px) rotate(0.3deg); }
+      50%  { transform: translate(-2px, 3px) rotate(-0.3deg); }
+      60%  { transform: translate(2px, -4px) rotate(0.2deg); }
+      70%  { transform: translate(-4px, 2px) rotate(-0.2deg); }
+      80%  { transform: translate(3px, 3px) rotate(0.1deg); }
+      90%  { transform: translate(-2px,-2px) rotate(0deg); }
+      100% { transform: translate(0,0) rotate(0deg); }
+    }
+    body.shake { animation: screen-shake 0.55s ease-in-out; }
+
+    /* ---- Result Toast ---- */
+    #result-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.7);
+      z-index: 100;
+      padding: 1.4rem 2.8rem;
+      border: 2px solid var(--clr-primary);
+      background: rgba(0,0,0,0.94);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #result-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #result-toast.win {
+      border-color: var(--clr-success);
+      box-shadow: 0 0 30px rgba(0,255,136,0.35), 0 0 60px rgba(0,255,136,0.15);
+    }
+    #result-toast.jackpot {
+      border-color: var(--clr-gold);
+      box-shadow: 0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2);
+      animation: jackpot-glow 0.4s ease-in-out infinite alternate;
+    }
+    @keyframes jackpot-glow {
+      from { box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+      to   { box-shadow: 0 0 60px rgba(255,215,0,0.7), 0 0 100px rgba(255,0,222,0.3); }
+    }
+    #result-toast.loss {
+      border-color: var(--clr-primary-dim);
+      box-shadow: 0 0 14px rgba(255,51,51,0.2);
+    }
+    #toast-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      opacity: 0.65;
+      margin-bottom: 0.4rem;
+    }
+    #toast-amount {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 700;
+      color: var(--clr-white);
+    }
+    #toast-desc {
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      opacity: 0.6;
+    }
+
+    /* ---- Error / Info Messages ---- */
+    #error-bar {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      padding: 0.7rem 1.4rem;
+      border: 1px solid var(--clr-primary-dim);
+      background: rgba(0,0,0,0.9);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      max-width: 90vw;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #error-bar.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ---- History Log ---- */
+    .history-section {
+      border: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      backdrop-filter: blur(8px);
+      padding: 0.9rem 1rem;
+    }
+    .history-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+    }
+    #history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: 140px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--clr-primary-dim) transparent;
+    }
+    .history-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.3rem;
+      border-left: 2px solid transparent;
+      opacity: 0;
+      animation: entry-appear 0.3s forwards ease-out;
+    }
+    .history-entry.win-entry  { border-left-color: var(--clr-success); color: var(--clr-success); }
+    .history-entry.loss-entry { border-left-color: var(--clr-primary-dim); color: rgba(255,51,51,0.75); }
+    @keyframes entry-appear {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ---- Back Link ---- */
+    .back-link {
+      position: relative;
+      display: block;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      text-decoration: none;
+      color: var(--clr-primary);
+      font-size: 0.85rem;
+      border: 1px solid var(--clr-border);
+      background: transparent;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.06em;
+    }
+    .back-link:hover {
+      color: var(--clr-white);
+      border-color: var(--clr-primary);
+      text-shadow: 0 0 8px var(--clr-glow);
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 400px) {
+      .pay-table { font-size: 0.65rem; }
+      .chip { font-size: 0.62rem; min-width: 36px; }
+      .stats-bar { gap: 0.4rem; padding: 0.7rem 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Matrix -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- Win Particle Overlay -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Toast Notification -->
+  <div id="result-toast" role="status" aria-live="polite">
+    <div id="toast-label">РЕЗУЛЬТАТ</div>
+    <div id="toast-amount">—</div>
+    <div id="toast-desc"></div>
+  </div>
+
+  <!-- Error Bar -->
+  <div id="error-bar" role="alert"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!--  MACHINE WRAPPER                               -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="machine-wrapper">
+
+    <h1 class="page-title">BOZHEMAN ≡ 777</h1>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-label">БАЛАНС</span>
+        <span class="stat-value" id="balance-display">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">СТАВКА</span>
+        <span class="stat-value" id="last-bet-display">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">СПИНОВ</span>
+        <span class="stat-value" id="spins-display">0</span>
+      </div>
+    </div>
+
+    <!-- Cabinet -->
+    <div class="machine-cabinet">
+
+      <!-- Reels -->
+      <div class="reels-section">
+        <div class="win-line" id="win-line"></div>
+
+        <div class="reel-wrap" id="reel-wrap-0">
+          <canvas id="reel-canvas-0"></canvas>
+        </div>
+        <div class="reel-wrap" id="reel-wrap-1">
+          <canvas id="reel-canvas-1"></canvas>
+        </div>
+        <div class="reel-wrap" id="reel-wrap-2">
+          <canvas id="reel-canvas-2"></canvas>
+        </div>
+      </div>
+
+      <!-- Pay Table -->
+      <div class="pay-table">
+        <div class="pay-row"><span class="pay-symbol">7  7  7</span><span class="pay-mult">× 10 JACKPOT</span></div>
+        <div class="pay-row"><span class="pay-symbol">★  ★  ★</span><span class="pay-mult">× 7</span></div>
+        <div class="pay-row"><span class="pay-symbol">Ω  Ω  Ω</span><span class="pay-mult">× 5</span></div>
+        <div class="pay-row"><span class="pay-symbol">▲  ▲  ▲</span><span class="pay-mult">× 3</span></div>
+        <div class="pay-row"><span class="pay-symbol">■  ■  ■</span><span class="pay-mult">× 2</span></div>
+        <div class="pay-row"><span class="pay-symbol">Любые 2</span><span class="pay-mult">× 1.5</span></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-section">
+
+        <!-- Quick-bet chips -->
+        <div class="chip-row" id="chip-row">
+          <button class="chip" data-amount="10">10</button>
+          <button class="chip" data-amount="25">25</button>
+          <button class="chip" data-amount="50">50</button>
+          <button class="chip" data-amount="100">100</button>
+          <button class="chip" data-amount="max">MAX</button>
+        </div>
+
+        <!-- Bet input row -->
+        <div class="bet-row">
+          <span class="bet-label">СТАВКА:</span>
+          <input
+            type="number"
+            id="bet-input"
+            class="input-field"
+            placeholder="0"
+            min="1"
+            step="1"
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- Spin button -->
+        <button class="btn-spin" id="spin-button" data-text="КРУТИТЬ">
+          КРУТИТЬ
+        </button>
+
+      </div>
+    </div><!-- /.machine-cabinet -->
+
+    <!-- History -->
+    <div class="history-section">
+      <div class="history-title">// ИСТОРИЯ РАУНДОВ</div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- Navigation -->
+    <a href="doubleindex.html" class="back-link">← ВЕРНУТЬСЯ В ПРОТОКОЛ</a>
+
+  </div><!-- /.machine-wrapper -->
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!--  SCRIPTS                                       -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <script type="module" src="roulette.js"></script>
+
+</body>
+</html>

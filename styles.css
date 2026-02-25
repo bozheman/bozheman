@@ -1,50 +1,409 @@
+/* =============================================
+   BOZHEMAN ≡ PROTOCOL  ‖  Master Stylesheet v6.0
+   ============================================= */
+
+/* ──────────────────────────────────────────────
+   0.  DESIGN TOKENS  (CSS Custom Properties)
+   All colour, spacing, timing, and typography
+   values are defined once here. Sub-pages that
+   need overrides can redefine inside :root or a
+   scoped selector without touching this file.
+   ────────────────────────────────────────────── */
+:root {
+  /* Palette */
+  --clr-bg:            #000000;
+  --clr-surface:       rgba(8, 0, 0, 0.45);
+  --clr-surface-heavy: rgba(8, 0, 0, 0.72);
+  --clr-border:        rgba(255, 51, 51, 0.28);
+  --clr-border-bright: rgba(255, 51, 51, 0.55);
+  --clr-primary:       #ff3333;
+  --clr-primary-dim:   #a30000;
+  --clr-white:         #ffffff;
+  --clr-success:       #00ff88;
+  --clr-glow:          #ff00de;
+  --clr-gold:          #ffd700;
+  --clr-matrix:        #600000;
+  --clr-text-muted:    rgba(255, 255, 255, 0.45);
+
+  /* Typography */
+  --font-mono:    'Fira Code', 'Courier New', monospace;
+  --fs-xs:        0.65rem;
+  --fs-sm:        0.8rem;
+  --fs-base:      1rem;
+  --fs-md:        1.2rem;
+  --fs-lg:        1.5rem;
+  --fs-xl:        2rem;
+  --fs-2xl:       2.5rem;
+
+  /* Spacing scale */
+  --sp-1:  0.25rem;
+  --sp-2:  0.5rem;
+  --sp-3:  0.75rem;
+  --sp-4:  1rem;
+  --sp-6:  1.5rem;
+  --sp-8:  2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+
+  /* Shadows / Glows */
+  --shadow-primary: 0 0 8px var(--clr-primary), 0 0 22px rgba(255, 51, 51, 0.35);
+  --shadow-glow:    0 0 12px var(--clr-glow),   0 0 30px rgba(255, 0, 222, 0.2);
+  --shadow-white:   0 0 5px #fff, 0 0 12px #fff;
+
+  /* Transitions */
+  --t-fast: 0.18s ease;
+  --t-med:  0.32s ease;
+  --t-slow: 0.6s ease;
+
+  /* Layout */
+  --max-w-content: 900px;
+  --max-w-narrow:  640px;
+}
+
+
+/* ──────────────────────────────────────────────
+   1.  RESET & BASE
+   ────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--clr-bg);
+  font-family: var(--font-mono);
+  color: var(--clr-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
 body {
-    background-color: black;
-    color: white;
-    font-family: Times new romans, sans-serif;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.container {
-    width: 80%;
-    max-width: 400px;
-    margin: 25px auto;
+a { color: inherit; }
+button { font-family: var(--font-mono); }
+
+
+/* ──────────────────────────────────────────────
+   2.  CANVASES & GLOBAL LAYERS
+   ────────────────────────────────────────────── */
+#matrix-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.avatar {
-    width: 100px;
-    border-radius: 50%;
-    margin-bottom: 15px;
+#scene-container {
+  width: 100%;
+  height: 40vh;
+  min-height: 250px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
-h1 {
-    font-size: 30px;
-    margin-bottom: 20px;
+#scene-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  display: block;
 }
 
-.links {
-    display: flex;
-    flex-direction: column;
+
+/* ──────────────────────────────────────────────
+   3.  PRELOADER
+   ────────────────────────────────────────────── */
+#preloader {
+  position: fixed;
+  inset: 0;
+  background: var(--clr-bg);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--sp-8);
+  transition: opacity 1s ease;
 }
 
-.btn {
-    display: block;
-    background-color: #18510f;
-    color: white;
-    text-decoration: none;
-    padding: 15px;
-    margin: 5px 0;
-    border: 2px solid #146c4a;
-    border-radius: 2px;
-    font-size: 20px;
+#preloader.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.special {
-    background-color: white;
-    color: black;
-    font-weight: bold;
+#preloader-text {
+  font-size: var(--fs-md);
+  color: var(--clr-primary);
+  text-shadow: var(--shadow-primary);
+  white-space: pre-wrap;
+  position: relative;
+  text-align: left;
 }
 
-.special span {
-    font-size: 12px;
+#preloader-text::after {
+  content: '_';
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Desktop preloader alignment */
+@media (min-width: 1024px) {
+  #preloader { justify-content: flex-start; }
+  #preloader-text { margin-left: 35%; }
+}
+
+
+/* ──────────────────────────────────────────────
+   4.  UI HEADER
+   ────────────────────────────────────────────── */
+#ui-header {
+  position: fixed;
+  top: var(--sp-4);
+  width: 100%;
+  max-width: var(--max-w-content);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 var(--sp-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#brand-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-shadow: var(--shadow-primary);
+}
+
+#sound-toggle {
+  background: transparent;
+  border: 2px solid var(--clr-primary-dim);
+  color: var(--clr-primary);
+  padding: var(--sp-2);
+  cursor: pointer;
+  transition: all var(--t-med);
+  pointer-events: all;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#sound-toggle:hover {
+  background: var(--clr-primary-dim);
+  color: var(--clr-white);
+  border-color: var(--clr-primary);
+  transform: scale(1.1);
+}
+
+.sound-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.sound-off-icon { display: none; }
+#sound-toggle.muted .sound-on-icon  { display: none; }
+#sound-toggle.muted .sound-off-icon { display: block; }
+
+
+/* ──────────────────────────────────────────────
+   5.  LINKS CONTAINER  (Human Interface)
+   ────────────────────────────────────────────── */
+#links-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: var(--max-w-content);
+  padding: var(--sp-8) var(--sp-4);
+  z-index: 5;
+  position: relative;
+}
+
+
+/* ──────────────────────────────────────────────
+   6.  SCANLINES EFFECT
+   ────────────────────────────────────────────── */
+.scanlines-effect {
+  position: relative;
+}
+
+.scanlines-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.22) 50%),
+    linear-gradient(90deg,
+      rgba(255,0,0,0.05),
+      rgba(0,255,0,0.015),
+      rgba(0,0,255,0.05)
+    );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+  animation: scanline 15s linear infinite;
+}
+
+@keyframes scanline {
+  from { background-position: 0 0; }
+  to   { background-position: 0 -100vh; }
+}
+
+
+/* ──────────────────────────────────────────────
+   7.  BTN-GLITCH  (Universal Neon Button)
+   ────────────────────────────────────────────── */
+.btn-glitch {
+  position: relative;
+  display: block;
+  padding: var(--sp-4);
+  text-align: center;
+  text-decoration: none;
+  color: var(--clr-primary);
+  font-size: var(--fs-base);
+  font-family: var(--font-mono);
+  border: 2px solid var(--clr-border);
+  background: var(--clr-surface);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all var(--t-med);
+  overflow: hidden;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.btn-glitch:hover {
+  border-color: rgba(255, 77, 77, 0.8);
+  color: var(--clr-white);
+  text-shadow:
+    var(--shadow-white),
+    var(--shadow-glow);
+}
+
+/* Liquid wave pseudo-elements */
+.btn-glitch::before,
+.btn-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: var(--sp-4);
+  background: transparent;
+  color: var(--clr-white);
+  opacity: 0;
+  transition: opacity var(--t-med);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.btn-glitch:hover::before,
+.btn-glitch:hover::after {
+  opacity: 1;
+}
+
+.btn-glitch:hover::before {
+  clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+  animation: liquid-wave-top 2s ease-in-out infinite;
+}
+
+.btn-glitch:hover::after {
+  clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+  animation: liquid-wave-bottom 2s ease-in-out infinite;
+}
+
+@keyframes liquid-wave-top {
+  0%, 100% { transform: translateX(0) skewX(0deg); }
+  50%       { transform: translateX(-5px) skewX(2deg); }
+}
+
+@keyframes liquid-wave-bottom {
+  0%, 100% { transform: translateX(0) skewX(0deg); }
+  50%       { transform: translateX(5px) skewX(-2deg); }
+}
+
+.btn-glitch.special {
+  background: linear-gradient(45deg, #600000, #000);
+  font-weight: 700;
+}
+
+.btn-glitch:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+
+/* ──────────────────────────────────────────────
+   8.  FULLSCREEN GLITCH  (Easter-egg transition)
+   ────────────────────────────────────────────── */
+body.glitch-out::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--clr-bg);
+  z-index: 9999;
+  animation: fullscreen-glitch 1.5s steps(2, end) forwards;
+}
+
+@keyframes fullscreen-glitch {
+  0%   { clip-path: polygon(0 2%,   100% 2%,   100% 98%,  0 98%);  transform: translateX(-5%); }
+  10%  { clip-path: polygon(0 75%,  100% 75%,  100% 100%, 0 100%); transform: translateX(5%); }
+  20%  { clip-path: polygon(0 45%,  100% 45%,  100% 55%,  0 55%);  transform: translateX(-2%); }
+  30%  { clip-path: polygon(0 10%,  100% 10%,  100% 90%,  0 90%);  transform: translateX(3%); }
+  40%  { clip-path: polygon(0 80%,  100% 80%,  100% 85%,  0 85%);  transform: translateX(-4%); }
+  50%  { clip-path: polygon(0 50%,  100% 50%,  100% 51%,  0 51%);  transform: translateX(1%); }
+  60%  { clip-path: polygon(0 25%,  100% 25%,  100% 75%,  0 75%);  transform: translateX(-3%); }
+  70%  { clip-path: polygon(0 90%,  100% 90%,  100% 95%,  0 95%);  transform: translateX(4%); }
+  80%  { clip-path: polygon(0 15%,  100% 15%,  100% 40%,  0 40%);  transform: translateX(-1%); }
+  90%  { clip-path: polygon(0 60%,  100% 60%,  100% 80%,  0 80%);  transform: translateX(2%); }
+  100% { clip-path: polygon(0 0,    100% 0,    100% 100%, 0 100%); transform: translateX(0); opacity: 1; }
+}
+
+
+/* ──────────────────────────────────────────────
+   9.  RESPONSIVE
+   ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  #scene-container {
+    height: 35vh;
+  }
+
+  #links-container {
+    grid-template-columns: 1fr;
+    padding: var(--sp-4);
+  }
+
+  #brand-title {
+    font-size: var(--fs-base);
+  }
+
+  .btn-glitch {
+    font-size: var(--fs-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  #preloader-text {
+    font-size: var(--fs-base);
+  }
 }

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOZHEMAN ≡ SUPPORT</title>
+  <link rel="icon" type="image/png" href="gg.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --base-color: #ff3333;
+      --bg-color: #000;
+      --surface-color: rgba(10, 0, 0, 0.3);
+      --border-color: rgba(255, 51, 51, 0.3);
+      --success-color: #00ff88;
+      --glow-color: #ff00de;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--base-color);
+      font-family: 'Fira Code', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      /* ГАРАНТИРУЕМ СКРОЛЛ */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+    .container {
+        width: 100%;
+        max-width: 900px;
+        padding: 2rem 1rem 4rem 1rem;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: var(--base-color);
+        transition: all 0.3s ease;
+        position: relative;
+        text-decoration: none;
+    }
+    .page-title:hover {
+        color: #fff;
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--glow-color), 0 0 30px var(--glow-color);
+    }
+
+    .support-block {
+        border: 2px solid var(--border-color);
+        background: var(--surface-color);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        padding: 1.5rem;
+    }
+
+    .support-block h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 51, 51, 0.5);
+        padding-bottom: 0.5rem;
+    }
+
+    .wallet-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .wallet-entry { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+    .wallet-entry strong { color: #fff; min-width: 120px; }
+    .wallet-address { color: #ff8a8a; word-break: break-all; flex-grow: 1; cursor: pointer; transition: color 0.3s ease; }
+    .wallet-address:hover { color: #fff; }
+    .copy-feedback { color: var(--success-color); font-weight: bold; }
+
+    .qr-btn {
+        background: transparent; border: 1px solid #a30000;
+        color: var(--base-color); font-family: 'Fira Code', monospace;
+        padding: 0.3rem 0.6rem; cursor: pointer; transition: all 0.3s ease;
+    }
+    .qr-btn:hover { background: #a30000; color: #fff; }
+    
+    .referral-links { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    
+    .btn-glitch {
+        position: relative; display: block; padding: 1rem; text-align: center;
+        text-decoration: none; color: var(--base-color); font-size: 1.1rem;
+        border: 2px solid var(--border-color); background: var(--surface-color);
+        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        transition: all 0.3s ease; overflow: hidden;
+    }
+    .btn-glitch:hover {
+        border-color: #ff4d4d; color: #fff;
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--glow-color), 0 0 30px var(--glow-color);
+    }
+    .btn-glitch::before, .btn-glitch::after {
+        content: attr(data-text); position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; padding: 1rem; background: transparent;
+        color: #fff; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .btn-glitch:hover::before, .btn-glitch:hover::after { opacity: 1; }
+    .btn-glitch:hover::before { clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); animation: liquid-wave-top 2s ease-in-out infinite; }
+    .btn-glitch:hover::after { clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%); animation: liquid-wave-bottom 2s ease-in-out infinite; }
+    @keyframes liquid-wave-top { 0%, 100% { transform: translateX(0) skewX(0); } 50% { transform: translateX(-5px) skewX(2deg); } }
+    @keyframes liquid-wave-bottom { 0%, 100% { transform: translateX(0) skewX(0); } 50% { transform: translateX(5px) skewX(-2deg); } }
+    .btn-glitch.special { background: linear-gradient(45deg, #600000, #000); font-weight: bold; }
+    
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+        z-index: 1000; display: flex; justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.visible { opacity: 1; pointer-events: all; }
+    #qr-modal { background: #111; padding: 2rem; border: 2px solid var(--base-color); text-align: center; }
+    #qr-canvas { display: block; background: white; padding: 1rem; }
+    #qr-address { margin-top: 1rem; word-break: break-all; max-width: 256px; }
+
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+<body>
+
+  <canvas id="matrix-canvas"></canvas>
+  
+  <main class="container">
+    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ SUPPORT">BOZHEMAN ≡ SUPPORT</a>
+
+    <section class="support-block">
+        <h2 data-text="КРИПТО-ШЛЮЗЫ">КРИПТО-ШЛЮЗЫ</h2>
+        <div class="wallet-list">
+            <div class="wallet-entry">
+                <strong>USDT (TRC20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
+                <button class="qr-btn" onclick="showQR('TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa')">QR</button>
+            </div>
+            <div class="wallet-entry">
+                <strong>BTC:</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
+                <button class="qr-btn" onclick="showQR('125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH')">QR</button>
+            </div>
+            <div class="wallet-entry">
+                <strong>ETH (ERC20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+            </div>
+            <div class="wallet-entry">
+                <strong>BNB (BEP20):</strong>
+                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="support-block">
+        <h2 data-text="ПРОТОКОЛ STEAM">ПРОТОКОЛ STEAM</h2>
+        <a class="btn-glitch" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer" data-text="ОТПРАВИТЬ ПРЕДМЕТЫ">ОТПРАВИТЬ ПРЕДМЕТЫ</a>
+    </section>
+
+    <section class="support-block">
+        <h2 data-text="РЕФЕРАЛЬНЫЕ СИСТЕМЫ">РЕФЕРАЛЬНЫЕ СИСТЕМЫ</h2>
+        <div class="referral-links">
+             <a class="btn-glitch" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer" data-text="DMarket: Мои скины">DMarket: Мои скины</a>
+             <a class="btn-glitch" href="https://csgoempire.com/r/bozheman" target="_blank" rel="noopener noreferrer" data-text="CSGOEmpire">CSGOEmpir - Рефералкаe</a>
+             <a class="btn-glitch" href="https://swap.gg/?r=uqOV9EAMXC" target="_blank" rel="noopener noreferrer" data-text="SWAP.GG">SWAP.GG</a>
+              <a class="btn-glitch" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank" rel="noopener noreferrer" data-text="DMarket: Регистрация">DMarket - Рефералка</a>
+             <a class="btn-glitch" href="https://pricempire.com/r/bozheman" target="_blank" rel="noopener noreferrer" data-text="DMarket: Регистрация">Сравнение цен - Рефералка</a>
+        </div>
+    </section>
+
+    <a href="index.html" class="btn-glitch special" data-text="< НАЗАД К ПРОТОКОЛУ">< НАЗАД К ПРОТОКОЛУ</a>
+  </main>
+  
+  <div id="modal-overlay" class="modal-overlay" onclick="hideQR()">
+      <div id="qr-modal" onclick="event.stopPropagation()">
+          <canvas id="qr-canvas"></canvas>
+          <p id="qr-address"></p>
+      </div>
+  </div>
+
+  <script>
+    function setupMatrix() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const chars = "BOZHEMAN01";
+      const font_size = 14;
+      const columns = canvas.width / font_size;
+      const drops = Array.from({ length: columns }).fill(1);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#600000';
+        ctx.font = font_size + 'px Fira Code';
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * font_size, drops[i] * font_size);
+          if (drops[i] * font_size > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+      setInterval(draw, 50);
+      window.addEventListener('resize', () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+      });
+    }
+    setupMatrix();
+
+    function copyToClipboard(element) {
+      const originalText = element.innerText;
+      navigator.clipboard.writeText(originalText).then(() => {
+        element.classList.add('copy-feedback');
+        element.innerText = 'СКОПИРОВАНО!';
+        setTimeout(() => {
+          element.classList.remove('copy-feedback');
+          element.innerText = originalText;
+        }, 1500);
+      }).catch(err => {
+        console.error("Ошибка копирования: ", err);
+        element.innerText = 'ОШИБКА';
+         setTimeout(() => {
+          element.innerText = originalText;
+        }, 1500);
+      });
+    }
+
+    const modalOverlay = document.getElementById('modal-overlay');
+    const qrCanvas = document.getElementById('qr-canvas');
+    const qrAddress = document.getElementById('qr-address');
+    let qrInstance = null;
+
+    function showQR(address) {
+        qrAddress.textContent = address;
+        if(qrInstance) {
+            qrInstance.set({ value: address });
+        } else {
+            qrInstance = new QRious({
+                element: qrCanvas,
+                value: address,
+                size: 256,
+                background: 'white',
+                foreground: 'black'
+            });
+        }
+        modalOverlay.classList.add('visible');
+    }
+
+    function hideQR() {
+        modalOverlay.classList.remove('visible');
+    }
+  </script>
+
+</body>
+</html>
+
