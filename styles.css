@@ -182,11 +182,29 @@ button { font-family: var(--font-mono); }
   pointer-events: none;
 }
 
+#header-extras {
+  display: flex;
+  gap: var(--sp-2);
+  pointer-events: all;
+}
+
 #brand-title {
   font-size: var(--fs-lg);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-shadow: var(--shadow-primary);
+}
+
+.btn-small {
+  font-size: var(--fs-xs);
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--clr-primary-dim);
+}
+
+.btn-small:hover {
+  background: var(--clr-primary-dim);
+  color: var(--clr-white);
+  border-color: var(--clr-primary);
 }
 
 #sound-toggle {
@@ -235,6 +253,27 @@ button { font-family: var(--font-mono); }
   padding: var(--sp-8) var(--sp-4);
   z-index: 5;
   position: relative;
+}
+
+/* Монетизационный баннер */
+#monetization-banner {
+  width: 100%;
+  max-width: var(--max-w-content);
+  padding: 0 var(--sp-4) var(--sp-6);
+  z-index: 5;
+  position: relative;
+}
+
+#monetization-banner .banner-text {
+  display: block;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+#monetization-banner .banner-sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
 }
 
 
