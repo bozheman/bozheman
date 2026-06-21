@@ -38,6 +38,14 @@
   
   <!-- КНОПКИ (ИНТЕРФЕЙС ЧЕЛОВЕКА) -->
   <nav id="links-container" class="scanlines-effect"></nav>
+  
+  <!-- МОНЕТИЗАЦИЯ -->
+  <section id="monetization-banner">
+    <a href="refer.html" class="btn-glitch" id="partner-link" data-text="ПАРТНЁРСКИЕ ПРЕДЛОЖЕНИЯ">
+      <span class="banner-text">ПАРТНЁРСКИЕ ПРЕДЛОЖЕНИЯ • ПРОСПОСОБЛЕНИЯ</span>
+      <span class="banner-sub">РЕФЕРАЛЬНЫЕ ССЫЛКИ • СПОНСОРСТВО</span>
+    </a>
+  </section>
 
   <!-- АУДИО -->
   <audio id="ambient-audio" loop preload="auto">
@@ -77,7 +85,8 @@
       { name: 'Instagram', url: 'https://www.instagram.com/bozheman' },
       { name: 'YouTube', url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw' },
       { name: 'TikTok', url: 'https://www.tiktok.com/@bozheman_' },
-      { name: 'Another', url: 'refer.html'},
+      { name: '🎮 GAMES', url: 'games.html' },
+      { name: '💝 SUPPORT', url: 'refer.html' },
       { name: '💰 DONATION', url: 'https://donatello.to/bozheman', isSpecial: true },
     ];
     
@@ -207,8 +216,10 @@
             a.className = 'btn-glitch';
             a.textContent = link.name;
             a.setAttribute('data-text', link.name);
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
+            if (link.url.startsWith('http')) {
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            }
             if(link.isSpecial) {
                 a.classList.add('special');
             }

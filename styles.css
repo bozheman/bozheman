@@ -237,6 +237,39 @@ button { font-family: var(--font-mono); }
   position: relative;
 }
 
+/* Монетизационный баннер */
+#monetization-banner {
+  width: 100%;
+  max-width: var(--max-w-content);
+  padding: 0 var(--sp-4) var(--sp-6);
+  z-index: 5;
+  position: relative;
+}
+
+#monetization-banner .banner-text {
+  display: block;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+#monetization-banner .banner-sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+}
+
+#monetization-banner .banner-text {
+  display: block;;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+#monetization-banner .banner-sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+}
+
 
 /* ──────────────────────────────────────────────
    6.  SCANLINES EFFECT
