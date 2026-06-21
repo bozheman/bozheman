@@ -28,10 +28,6 @@
   <!-- ИНТЕРФЕЙС -->
   <header id="ui-header">
     <div id="brand-title">BOZHEMAN</div>
-    <div id="header-extras">
-      <a href="refer.html" class="btn-glitch btn-small" id="partner-btn" data-text="ПАРТНЁРЫ">Партнёрские программы</a>
-      <a href="games.html" class="btn-glitch btn-small" id="games-btn" data-text="ИГРЫ">Игры</a>
-    </div>
     <button id="sound-toggle" aria-label="Переключить звук">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="sound-icon">
         <path class="sound-on-icon" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
@@ -46,8 +42,7 @@
   <!-- МОНЕТИЗАЦИЯ -->
   <section id="monetization-banner">
     <a href="refer.html" class="btn-glitch" id="partner-link" data-text="ПАРТНЁРСКИЕ ПРЕДЛОЖЕНИЯ">
-      <span class="banner-text">ПАРТНЁРСКИЕ ПРЕДЛОЖЕНИЯ • ПРОСПОСОБЛЕНИЯ</span>
-      <span class="banner-sub">РЕФЕРАЛЬНЫЕ ССЫЛКИ • СПОНСОРСТВО</span>
+      <span class="banner-text">ПАРТНЁРСКИЕ ПРЕДЛОЖЕНИЯ</span>
     </a>
   </section>
 
@@ -78,10 +73,10 @@
     // --- НАСТРОЙКИ ---
     // УСКОРЕННЫЕ ЗАДЕРЖКИ
     const PRELOADER_LINES = [
-      { text: '> INIT_CONNECTION...', delay: 800 },
-      { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 500 },
-      { text: '> LOADING_PROTOCOL_0ZERO...', delay: 800 },
-      { text: '> ACCESS GRANTED', delay: 500 }
+      { text: '> INIT_CONNECTION...', delay: 80 },
+      { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 50 },
+      { text: '> LOADING_PROTOCOL_0ZERO...', delay: 80 },
+      { text: '> ACCESS GRANTED', delay: 50 }
     ];
 
     const LINKS = [
@@ -90,7 +85,6 @@
       { name: 'YouTube', url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw' },
       { name: 'TikTok', url: 'https://www.tiktok.com/@bozheman_' },
       { name: '🎮 GAMES', url: 'games.html' },
-      { name: '💝 SUPPORT', url: 'refer.html' },
       { name: '💰 DONATION', url: 'https://donatello.to/bozheman', isSpecial: true },
     ];
     
