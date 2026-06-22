@@ -19,7 +19,7 @@
 // ─────────────────────────────────────────────
 let _State;
 try {
-  const mod = await import('./js/state.js');
+  const mod = await import('./state.js');
   _State = mod.State;
 } catch {
   // Inline fallback identical to state.js logic
@@ -123,40 +123,8 @@ const AudioEngine = (() => {
 // ─────────────────────────────────────────────
 // 3.  MATRIX BACKGROUND
 // ─────────────────────────────────────────────
-function initMatrixBackground() {
-  const canvas = document.getElementById('matrix-canvas');
-  if (!canvas) return;
-  const ctx    = canvas.getContext('2d');
-  const CHARS  = 'BOZHEMAN01≡★7Ω▲■';
-  const FS     = 14;
-  let cols, drops, rafId;
-
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-    cols  = Math.floor(canvas.width / FS);
-    drops = new Float32Array(cols).fill(1);
-  }
-
-  function draw() {
-    ctx.fillStyle = 'rgba(0,0,0,0.048)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#600000';
-    ctx.font = `${FS}px "Fira Code", monospace`;
-    for (let i = 0; i < cols; i++) {
-      ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], i * FS, drops[i] * FS);
-      if (drops[i] * FS > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
-    rafId = requestAnimationFrame(draw);
-  }
-
-  resize();
-  draw();
-  window.addEventListener('resize', resize, { passive: true });
-
-  return () => { cancelAnimationFrame(rafId); window.removeEventListener('resize', resize); };
-}
+import { setupMatrix } from './matrix.js';
+setupMatrix('matrix-canvas');
 
 
 // ─────────────────────────────────────────────

@@ -1,0 +1,120 @@
+@import 'main.css';
+
+:root {
+  --t-med: 0.3s ease;
+}
+
+body {
+  padding: var(--sp-4);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-w-content);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.page-title {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  text-align: center;
+  color: var(--clr-primary);
+  transition: all var(--t-med);
+  text-decoration: none;
+  display: block;
+}
+
+.page-title:hover {
+  color: var(--clr-white);
+  text-shadow: 0 0 5px #fff, 0 0 10px var(--clr-glow), 0 0 20px var(--clr-glow);
+}
+
+.game-card {
+  border: 2px solid var(--clr-border);
+  background: var(--clr-surface);
+  backdrop-filter: blur(5px);
+  padding: var(--sp-6);
+  transition: all var(--t-med);
+}
+
+.game-card:hover {
+  border-color: rgba(255, 77, 77, 0.8);
+  box-shadow: 0 0 15px var(--clr-glow), 0 0 30px rgba(255, 0, 222, 0.2);
+}
+
+.game-title {
+  font-size: var(--fs-lg);
+  margin-bottom: var(--sp-4);
+  color: var(--clr-white);
+  text-shadow: 0 0 8px var(--clr-primary);
+}
+
+.game-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--clr-primary-dim);
+  color: var(--clr-white);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--sp-4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; box-shadow: 0 0 10px var(--clr-primary); }
+}
+
+.countdown {
+  font-size: var(--fs-md);
+  color: var(--clr-success);
+  margin: var(--sp-4) 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.game-description {
+  line-height: 1.6;
+  margin-bottom: var(--sp-4);
+}
+
+.wishlist-section {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--clr-border);
+}
+
+.notify-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.notify-btn {
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--clr-primary-dim);
+  border: 1px solid var(--clr-primary);
+  color: var(--clr-white);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all var(--t-med);
+}
+
+.notify-btn:hover {
+  background: var(--clr-primary);
+  box-shadow: 0 0 10px var(--clr-primary);
+}
+
+.back-link {
+  text-align: center;
+  margin-top: var(--sp-6);
+}
+
+@media (max-width: 768px) {
+  .page-title { font-size: var(--fs-lg); }
+  .game-title { font-size: var(--fs-md); }
+  .container { padding: var(--sp-4); }
+}
