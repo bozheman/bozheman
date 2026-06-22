@@ -327,6 +327,34 @@ body::after {
   50%       { transform: translateX(4px) skewX(-1.5deg); }
 }
 
+.btn-refill {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  background: rgba(0, 40, 20, 0.4);
+  color: var(--clr-success);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all var(--transition-med);
+  animation: refill-pulse 1.5s ease-in-out infinite alternate;
+}
+.btn-refill:hover {
+  border-color: var(--clr-success);
+  background: rgba(0, 255, 136, 0.12);
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.35);
+}
+@keyframes refill-pulse {
+  from { box-shadow: 0 0 4px rgba(0,255,136,0.15); }
+  to   { box-shadow: 0 0 16px rgba(0,255,136,0.45), 0 0 28px rgba(0,255,136,0.15); }
+}
+
 #particle-canvas {
   position: fixed;
   inset: 0;

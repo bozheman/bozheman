@@ -457,7 +457,7 @@ class SlotMachine {
       lastBetDisplay: document.getElementById('last-bet-display'),
       spinsDisplay:   document.getElementById('spins-display'),
       betInput:       document.getElementById('bet-input'),
-      spinButton:     document.getElementById('spin-button'),
+      spinButton:     document.getElementById('btn-spin'),
       winLine:        document.getElementById('win-line'),
       historyList:    document.getElementById('history-list'),
       resultToast:    document.getElementById('result-toast'),
@@ -465,7 +465,10 @@ class SlotMachine {
       toastAmount:    document.getElementById('toast-amount'),
       toastDesc:      document.getElementById('toast-desc'),
       errorBar:       document.getElementById('error-bar'),
-      chipRow:        document.getElementById('chip-row'),
+      chipRow:        document.querySelector('.chip-row'),
+      btnBetPlus:     document.getElementById('btn-bet-plus'),
+      btnBetMinus:    document.getElementById('btn-bet-minus'),
+      refillBtn:      document.getElementById('btn-refill'),
     };
 
     // State
@@ -474,8 +477,9 @@ class SlotMachine {
     this.stats   = {};
 
     // Reels
-    this.reels   = [];
-    this._initReels();
+    this.reels = [];
+    // Wait for fonts before drawing canvas symbols
+    document.fonts.ready.then(() => this._initReels());
 
     // Load persistent state
     this._loadState();
@@ -497,6 +501,7 @@ class SlotMachine {
     this.balance = s.balance;
     this.stats   = s.rouletteStats;
     this._refreshUI();
+    this._checkRefill();
   }
 
   _saveBalance() {
@@ -508,6 +513,7 @@ class SlotMachine {
     this.dom.spinsDisplay.textContent   = this.stats.spins;
     const lb = State.read('lastBet');
     this.dom.lastBetDisplay.textContent = lb || '—';
+    this._checkRefill();
   }
 
   _bindEvents() {
@@ -522,8 +528,29 @@ class SlotMachine {
       }
     });
 
+    // +/- bet buttons
+    const BET_STEP = 10;
+    if (this.dom.btnBetPlus) {
+      this.dom.btnBetPlus.addEventListener('click', () => {
+        if (this.state !== GameState.IDLE) return;
+        AudioEngine.click();
+        const cur = parseInt(this.dom.betInput.value, 10) || 10;
+        this.dom.betInput.value = Math.min(cur + BET_STEP, this.balance, 99999);
+        State.set({ lastBet: this.dom.betInput.value });
+      });
+    }
+    if (this.dom.btnBetMinus) {
+      this.dom.btnBetMinus.addEventListener('click', () => {
+        if (this.state !== GameState.IDLE) return;
+        AudioEngine.click();
+        const cur = parseInt(this.dom.betInput.value, 10) || 10;
+        this.dom.betInput.value = Math.max(cur - BET_STEP, 10);
+        State.set({ lastBet: this.dom.betInput.value });
+      });
+    }
+
     // Quick-bet chips
-    this.dom.chipRow.querySelectorAll('.chip').forEach(chip => {
+    this.dom.chipRow.querySelectorAll('[data-amount]').forEach(chip => {
       chip.addEventListener('click', () => {
         if (this.state !== GameState.IDLE) return;
         AudioEngine.click();
@@ -531,20 +558,39 @@ class SlotMachine {
         if (amount === 'max') {
           this.dom.betInput.value = this.balance;
         } else {
-          this.dom.betInput.value = Math.min(parseInt(amount), this.balance);
+          const cur = parseInt(this.dom.betInput.value, 10) || 10;
+          const add = parseInt(amount, 10);
+          this.dom.betInput.value = Math.min(cur + add, this.balance, 99999);
         }
         State.set({ lastBet: this.dom.betInput.value });
       });
     });
 
-    // Persist bet on change
-    this.dom.betInput.addEventListener('input', () => {
-      State.set({ lastBet: this.dom.betInput.value });
+    // Persist bet on change + enforce min 10
+    this.dom.betInput.addEventListener('change', () => {
+      let v = parseInt(this.dom.betInput.value, 10);
+      if (isNaN(v) || v < 10) v = 10;
+      this.dom.betInput.value = v;
+      State.set({ lastBet: String(v) });
     });
 
-    // Pre-fill last bet
+    // Pre-fill: default 10 or last bet
     const lastBet = State.read('lastBet');
-    if (lastBet) this.dom.betInput.value = lastBet;
+    this.dom.betInput.value = lastBet && parseInt(lastBet) >= 10 ? lastBet : '10';
+
+    // Refill button
+    if (this.dom.refillBtn) {
+      this.dom.refillBtn.addEventListener('click', () => {
+        if (this.state !== GameState.IDLE) return;
+        this.balance += 1000;
+        this._saveBalance();
+        this._refreshUI();
+        this.dom.refillBtn.textContent = '✓ +1000 ДОБАВЛЕНО';
+        setTimeout(() => {
+          this.dom.refillBtn.textContent = '+ ПОЛУЧИТЬ 1000 МОНЕТ';
+        }, 2000);
+      });
+    }
   }
 
   // ── Validation ──────────────────────────────
@@ -555,8 +601,8 @@ class SlotMachine {
     if (rawBet === '' || isNaN(bet)) {
       return { ok: false, msg: 'ВВЕДИТЕ РАЗМЕР СТАВКИ' };
     }
-    if (!Number.isFinite(bet) || bet <= 0) {
-      return { ok: false, msg: 'СТАВКА ДОЛЖНА БЫТЬ БОЛЬШЕ 0' };
+    if (!Number.isFinite(bet) || bet < 10) {
+      return { ok: false, msg: 'МИНИМАЛЬНАЯ СТАВКА: 10' };
     }
     if (bet > this.balance) {
       return { ok: false, msg: 'НЕДОСТАТОЧНО СРЕДСТВ НА БАЛАНСЕ' };
@@ -691,6 +737,7 @@ class SlotMachine {
     this._transition(GameState.IDLE);
     this._setControlsDisabled(false);
     this.dom.spinButton.classList.remove('spinning');
+    this._checkRefill();
   }
 
   async _showResult(type, label, winnings, desc, bet) {
@@ -777,13 +824,23 @@ class SlotMachine {
     clearTimeout(this._errorTimer);
     this._errorTimer = setTimeout(() => bar.classList.remove('show'), 3000);
   }
+
+  _checkRefill() {
+    if (!this.dom.refillBtn) return;
+    const show = this.balance < 10;
+    this.dom.refillBtn.style.display = show ? 'block' : 'none';
+    this.dom.spinButton.style.display = show ? 'none' : 'block';
+  }
 }
 
 
 // ─────────────────────────────────────────────
 // 7.  BOOTSTRAP
 // ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  initMatrixBackground();
+// Matrix is already started at top-level (import + setupMatrix call above).
+// SlotMachine init must happen after DOM is ready.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new SlotMachine());
+} else {
   new SlotMachine();
-});
+}
