@@ -49,30 +49,74 @@ if (soundToggle) {
 }
 
 init();
+let preloaderSkipped = false;
+let currentTypingInterval = null;
 runPreloader();
 
-async function runPreloader() {
-  for (const line of PRELOADER_LINES) {
-    await typeLine(line.text, 50);
-    await new Promise(resolve => setTimeout(resolve, line.delay));
+function skipPreloader() {
+  if (preloaderSkipped) return;
+  preloaderSkipped = true;
+  if (currentTypingInterval) {
+    clearInterval(currentTypingInterval);
   }
   if (preloader) {
     preloader.classList.add('hidden');
     setTimeout(() => preloader.style.display = 'none', 1000);
   }
+  document.removeEventListener('click', skipPreloader);
+  document.removeEventListener('keydown', handlePreloaderKeyDown);
+}
+
+function handlePreloaderKeyDown(e) {
+  if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') {
+    skipPreloader();
+  }
+}
+
+async function runPreloader() {
+  document.addEventListener('click', skipPreloader);
+  document.addEventListener('keydown', handlePreloaderKeyDown);
+
+  for (const line of PRELOADER_LINES) {
+    if (preloaderSkipped) break;
+    await typeLine(line.text, 50);
+    if (preloaderSkipped) break;
+    
+    // Abortable stagger delay
+    await new Promise(resolve => {
+      const timer = setTimeout(resolve, line.delay);
+      const checkInterval = setInterval(() => {
+        if (preloaderSkipped) {
+          clearTimeout(timer);
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 30);
+      setTimeout(() => clearInterval(checkInterval), line.delay + 50);
+    });
+  }
+  
+  if (!preloaderSkipped) {
+    skipPreloader();
+  }
 }
 
 function typeLine(text, speed) {
   return new Promise(resolve => {
+    if (preloaderSkipped) return resolve();
     let i = 0;
     if (!preloaderText) return resolve();
     preloaderText.innerHTML = '';
-    const typing = setInterval(() => {
+    currentTypingInterval = setInterval(() => {
+      if (preloaderSkipped) {
+        clearInterval(currentTypingInterval);
+        return resolve();
+      }
       if (i < text.length) {
         preloaderText.innerHTML += text.charAt(i);
         i++;
       } else {
-        clearInterval(typing);
+        clearInterval(currentTypingInterval);
         resolve();
       }
     }, speed);

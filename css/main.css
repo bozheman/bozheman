@@ -157,6 +157,26 @@ button { font-family: var(--font-mono); }
   50% { opacity: 0; }
 }
 
+.preloader-skip-hint {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--clr-primary);
+  opacity: 0.5;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-shadow: var(--shadow-primary);
+  animation: pulse-skip 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-skip {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
 /* Desktop preloader alignment */
 @media (min-width: 1024px) {
   #preloader { justify-content: flex-start; }

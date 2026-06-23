@@ -23,17 +23,61 @@ const DEFAULTS = {
   lastSeed: null,
 };
 
+function validateState(state) {
+  if (!state || typeof state !== 'object') return { ...DEFAULTS };
+  
+  const validated = { ...DEFAULTS };
+  
+  // 1. Balance validation
+  if (typeof state.balance === 'number' && Number.isFinite(state.balance) && state.balance >= 0) {
+    validated.balance = Math.floor(state.balance);
+  } else if (typeof state.balance === 'string') {
+    const parsedBal = parseInt(state.balance, 10);
+    if (!isNaN(parsedBal) && Number.isFinite(parsedBal) && parsedBal >= 0) {
+      validated.balance = Math.floor(parsedBal);
+    }
+  }
+  
+  // 2. audioMuted
+  if (typeof state.audioMuted === 'boolean') {
+    validated.audioMuted = state.audioMuted;
+  }
+  
+  // 3. secretUnlocked
+  if (typeof state.secretUnlocked === 'boolean') {
+    validated.secretUnlocked = state.secretUnlocked;
+  }
+  
+  // 4. rouletteStats
+  if (state.rouletteStats && typeof state.rouletteStats === 'object') {
+    const stats = state.rouletteStats;
+    validated.rouletteStats = {
+      spins: typeof stats.spins === 'number' && Number.isFinite(stats.spins) && stats.spins >= 0 ? Math.floor(stats.spins) : DEFAULTS.rouletteStats.spins,
+      wins: typeof stats.wins === 'number' && Number.isFinite(stats.wins) && stats.wins >= 0 ? Math.floor(stats.wins) : DEFAULTS.rouletteStats.wins,
+      totalWagered: typeof stats.totalWagered === 'number' && Number.isFinite(stats.totalWagered) && stats.totalWagered >= 0 ? Math.floor(stats.totalWagered) : DEFAULTS.rouletteStats.totalWagered,
+      totalWon: typeof stats.totalWon === 'number' && Number.isFinite(stats.totalWon) && stats.totalWon >= 0 ? Math.floor(stats.totalWon) : DEFAULTS.rouletteStats.totalWon,
+    };
+  }
+  
+  // 5. lastBet
+  if (typeof state.lastBet === 'string' || typeof state.lastBet === 'number') {
+    validated.lastBet = String(state.lastBet);
+  }
+  
+  // 6. lastSeed
+  if (state.lastSeed !== undefined) {
+    validated.lastSeed = state.lastSeed;
+  }
+  
+  return validated;
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STATE_KEY);
     if (!raw) return { ...DEFAULTS };
     const parsed = JSON.parse(raw);
-    // Deep merge: defaults fill missing keys on old saves
-    return {
-      ...DEFAULTS,
-      ...parsed,
-      rouletteStats: { ...DEFAULTS.rouletteStats, ...(parsed.rouletteStats || {}) },
-    };
+    return validateState(parsed);
   } catch {
     return { ...DEFAULTS };
   }
