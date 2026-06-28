@@ -15,12 +15,12 @@
   <canvas id="matrix-canvas"></canvas>
 
   <main class="terminal-window" id="terminal">
-    <h1 data-text="ИЛЛЮЗИЯ">ИЛЛЮЗИЯ</h1>
+    <h1 data-text="ILLUSION" data-i18n="illusion_title">ILLUSION</h1>
     <div id="fragment-display">
-        <p>[КЛИКНИ, ЧТОБЫ УЗРЕТЬ]</p>
+        <p data-i18n="illusion_click">[CLICK TO BEHOLD]</p>
     </div>
     <div id="countdown-timer">
-        <span>ПЕРЕАДРЕСАЦИЯ ПРОТОКОЛА...</span>
+        <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span>
         <div id="progress-bar">
             <div id="progress-bar-inner"></div>
         </div>
@@ -30,6 +30,8 @@
   <audio id="ambient-audio" preload="auto" loop>
     <source src="assets/audio/omega2.m4a" type="audio/mp4" />
   </audio>
+  
+  <button id="lang-toggle" class="lang-toggle">ENG</button>
   
   <script type="module" src="js/doubleindex.js"></script>
 

@@ -1,19 +1,19 @@
 import { setupMatrix } from './matrix.js';
-
+import { t } from './i18n.js';
 setupMatrix('matrix-canvas');
 
 window.copyToClipboard = function(element) {
   const originalText = element.innerText;
   navigator.clipboard.writeText(originalText).then(() => {
     element.classList.add('copy-feedback');
-    element.innerText = 'СКОПИРОВАНО!';
+    element.innerText = t('copied');
     setTimeout(() => {
       element.classList.remove('copy-feedback');
       element.innerText = originalText;
     }, 1500);
   }).catch(err => {
-    console.error("Ошибка копирования: ", err);
-    element.innerText = 'ОШИБКА';
+    console.error("Copy error: ", err);
+    element.innerText = t('error');
      setTimeout(() => {
       element.innerText = originalText;
     }, 1500);

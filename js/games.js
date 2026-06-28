@@ -4,6 +4,7 @@ import {
   signInWithPopup, GoogleAuthProvider,
   collection, addDoc, serverTimestamp, query, where, getDocs
 } from './firebase-config.js';
+import { t } from './i18n.js';
 
 setupMatrix('matrix-canvas');
 
@@ -40,7 +41,7 @@ function showToast(msg, type = 'info') {
 
 // ─── Countdown ─────────────────────────────────────────────────────────────
 function updateCountdown() {
-  const launchDate = new Date('2026-12-31T00:00:00');
+  const launchDate = new Date('2026-09-09T12:00:00+03:00');
   const now  = new Date();
   const diff = launchDate - now;
 
@@ -52,9 +53,9 @@ function updateCountdown() {
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const secs  = Math.floor((diff % (1000 * 60)) / 1000);
-    timerEl.textContent = `${days}д ${hours}ч ${mins}м ${secs}с`;
+    timerEl.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
   } else {
-    timerEl.textContent = 'Скоро!';
+    timerEl.textContent = t('game_1_timer_soon');
   }
 }
 
@@ -71,7 +72,7 @@ if (notifyBtn) {
     // Loading state
     notifyBtn.disabled = true;
     const originalText = notifyBtn.textContent;
-    notifyBtn.textContent = 'ПОДКЛЮЧЕНИЕ...';
+    notifyBtn.textContent = t('game_1_btn_connecting');
 
     try {
       const provider = new GoogleAuthProvider();
@@ -79,7 +80,7 @@ if (notifyBtn) {
       const user     = result.user;
 
       if (user && user.email) {
-        notifyBtn.textContent = 'ПРОВЕРКА...';
+        notifyBtn.textContent = t('game_1_btn_verifying');
 
         // Check if already subscribed
         const q             = query(collection(db, 'interested_users'), where('email', '==', user.email));
@@ -92,19 +93,19 @@ if (notifyBtn) {
             uid:         user.uid,
             timestamp:   serverTimestamp(),
           });
-          notifyBtn.textContent = '✓ ПОДПИСКА ОФОРМЛЕНА';
-          showToast(`✓ Почта ${user.email} сохранена. Уведомим о релизе!`, 'success');
+          notifyBtn.textContent = t('game_1_btn_subscribed');
+          showToast(t('toast_saved', { email: user.email }), 'success');
         } else {
-          showToast('Ваша почта уже в списке ожидающих.', 'info');
-          notifyBtn.textContent = '✓ УЖЕ В СПИСКЕ';
+          showToast(t('toast_already'), 'info');
+          notifyBtn.textContent = t('game_1_btn_already');
         }
         // Don't re-enable — user is subscribed
       }
     } catch (error) {
       console.error('Auth error:', error);
       const msg = error.code === 'auth/popup-closed-by-user'
-        ? 'Окно авторизации было закрыто. Попробуйте снова.'
-        : 'Ошибка авторизации. Попробуйте ещё раз.';
+        ? t('toast_auth_closed')
+        : t('toast_auth_error');
       showToast(msg, 'error');
       notifyBtn.textContent = originalText;
       notifyBtn.disabled = false;

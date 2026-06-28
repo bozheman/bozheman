@@ -20,44 +20,44 @@
   <canvas id="matrix-canvas"></canvas>
   
   <main class="container">
-    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ GAMES">BOZHEMAN ≡ GAMES</a>
+    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ GAMES" data-i18n="games_title">BOZHEMAN ≡ GAMES</a>
     
     <section class="game-card">
-      <h2 class="game-title" data-text="UNKNOWN PROTOCOL">UNKNOWN PROTOCOL</h2>
-      <span class="game-status">СКОРО В РАЗРАБОТКЕ</span>
+      <h2 class="game-title" data-text="UNKNOWN PROTOCOL" data-i18n="game_1_title">UNKNOWN PROTOCOL</h2>
+      <span class="game-status" data-i18n="game_1_status">IN DEVELOPMENT</span>
       
       <div class="countdown" id="countdown">
-        До анонса: <span id="timer">09.09.2026</span>
+        <span data-i18n="game_1_timer">Until announcement: </span><span id="timer">09.09.2026</span>
       </div>
       
-      <p class="game-description">
-        Проект «Терминус» — это погружение в холодную логику неизбежного конца. В роли ИИ-диспетчера вам предстоит распределять остатки энергии в изолированных секторах умирающего мира Обстрактус, где каждое решение оставляет необратимый след, а математика выживания безжалостно требует жертв. Вы не сможете спасти всех, но именно вам придется решать, чьи мольбы о помощи навсегда исчезнут в радиопомехах. Готовы ли вы взять на себя ответственность за систему, которая обречена на распад?
+      <p class="game-description" data-i18n="game_1_desc">
+        Project 'Terminus' is a dive into the cold logic of an inevitable end. As an AI dispatcher, you must distribute remaining energy in the isolated sectors of the dying world Obstractus, where every decision leaves an irreversible mark, and the mathematics of survival ruthlessly demand sacrifices. You cannot save everyone, but it is you who must decide whose pleas for help will forever disappear into radio static. Are you ready to take responsibility for a system doomed to decay?
       </p>
       
       <div class="wishlist-section">
-        <p>Следите за развитием проекта — первая альфа версия уже в пути.</p>
+        <p data-i18n="game_1_wishlist">Follow the project's development — the first alpha version is on the way.</p>
         <div class="notify-form">
-          <button class="notify-btn" id="notify-btn">Авторизоваться через Google и подписаться</button>
+          <button class="notify-btn" id="notify-btn" data-i18n="game_1_auth_btn">Authenticate via Google & Subscribe</button>
         </div>
       </div>
     </section>
     
     <section class="game-card">
-      <h2 class="game-title" data-text="COMING SOON">COMING SOON</h2>
-      <span class="game-status">ПЛАТФОРМА: PC • CONSOLE • MOBILE</span>
+      <h2 class="game-title" data-text="COMING SOON" data-i18n="game_2_title">COMING SOON</h2>
+      <span class="game-status" data-i18n="game_2_status">PLATFORMS: PC • CONSOLE • MOBILE</span>
       
-      <p class="game-description">
-        Анонс других проектов будет доступен позже. 
-        Присоединяйтесь к нашим соцсетям, чтобы не пропустить 
-        важные новости.
+      <p class="game-description" data-i18n="game_2_desc">
+        Announcements of other projects will be available later. Join our socials so you don't miss important news.
       </p>
     </section>
     
     <div class="back-link">
-      <a href="index.html" class="btn-glitch" data-text="< НАЗАД К ПРОТОКОЛУ">< НАЗАД К ПРОТОКОЛУ</a>
+      <a href="index.html" class="btn-glitch" data-text="< BACK TO PROTOCOL" data-i18n="back_to_protocol">< BACK TO PROTOCOL</a>
     </div>
   </main>
   
+  <button id="lang-toggle" class="lang-toggle">ENG</button>
+
   <script type="module" src="js/games.js"></script>
 </body>
 </html>

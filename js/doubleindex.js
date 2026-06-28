@@ -1,5 +1,5 @@
 import { setupMatrix } from './matrix.js';
-
+import { t } from './i18n.js';
 setupMatrix('matrix-canvas');
 
 const terminal = document.getElementById('terminal');

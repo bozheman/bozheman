@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import TWEEN from 'three/addons/libs/tween.module.js';
 import { setupMatrix } from './matrix.js';
+import { t } from './i18n.js';
 
 // --- НАСТРОЙКИ ---
 const PRELOADER_LINES = [
-  { text: '> INIT_CONNECTION...', delay: 80 },
-  { text: '> AUTH_USER_IDENTITY... [ACCEPTED]', delay: 50 },
-  { text: '> LOADING_PROTOCOL_0ZERO...', delay: 80 },
-  { text: '> ACCESS GRANTED', delay: 50 }
+  { key: 'preloader_1', delay: 80 },
+  { key: 'preloader_2', delay: 50 },
+  { key: 'preloader_3', delay: 80 },
+  { key: 'preloader_4', delay: 50 }
 ];
 
 const LINKS = [
@@ -16,8 +17,8 @@ const LINKS = [
   { name: 'Instagram', url: 'https://www.instagram.com/bozheman' },
   { name: 'YouTube', url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw' },
   { name: 'TikTok', url: 'https://www.tiktok.com/@bozheman_' },
-  { name: '🎮 GAMES', url: 'games.html' },
-  { name: '💰 DONATION', url: 'https://donatello.to/bozheman', isSpecial: true },
+  { name: 'nav_games', url: 'games.html' },
+  { name: 'nav_donation', url: 'https://donatello.to/bozheman', isSpecial: true },
 ];
 
 const SECRET_CLICK_COUNT = 10;
@@ -79,7 +80,7 @@ async function runPreloader() {
 
   for (const line of PRELOADER_LINES) {
     if (preloaderSkipped) break;
-    await typeLine(line.text, 50);
+    await typeLine(t(line.key), 50);
     if (preloaderSkipped) break;
     
     // Abortable stagger delay
@@ -177,8 +178,9 @@ function createLinkButtons() {
         const a = document.createElement('a');
         a.href = link.url;
         a.className = 'btn-glitch';
-        a.textContent = link.name;
-        a.setAttribute('data-text', link.name);
+        a.textContent = t(link.name);
+        a.setAttribute('data-text', t(link.name));
+        a.setAttribute('data-i18n', link.name);
         if (link.url.startsWith('http')) {
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
@@ -241,10 +243,10 @@ function toggleSound() {
     if (ambientAudio.paused) {
         ambientAudio.play().catch(e => console.error("Audio play failed:", e));
         soundToggle.classList.remove('muted');
-        soundToggle.childNodes[0].nodeValue = 'SOUND: ON ';
+        soundToggle.childNodes[0].nodeValue = t('sound_on');
     } else {
         ambientAudio.pause();
         soundToggle.classList.add('muted');
-        soundToggle.childNodes[0].nodeValue = 'SOUND: OFF ';
+        soundToggle.childNodes[0].nodeValue = t('sound_off');
     }
 }

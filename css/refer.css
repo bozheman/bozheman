@@ -60,7 +60,21 @@
 }
 .qr-btn:hover { background: #a30000; color: #fff; }
 
-.referral-links { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.referral-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.referral-links-bottom {
+    margin-top: 1rem;
+}
+.ref-disclaimer {
+    margin-top: 1rem;
+    font-size: var(--fs-xs);
+    color: var(--clr-text-muted, rgba(255, 255, 255, 0.45));
+    text-align: center;
+}
 .sponsor-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

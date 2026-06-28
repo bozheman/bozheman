@@ -22,19 +22,19 @@
   <canvas id="matrix-canvas"></canvas>
 
   <div class="machine-wrapper">
-    <h1 class="page-title" data-text="BOZHEMAN SLOTS">BOZHEMAN SLOTS</h1>
+    <h1 class="page-title" data-text="BOZHEMAN SLOTS" data-i18n="slots_title">BOZHEMAN SLOTS</h1>
 
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-label">БАЛАНС</span>
+        <span class="stat-label" data-i18n="slots_balance">BALANCE</span>
         <span class="stat-value" id="balance-display">1000</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">СПИНЫ</span>
+        <span class="stat-label" data-i18n="slots_spins">SPINS</span>
         <span class="stat-value" id="spins-display">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">ПРОШЛАЯ СТАВКА</span>
+        <span class="stat-label" data-i18n="slots_last_bet">LAST BET</span>
         <span class="stat-value" id="last-bet-display">—</span>
       </div>
     </div>
@@ -53,40 +53,40 @@
         <div class="pay-row"><span class="pay-symbol">Ω Ω Ω</span><span class="pay-mult">x5</span></div>
         <div class="pay-row"><span class="pay-symbol">▲ ▲ ▲</span><span class="pay-mult">x3</span></div>
         <div class="pay-row"><span class="pay-symbol">■ ■ ■</span><span class="pay-mult">x2</span></div>
-        <div class="pay-row"><span class="pay-symbol">ЛЮБЫЕ 2</span><span class="pay-mult">x1.5</span></div>
+        <div class="pay-row"><span class="pay-symbol" data-i18n="slots_any2">ANY 2</span><span class="pay-mult">x1.5</span></div>
       </div>
 
       <div class="controls-section">
         <div class="bet-row" style="display: flex; gap: 0.5rem; align-items: center;">
           <button class="chip" id="btn-bet-minus" style="flex: 0; min-width: 40px; font-size: 1.2rem;">-</button>
-          <input type="number" id="bet-input" class="input-field" placeholder="СТАВКА" min="10" max="99999" value="10" />
+          <input type="number" id="bet-input" class="input-field" placeholder="BET" data-i18n-attr="placeholder" data-i18n="slots_bet" min="10" max="99999" value="10" />
           <button class="chip" id="btn-bet-plus" style="flex: 0; min-width: 40px; font-size: 1.2rem;">+</button>
         </div>
         
         <div class="chip-row">
-          <button class="chip" data-amount="10">MIN</button>
+          <button class="chip" data-amount="10" data-i18n="slots_min">MIN</button>
           <button class="chip" data-amount="50">+50</button>
           <button class="chip" data-amount="100">+100</button>
-          <button class="chip" data-amount="max">MAX</button>
+          <button class="chip" data-amount="max" data-i18n="slots_max">MAX</button>
         </div>
 
-        <button id="btn-spin" class="btn-spin" data-text="КРУТИТЬ (SPACE)">КРУТИТЬ (SPACE)</button>
-        <button id="btn-refill" class="btn-refill" style="display:none;" data-text="+ ПОЛУЧИТЬ 1000 МОНЕТ">+ ПОЛУЧИТЬ 1000 МОНЕТ</button>
+        <button id="btn-spin" class="btn-spin" data-text="SPIN (SPACE)" data-i18n="slots_spin_btn">SPIN (SPACE)</button>
+        <button id="btn-refill" class="btn-refill" style="display:none;" data-text="+ GET 1000 COINS" data-i18n="slots_refill_btn">+ GET 1000 COINS</button>
       </div>
     </div>
 
     <div class="history-section">
-      <div class="history-title">ИСТОРИЯ ОПЕРАЦИЙ</div>
+      <div class="history-title" data-i18n="slots_history">TRANSACTION HISTORY</div>
       <div id="history-list"></div>
     </div>
 
-    <a href="games.html" class="back-link">< НАЗАД К ИГРАМ</a>
+    <a href="games.html" class="back-link" data-i18n="slots_back">< BACK TO GAMES</a>
   </div>
 
   <canvas id="particle-canvas"></canvas>
 
   <div id="result-toast">
-    <div id="toast-label">ВЫИГРЫШ</div>
+    <div id="toast-label" data-i18n="slots_win_toast">WIN</div>
     <div id="toast-amount">0</div>
     <div id="toast-desc"></div>
   </div>
@@ -94,6 +94,8 @@
   <div id="error-bar"></div>
 
   <audio id="sfx-ambient" src="assets/audio/glitch.mp3" loop preload="auto"></audio>
+  
+  <button id="lang-toggle" class="lang-toggle">ENG</button>
 
   <script type="module" src="js/roulette.js"></script>
 </body>

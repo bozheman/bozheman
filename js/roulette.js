@@ -15,7 +15,7 @@ import { AudioEngine } from './engine/audio.js';
 import { ParticleSystem } from './engine/particles.js';
 import { ReelEngine } from './engine/reel.js';
 import { setupMatrix } from './matrix.js';
-
+import { t } from './i18n.js';
 // Setup background matrix animation
 setupMatrix('matrix-canvas');
 

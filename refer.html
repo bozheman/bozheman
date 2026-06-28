@@ -22,10 +22,10 @@
   <canvas id="matrix-canvas"></canvas>
   
   <main class="container">
-    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ SUPPORT">BOZHEMAN ≡ SUPPORT</a>
+    <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ SUPPORT" data-i18n="support_title">BOZHEMAN ≡ SUPPORT</a>
 
     <section class="support-block">
-        <h2 data-text="КРИПТО-ШЛЮЗЫ">КРИПТО-ШЛЮЗЫ</h2>
+        <h2 data-text="CRYPTO GATEWAYS" data-i18n="crypto_gateways">CRYPTO GATEWAYS</h2>
         <div class="wallet-list">
             <div class="wallet-entry">
                 <strong>USDT (TRC20):</strong>
@@ -51,13 +51,13 @@
     </section>
 
     <section class="support-block">
-        <h2 data-text="ПРОТОКОЛ STEAM">ПРОТОКОЛ STEAM</h2>
-        <a class="btn-glitch" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer" data-text="ОТПРАВИТЬ ПРЕДМЕТЫ">ОТПРАВИТЬ ПРЕДМЕТЫ</a>
+        <h2 data-text="STEAM PROTOCOL" data-i18n="steam_protocol">STEAM PROTOCOL</h2>
+        <a class="btn-glitch" href="https://steamcommunity.com/tradeoffer/new/?partner=158634293&token=U2y7ekdF" target="_blank" rel="noopener noreferrer" data-text="SEND ITEMS" data-i18n="steam_send">SEND ITEMS</a>
     </section>
 
     <section class="support-block">
-        <h2 data-text="РЕФЕРАЛЬНЫЕ СИСТЕМЫ">РЕФЕРАЛЬНЫЕ СИСТЕМЫ</h2>
-        <div class="referral-links" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <h2 data-text="REFERRAL SYSTEMS" data-i18n="referral_systems">REFERRAL SYSTEMS</h2>
+        <div class="referral-links">
              <a class="btn-glitch sponsor-card" href="https://dmarket.com?ref=9Slq8aucc0" target="_blank" rel="noopener noreferrer" data-text="DMARKET">
                  <img src="assets/images/DM-LOGO.png" alt="DMarket" onerror="this.style.display='none'">
                  <span>DMarket</span>
@@ -74,15 +74,16 @@
                  <span>Pricempire</span>
              </a>
         </div>
-        <div class="referral-links" style="margin-top: 1rem;">
-             <a class="btn-glitch" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer" data-text="DMarket: Инвентарь (Мои скины)">DMarket: Инвентарь (Мои скины)</a>
         </div>
-        <p style="margin-top: 1rem; font-size: var(--fs-xs); color: var(--clr-text-muted, rgba(255,255,255,0.45)); text-align: center;">
-            * Партнёрские ссылки приносят доход при регистрации
+        <div class="referral-links-bottom">
+             <a class="btn-glitch" href="https://dmarket.com/ua/ingame-items/item-list/csgo-skins?sagaAddress=0x064Ca91243119Da8484b401984eC625554Ec9b30&exchangeTab=f2fOffers" target="_blank" rel="noopener noreferrer" data-text="DMarket: Inventory (My Skins)" data-i18n="ref_dmarket_inv">DMarket: Inventory (My Skins)</a>
+        </div>
+        <p class="ref-disclaimer" data-i18n="ref_disclaimer">
+            * Partner links generate revenue upon registration
         </p>
     </section>
 
-    <a href="index.html" class="btn-glitch special" data-text="< НАЗАД К ПРОТОКОЛУ">< НАЗАД К ПРОТОКОЛУ</a>
+    <a href="index.html" class="btn-glitch special" data-text="< BACK TO PROTOCOL" data-i18n="back_to_protocol">< BACK TO PROTOCOL</a>
   </main>
   
   <div id="modal-overlay" class="modal-overlay" onclick="hideQR()">
@@ -91,6 +92,8 @@
           <p id="qr-address"></p>
       </div>
   </div>
+  
+  <button id="lang-toggle" class="lang-toggle">ENG</button>
 
   <script type="module" src="js/refer.js"></script>
 
