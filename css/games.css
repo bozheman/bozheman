@@ -113,8 +113,147 @@ body {
   margin-top: var(--sp-6);
 }
 
+/* ─── GROWERSIM CARD & GUIDE STYLES ─────────────────────────── */
+.growersim-card {
+  position: relative;
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.growersim-card:hover {
+  border-color: rgba(0, 255, 136, 0.8);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), 0 0 30px rgba(0, 136, 204, 0.2);
+}
+
+.status-online {
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid var(--clr-success);
+  color: var(--clr-success);
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 0.85; box-shadow: 0 0 5px var(--clr-success); }
+  50% { opacity: 1; box-shadow: 0 0 15px var(--clr-success); }
+}
+
+.bot-action-section {
+  margin: var(--sp-4) 0;
+}
+
+.btn-tg {
+  display: inline-block;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(0, 136, 204, 0.18);
+  border: 2px solid #0088cc;
+  color: #0088cc;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.btn-tg:hover {
+  background: #0088cc;
+  border-color: #0088cc;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 136, 204, 0.7), 0 0 30px rgba(0, 255, 136, 0.4);
+}
+
+.guide-details {
+  margin-top: var(--sp-4);
+  border: 1px dashed var(--clr-border);
+  background: rgba(0, 0, 0, 0.6);
+  padding: var(--sp-3);
+  transition: all var(--t-med);
+}
+
+.guide-details[open] {
+  border-style: solid;
+  border-color: var(--clr-primary-dim);
+  box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.15);
+}
+
+.guide-summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--clr-gold);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  transition: color var(--t-fast);
+  list-style: none;
+}
+
+.guide-summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-summary:hover {
+  color: var(--clr-white);
+  text-shadow: 0 0 8px var(--clr-gold);
+}
+
+.guide-summary .summary-icon {
+  display: inline-block;
+  transition: transform var(--t-fast);
+  color: var(--clr-primary);
+  font-size: 0.75rem;
+}
+
+.guide-details[open] .summary-icon {
+  transform: rotate(90deg);
+}
+
+.guide-content {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--clr-border);
+  max-height: 480px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-primary) var(--clr-bg);
+}
+
+.terminal-guide {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #00ff88;
+  background: rgba(0, 12, 6, 0.9);
+  padding: var(--sp-4);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.1);
+}
+
+.footnote-section {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  font-size: var(--fs-xs);
+  color: var(--clr-text-muted);
+}
+
+.footnote-tag {
+  color: var(--clr-gold);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: var(--sp-1);
+}
+
+.footnote-text {
+  font-style: italic;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 @media (max-width: 768px) {
   .page-title { font-size: var(--fs-lg); }
   .game-title { font-size: var(--fs-md); }
   .container { padding: var(--sp-4); }
+  .btn-tg { max-width: 100%; }
 }
+
