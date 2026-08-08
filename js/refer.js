@@ -37,8 +37,8 @@ window.showQR = function(address) {
         element: qrCanvas,
         value: address,
         size: 256,
-        background: 'white',
-        foreground: 'black'
+        background: 'black',
+        foreground: '#ff3333'
       });
     }
   } else if (qrCanvas) {

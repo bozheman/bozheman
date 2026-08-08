@@ -1,14 +1,14 @@
 /**
- * BOZHEMAN ≡ 777  —  Slot Machine Constants
+ * BOZHEMAN ≡ 777  —  Slot Machine Constants (Pure Red-Neon Theme)
  */
 
 export const SYMBOLS = [
   { id: 'seven',    glyph: '7',  color: '#ff3333', glow: '#ff0000', weight: 4  },
-  { id: 'star',     glyph: '★',  color: '#ffd700', glow: '#ffaa00', weight: 7  },
-  { id: 'omega',    glyph: 'Ω',  color: '#cc66ff', glow: '#aa00ff', weight: 9  },
-  { id: 'triangle', glyph: '▲',  color: '#00ccff', glow: '#0088ff', weight: 12 },
-  { id: 'square',   glyph: '■',  color: '#ff6699', glow: '#ff0066', weight: 14 },
-  { id: 'dash',     glyph: '—',  color: '#555566', glow: '#334',    weight: 18 },
+  { id: 'star',     glyph: '★',  color: '#ff4d4d', glow: '#ff3333', weight: 7  },
+  { id: 'omega',    glyph: 'Ω',  color: '#cc0000', glow: '#a30000', weight: 9  },
+  { id: 'triangle', glyph: '▲',  color: '#ff1a1a', glow: '#e60000', weight: 12 },
+  { id: 'square',   glyph: '■',  color: '#b30000', glow: '#800000', weight: 14 },
+  { id: 'dash',     glyph: '—',  color: '#660000', glow: '#330000', weight: 18 },
 ];
 
 export const SYMBOL_POOL = (() => {

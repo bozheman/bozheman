@@ -353,9 +353,7 @@ class SlotMachine {
         ? `+${winnings}`
         : `-${bet}`;
       this.dom.toastDesc.textContent   = desc;
-      this.dom.toastAmount.style.color = winnings > 0
-        ? (type === 'jackpot' ? 'var(--clr-gold)' : 'var(--clr-success)')
-        : 'var(--clr-primary)';
+      this.dom.toastAmount.style.color = 'var(--clr-primary, #ff3333)';
 
       toast.classList.add('visible');
 

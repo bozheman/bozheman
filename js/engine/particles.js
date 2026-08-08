@@ -1,5 +1,5 @@
 /**
- * BOZHEMAN ≡ 777  —  Particle System Module
+ * BOZHEMAN ≡ 777  —  Particle System Module (Pure Red-Neon Theme)
  * Renders celebration particles on a canvas overlay.
  */
 
@@ -34,8 +34,8 @@ class Particle {
     this.life = 1.0;
     this.decay = Math.random() * 0.018 + 0.012;
     const palette = jackpot
-      ? ['#ffd700','#ff00de','#ff3333','#ffffff','#00ff88']
-      : ['#ff3333','#ff00de','#ffffff','#ff6699'];
+      ? ['#ff3333', '#ff0000', '#a30000', '#ff4d4d', '#cc0000']
+      : ['#ff3333', '#a30000', '#ff1a1a', '#990000'];
     this.color = palette[Math.floor(Math.random() * palette.length)];
     this.shape = Math.random() > 0.5 ? 'circle' : 'rect';
     this.rot   = Math.random() * Math.PI * 2;

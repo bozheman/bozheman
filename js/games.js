@@ -20,12 +20,12 @@ function showToast(msg, type = 'info') {
     position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
     z-index: 9999; padding: 0.8rem 1.6rem;
     background: rgba(0,0,0,0.95); backdrop-filter: blur(12px);
-    border: 1px solid ${type === 'success' ? '#00ff88' : type === 'error' ? '#ff3333' : '#a30000'};
-    color: ${type === 'success' ? '#00ff88' : type === 'error' ? '#ff3333' : '#fff'};
+    border: 1px solid ${type === 'error' ? '#a30000' : '#ff3333'};
+    color: var(--clr-primary, #ff3333);
     font-family: 'Fira Code', monospace; font-size: 0.85rem;
     white-space: nowrap; max-width: 90vw; text-align: center; overflow: hidden; text-overflow: ellipsis;
     opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
-    box-shadow: 0 0 20px ${type === 'success' ? 'rgba(0,255,136,0.3)' : 'rgba(255,51,51,0.3)'};
+    box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
   `;
   document.body.appendChild(toast);
   requestAnimationFrame(() => {

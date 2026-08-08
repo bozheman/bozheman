@@ -18,12 +18,12 @@
   --clr-border-bright: rgba(255, 51, 51, 0.55);
   --clr-primary:       #ff3333;
   --clr-primary-dim:   #a30000;
-  --clr-white:         #ffffff;
-  --clr-success:       #00ff88;
-  --clr-glow:          #ff00de;
-  --clr-gold:          #ffd700;
-  --clr-matrix:        #600000;
-  --clr-text-muted:    rgba(255, 255, 255, 0.45);
+  --clr-white:         #ff3333;
+  --clr-success:       #ff3333;
+  --clr-glow:          #ff0000;
+  --clr-gold:          #ff4d4d;
+  --clr-matrix:        #a30000;
+  --clr-text-muted:    rgba(255, 51, 51, 0.6);
 
   /* Typography */
   --font-mono:    'Fira Code', 'Courier New', monospace;
@@ -47,8 +47,8 @@
 
   /* Shadows / Glows */
   --shadow-primary: 0 0 8px var(--clr-primary), 0 0 22px rgba(255, 51, 51, 0.35);
-  --shadow-glow:    0 0 12px var(--clr-glow),   0 0 30px rgba(255, 0, 222, 0.2);
-  --shadow-white:   0 0 5px #fff, 0 0 12px #fff;
+  --shadow-glow:    0 0 12px var(--clr-glow),   0 0 30px rgba(255, 0, 0, 0.4);
+  --shadow-white:   0 0 8px var(--clr-primary), 0 0 20px rgba(255, 51, 51, 0.5);
 
   /* Transitions */
   --t-fast: 0.18s ease;
@@ -85,6 +85,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100vh;
 }
 
 a { color: inherit; }
@@ -386,10 +389,10 @@ button { font-family: var(--font-mono); }
 }
 
 .btn-glitch:hover {
-  border-color: rgba(255, 77, 77, 0.8);
-  color: var(--clr-white);
+  border-color: rgba(255, 51, 51, 0.9);
+  color: var(--clr-primary);
   text-shadow:
-    var(--shadow-white),
+    var(--shadow-primary),
     var(--shadow-glow);
 }
 

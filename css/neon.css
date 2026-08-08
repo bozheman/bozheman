@@ -87,7 +87,7 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
 
 .lang-select:hover, .lang-select:focus {
   background-color: var(--clr-primary-dim, #a30000);
-  color: var(--clr-white, #ffffff);
+  color: var(--clr-primary, #ff3333);
   border-color: var(--clr-primary, #ff3333);
   box-shadow: 0 0 18px rgba(255, 51, 51, 0.7);
   transform: scale(1.03);
@@ -108,7 +108,7 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
 .scanlines-effect::after {
   background: 
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.08));
+    linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 0, 0, 0.02), rgba(255, 0, 0, 0.08));
   background-size: 100% 3px, 5px 100%;
   animation: scanline 8s linear infinite !important;
   will-change: background-position;
@@ -120,15 +120,20 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
   will-change: transform, text-shadow;
 }
 
+@keyframes scanline {
+  from { background-position: 0 0; }
+  to   { background-position: 0 -100vh; }
+}
+
 @keyframes glitch-anim {
   0% {
-    text-shadow: 2px 0 #ff00de, -2px 0 #00ff88;
+    text-shadow: 2px 0 #ff0000, -2px 0 #a30000;
   }
   50% {
-    text-shadow: -3px 0 #ff3333, 3px 0 #00ff88;
+    text-shadow: -3px 0 #ff3333, 3px 0 #600000;
   }
   100% {
-    text-shadow: 2px 0 #ff00de, -2px 0 #ff3333;
+    text-shadow: 2px 0 #ff0000, -2px 0 #ff3333;
   }
 }
 

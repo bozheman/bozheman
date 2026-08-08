@@ -2,107 +2,124 @@
 
 :root {
   --base-color: #ff3333;
-  --glow-color: #ff00de;
+  --glow-color: #ff0000;
 }
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    background: #000;
-    font-family: 'Fira Code', monospace;
-    color: var(--base-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #000000;
+  font-family: 'Fira Code', monospace;
+  color: var(--base-color);
 }
 #matrix-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 .terminal-window {
-    width: 100%;
-    max-width: 800px;
-    padding: 2rem;
-    border: 2px solid rgba(255, 51, 51, 0.3);
-    background: rgba(10, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    text-align: left;
-    z-index: 5;
-    cursor: pointer;
-    position: relative;
-    /* Анимация появления */
-    opacity: 0;
-    transform: scale(0.95);
-    animation: boot-up 1s forwards ease-out, flicker 8s 1s linear infinite;
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  border: 2px solid rgba(255, 51, 51, 0.4);
+  background: rgba(8, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  cursor: pointer;
+  position: relative;
+  margin: 0 1rem;
+  opacity: 0;
+  transform: scale(0.95);
+  animation: boot-up 1s forwards ease-out, flicker 8s 1s linear infinite;
 }
-/* Эффект Scanlines */
+
 .terminal-window::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 4px, 6px 100%;
-    pointer-events: none;
-    animation: scanline 15s linear infinite;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 0, 0, 0.02), rgba(255, 0, 0, 0.08));
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+  animation: scanline 15s linear infinite;
 }
 
 @keyframes boot-up {
-    to { opacity: 1; transform: scale(1); }
+  to { opacity: 1; transform: scale(1); }
 }
 @keyframes flicker {
-    0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.1); }
-    50% { box-shadow: 0 0 25px rgba(255, 51, 51, 0.15); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 51, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(255, 51, 51, 0.4); }
 }
 @keyframes scanline {
-    from { background-position: 0 0; }
-    to { background-position: 0 -100vh; }
+  from { background-position: 0 0; }
+  to { background-position: 0 -100vh; }
 }
 
 h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 0 10px var(--glow-color);
-    text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--base-color);
+  text-shadow: 0 0 10px var(--glow-color);
+  text-align: center;
 }
 #fragment-display {
-    min-height: 250px;
-    font-size: 1.1rem;
-    line-height: 1.7;
-    padding: 1rem;
-    color: #fff;
+  min-height: 250px;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  padding: 1rem;
+  color: var(--base-color);
+  text-align: center;
 }
 .fragment-title {
-    font-weight: bold;
-    color: var(--base-color);
-    display: block;
-    margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--base-color);
+  display: block;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.6);
 }
 .typing-cursor {
-    display: inline-block;
-    width: 10px;
-    height: 1.2rem;
-    background: var(--base-color);
-    animation: blink 1s step-end infinite;
+  display: inline-block;
+  width: 10px;
+  height: 1.2rem;
+  background: var(--base-color);
+  animation: blink 1s step-end infinite;
 }
 @keyframes blink {
-    50% { opacity: 0; }
+  50% { opacity: 0; }
 }
 
 #countdown-timer {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: rgba(255, 51, 51, 0.7);
-    text-align: center;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: rgba(255, 51, 51, 0.8);
+  text-align: center;
+  width: 100%;
 }
 #progress-bar {
-    width: 100%; height: 2px;
-    background: rgba(255, 51, 51, 0.3);
-    margin-top: 0.5rem;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 51, 51, 0.3);
+  margin-top: 0.5rem;
 }
 #progress-bar-inner {
-    width: 100%; height: 100%;
-    background: var(--base-color);
-    transition: width 1s linear;
+  width: 100%;
+  height: 100%;
+  background: var(--base-color);
+  transition: width 1s linear;
+}
+
+@media (max-width: 480px) {
+  .terminal-window { padding: 1rem; }
+  h1 { font-size: 1.8rem; }
+  #fragment-display { font-size: 0.95rem; min-height: 200px; }
 }

@@ -36,6 +36,7 @@ const linksContainer = document.getElementById('links-container');
 let scene, camera, renderer, controls;
 let mainObject;
 let secretClickCounter = 0;
+let wasPlayingOnHide = false;
 
 // Установка громкости 50% и начального состояния
 if (ambientAudio) {
@@ -145,7 +146,7 @@ function init() {
   controls.enableZoom = false;
   controls.enablePan = false;
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.5;
+  controls.autoRotateSpeed = 1.0;
   
   createMainObject();
   createLinkButtons();
@@ -165,12 +166,12 @@ function init() {
     if (document.hidden) {
       if (ambientAudio && !ambientAudio.paused) {
         ambientAudio.pause();
-        this._wasPlayingOnHide = true;
+        wasPlayingOnHide = true;
       }
     } else {
-      if (this._wasPlayingOnHide && ambientAudio) {
+      if (wasPlayingOnHide && ambientAudio) {
         ambientAudio.play().catch(() => {});
-        this._wasPlayingOnHide = false;
+        wasPlayingOnHide = false;
       }
     }
   });
@@ -179,9 +180,9 @@ function init() {
 function createMainObject() {
   const geometry = new THREE.IcosahedronGeometry(1.2, 1);
   const material = new THREE.MeshStandardMaterial({
-    color: 0xcc0000,
+    color: 0xff3333,
     emissive: 0xcc0000,
-    emissiveIntensity: 0.6,
+    emissiveIntensity: 0.8,
     metalness: 0.8,
     roughness: 0.2,
     wireframe: true
@@ -191,28 +192,32 @@ function createMainObject() {
 }
 
 function createLinkButtons() {
-    if (!linksContainer) return;
-    linksContainer.innerHTML = '';
-    LINKS.forEach(link => {
-        const a = document.createElement('a');
-        a.href = link.url;
-        a.className = 'btn-glitch';
-        a.textContent = t(link.name);
-        a.setAttribute('data-text', t(link.name));
-        a.setAttribute('data-i18n', link.name);
-        if (link.url.startsWith('http')) {
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-        }
-        if(link.isSpecial) {
-            a.classList.add('special');
-        }
-        linksContainer.appendChild(a);
-    });
+  if (!linksContainer) return;
+  linksContainer.innerHTML = '';
+  LINKS.forEach(link => {
+    const a = document.createElement('a');
+    a.href = link.url;
+    a.className = 'btn-glitch';
+    a.textContent = t(link.name);
+    a.setAttribute('data-text', t(link.name));
+    a.setAttribute('data-i18n', link.name);
+    if (link.url.startsWith('http')) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
+    if (link.isSpecial) {
+      a.classList.add('special');
+    }
+    linksContainer.appendChild(a);
+  });
 }
 
 function animate() {
   requestAnimationFrame(animate);
+  if (mainObject) {
+    mainObject.rotation.x += 0.005;
+    mainObject.rotation.y += 0.008;
+  }
   controls.update();
   TWEEN.update();
   renderer.render(scene, camera);
@@ -226,46 +231,48 @@ function onWindowResize() {
 }
 
 function onCanvasClick() {
-    secretClickCounter++;
-    
+  secretClickCounter++;
+  
+  if (mainObject) {
     const originalIntensity = mainObject.material.emissiveIntensity;
     new TWEEN.Tween({ intensity: originalIntensity })
-        .to({ intensity: 2.0 }, 100)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .yoyo(true)
-        .repeat(1)
-        .onUpdate((obj) => { mainObject.material.emissiveIntensity = obj.intensity; })
-        .start();
+      .to({ intensity: 2.5 }, 100)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .yoyo(true)
+      .repeat(1)
+      .onUpdate((obj) => { mainObject.material.emissiveIntensity = obj.intensity; })
+      .start();
+  }
 
-    if (secretClickCounter >= SECRET_CLICK_COUNT) {
-        activateSecretProtocol();
-    }
+  if (secretClickCounter >= SECRET_CLICK_COUNT) {
+    activateSecretProtocol();
+  }
 }
 
 function activateSecretProtocol() {
-    console.log("SECRET PROTOCOL ACTIVATED!");
-    if (glitchAudio) {
-        if(!glitchAudio.paused) {
-            glitchAudio.currentTime = 0;
-        } else {
-            glitchAudio.play().catch(e => console.warn(e));
-        }
+  console.log("SECRET PROTOCOL ACTIVATED!");
+  if (glitchAudio) {
+    if (!glitchAudio.paused) {
+      glitchAudio.currentTime = 0;
+    } else {
+      glitchAudio.play().catch(e => console.warn(e));
     }
-    document.body.classList.add('glitch-out');
-    setTimeout(() => {
-        window.location.href = SECRET_LINK_URL;
-    }, 1500);
+  }
+  document.body.classList.add('glitch-out');
+  setTimeout(() => {
+    window.location.href = SECRET_LINK_URL;
+  }, 1500);
 }
 
 function toggleSound() {
-    if (!ambientAudio) return;
-    if (ambientAudio.paused) {
-        ambientAudio.play().catch(e => console.error("Audio play failed:", e));
-        soundToggle.classList.remove('muted');
-        soundToggle.childNodes[0].nodeValue = t('sound_on');
-    } else {
-        ambientAudio.pause();
-        soundToggle.classList.add('muted');
-        soundToggle.childNodes[0].nodeValue = t('sound_off');
-    }
+  if (!ambientAudio) return;
+  if (ambientAudio.paused) {
+    ambientAudio.play().catch(e => console.error("Audio play failed:", e));
+    soundToggle.classList.remove('muted');
+    soundToggle.childNodes[0].nodeValue = t('sound_on');
+  } else {
+    ambientAudio.pause();
+    soundToggle.classList.add('muted');
+    soundToggle.childNodes[0].nodeValue = t('sound_off');
+  }
 }

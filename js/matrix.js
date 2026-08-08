@@ -29,7 +29,7 @@ export function setupMatrix(canvasId = 'matrix-canvas') {
 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#600000';
+    ctx.fillStyle = '#ff3333';
     ctx.font = FONT_SIZE + 'px "Fira Code", monospace';
 
     for (let i = 0; i < drops.length; i++) {
