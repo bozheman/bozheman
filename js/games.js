@@ -62,6 +62,80 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
+// ─── Filter Bar Logic ────────────────────────────────────────────────────────
+const filterBtns = document.querySelectorAll('.filter-btn');
+const gameCards  = document.querySelectorAll('.game-card');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filter = btn.dataset.filter;
+    gameCards.forEach(card => {
+      if (filter === 'all' || card.dataset.category === filter) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+// ─── Modal Manual Logic ──────────────────────────────────────────────────────
+const openManualBtn  = document.getElementById('open-manual-btn');
+const closeManualBtn = document.getElementById('close-manual-btn');
+const modalCloseFooter = document.getElementById('modal-footer-close');
+const manualModal    = document.getElementById('manual-modal');
+
+function openModal() {
+  if (manualModal) {
+    manualModal.classList.add('active');
+    manualModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeModal() {
+  if (manualModal) {
+    manualModal.classList.remove('active');
+    manualModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+}
+
+if (openManualBtn) openManualBtn.addEventListener('click', openModal);
+if (closeManualBtn) closeManualBtn.addEventListener('click', closeModal);
+if (modalCloseFooter) modalCloseFooter.addEventListener('click', closeModal);
+
+if (manualModal) {
+  manualModal.addEventListener('click', (e) => {
+    if (e.target === manualModal) closeModal();
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && manualModal && manualModal.classList.contains('active')) {
+    closeModal();
+  }
+});
+
+// ─── Modal Tab Navigation ─────────────────────────────────────────────────────
+const manualTabs = document.querySelectorAll('.manual-tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+manualTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    manualTabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(c => c.classList.remove('active'));
+
+    tab.classList.add('active');
+    const targetId = tab.dataset.tab;
+    const targetContent = document.getElementById(targetId);
+    if (targetContent) targetContent.classList.add('active');
+  });
+});
+
 // ─── Firebase Auth & Email Submission ──────────────────────────────────────
 const notifyBtn = document.getElementById('notify-btn');
 
