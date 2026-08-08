@@ -31,11 +31,9 @@
 
     <!-- FILTER BAR -->
     <nav class="filter-bar">
-      <button class="filter-btn active" data-filter="all" data-i18n="filter_all">ALL PROJECTS [3]</button>
-      <button class="filter-btn" data-filter="bot" data-i18n="filter_bots">TG BOTS [1]</button>
-      <button class="filter-btn" data-filter="dev" data-i18n="filter_indev">IN DEV [1]</button>
-      <button class="filter-btn" data-filter="soon" data-i18n="filter_soon">SOON [1]</button>
-    </nav>
+  <button class="filter-btn active" data-filter="all" data-i18n="filter_all">ALL PROJECTS [1]</button>
+  <button class="filter-btn" data-filter="bot" data-i18n="filter_bots">TG BOTS [1]</button>
+</nav>
     
     <!-- GAMES GRID -->
     <div class="games-grid">
@@ -71,53 +69,9 @@
         </div>
       </article>
 
-      <!-- CARD 2: UNKNOWN PROTOCOL -->
-      <article class="game-card dev-card" data-category="dev">
-        <div class="card-header">
-          <span class="game-status status-dev" data-i18n="game_1_status">▲ IN DEVELOPMENT</span>
-          <span class="card-id">#MOD-02</span>
-        </div>
-
-        <h2 class="game-title" data-text="UNKNOWN PROTOCOL" data-i18n="game_1_title">UNKNOWN PROTOCOL</h2>
-        
-        <div class="countdown" id="countdown">
-          <span data-i18n="game_1_timer">ANNOUNCEMENT: </span><span id="timer">09.09.2026</span>
-        </div>
-        
-        <p class="game-description" data-i18n="game_1_desc">
-          Проект 'Terminus' — погружение в холодную логику неизбежного конца. В роли ШИ-диспетчера распределяйте остатки энергии угасающего мира Obstractus.
-        </p>
-
-        <div class="tech-tags">
-          <span class="tag">AI DISPATCHER</span>
-          <span class="tag">SURVIVAL MATH</span>
-          <span class="tag">CYBERPUNK</span>
-        </div>
-        
-        <div class="wishlist-section">
-          <button class="notify-btn btn-glitch" id="notify-btn" data-text="AUTH & SUBSCRIBE" data-i18n="game_1_auth_btn">AUTH & SUBSCRIBE</button>
-        </div>
-      </article>
       
-      <!-- CARD 3: COMING SOON -->
-      <article class="game-card soon-card" data-category="soon">
-        <div class="card-header">
-          <span class="game-status status-soon" data-i18n="game_2_status">■ MULTI-PLATFORM</span>
-          <span class="card-id">#MOD-03</span>
-        </div>
-
-        <h2 class="game-title" data-text="CLASSIFIED PROJECTS" data-i18n="game_2_title">CLASSIFIED PROJECTS</h2>
-        
-        <p class="game-description" data-i18n="game_2_desc">
-          Анонсы новых игровых проектов протокола BOZHEMAN будут доступны позже. Следите за обновлениями в официальных каналах.
-        </p>
-
-        <div class="tech-tags">
-          <span class="tag">PC</span>
-          <span class="tag">CONSOLE</span>
-          <span class="tag">MOBILE</span>
-        </div>
-      </article>
+      
+      
 
     </div>
     
@@ -141,9 +95,7 @@
         <button class="manual-tab active" data-tab="tab-overview" data-i18n="tab_overview">01. PROFILE</button>
         <button class="manual-tab" data-tab="tab-garden" data-i18n="tab_garden">02. GARDEN</button>
         <button class="manual-tab" data-tab="tab-shop" data-i18n="tab_shop">03. SHOP</button>
-        <button class="manual-tab" data-tab="tab-genetics" data-i18n="tab_genetics">04. GENETICS</button>
-        <button class="manual-tab" data-tab="tab-market" data-i18n="tab_market">05. MARKET</button>
-        <button class="manual-tab" data-tab="tab-cup" data-i18n="tab_cup">06. CUP & SLEEP</button>
+        
       </nav>
 
       <div class="modal-body">
@@ -176,39 +128,12 @@
             <li><strong>⚡ Энергия & Bman:</strong> Фито-тоник (+50 Энергии), Расширение сада, Telegram Stars обмен.</li>
           </ul>
         </div>
-
-        <div id="tab-genetics" class="tab-content">
-          <h4>4. СЕЛЕКЦИЯ И МЕНДЕЛЕВСКАЯ ГЕНЕТИКА</h4>
-          <ul>
-            <li><strong>Решетка Пеннета:</strong> Виртуальное скрещивание сортов и расщепление аллелей генов.</li>
-            <li><strong>Признаки:</strong> Потенция, ТГК/КБД, Урожайность, Аромат (Citrus/Pine/Earthy), Индика/Сатива.</li>
-            <li><strong>Инбредная депрессия (Vigor):</strong> Чрезмерно близкородственное скрещивание снижает жизнеспособность.</li>
-            <li><strong>Мутации:</strong> Шанс получить мутантный сорт с рекордным ТГК и очками Эло.</li>
-          </ul>
-        </div>
-
-        <div id="tab-market" class="tab-content">
-          <h4>5. ТОРГОВЛЯ И ЭКОНОМИКА (P2P & CONTRACTS)</h4>
-          <ul>
-            <li><strong>P2P Площадка:</strong> Продажа урожая, семян и клонов между игроками по своим ценам.</li>
-            <li><strong>Trade Lock (Анти-Бот):</strong> Защита рынка в первые 48 часов или до выполнения 3 NPC контрактов.</li>
-            <li><strong>Контракты NPC:</strong> Ежедневные задания заказчиков с наградой Bman, XP и доступом к рынку.</li>
-            <li><strong>Лаборатория & Сепаратор:</strong> Переработка 10 семян в элитное удобрение, анализ генотипа.</li>
-          </ul>
-        </div>
-
-        <div id="tab-cup" class="tab-content">
-          <h4>6. CANNABIS CUP & РЕЖИМ СНА</h4>
-          <ul>
-            <li><strong>Cannabis Cup:</strong> Еженедельные турниры с тематическими номинациями и Эло-рейтингом.</li>
-            <li><strong>Режим Сна (/sleep):</strong> Ускорение восстановления энергии гровера в 2 раза во время сна.</li>
-          </ul>
-        </div>
       </div>
 
       <div class="modal-footer">
         <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="btn-glitch btn-tg-sm">⚡ LAUNCH BOT @GrowerSim_bot</a>
-        <button class="btn-glitch btn-close-modal" id="modal-footer-close">CLOSE [ESC]</button>
+<a href="grower_manual.html" id="full-manual-btn" class="btn-glitch btn-full-manual" data-i18n="full_manual_btn">FULL MANUAL</a>
+<button class="btn-glitch btn-close-modal" id="modal-footer-close">CLOSE [ESC]</button>
       </div>
     </div>
   </div>

@@ -105,6 +105,14 @@ function closeModal() {
 }
 
 if (openManualBtn) openManualBtn.addEventListener('click', openModal);
+
+// Full manual button navigation
+const fullManualBtn = document.getElementById('full-manual-btn');
+if (fullManualBtn) {
+  fullManualBtn.addEventListener('click', () => {
+    window.location.href = 'grower_manual.html';
+  });
+}
 if (closeManualBtn) closeManualBtn.addEventListener('click', closeModal);
 if (modalCloseFooter) modalCloseFooter.addEventListener('click', closeModal);
 
