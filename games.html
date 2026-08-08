@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/games.css">
+  <link rel="stylesheet" href="css/neon.css">
 </head>
 <body>
   <canvas id="matrix-canvas"></canvas>
@@ -138,7 +139,16 @@
     </div>
   </div>
 
-  <button id="lang-toggle" class="lang-toggle">ENG</button>
+  <select id="lang-select" class="lang-select" aria-label="Select language">
+    <option value="en">English</option>
+    <option value="ru">Русский</option>
+    <option value="uk">Українська</option>
+    <option value="be">Беларуская</option>
+    <option value="pl">Polski</option>
+    <option value="de">Deutsch</option>
+    <option value="fr">Français</option>
+    <option value="es">Español</option>
+  </select>
 
   <script type="module" src="js/games.js"></script>
 </body>

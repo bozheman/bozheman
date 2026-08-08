@@ -153,20 +153,40 @@ const translations = {
     "illusion_title": "ІЛЮЗІЯ",
     "illusion_click": "[КЛІКНИ, ЩОБ ПОБАЧИТИ]",
     "illusion_redirect": "ПЕРЕАДРЕСАЦІЯ ПРОТОКОЛУ..."
+  },
+  be: {
+    // Placeholder translations (copy from en)
+    ...translations.en
+  },
+  pl: {
+    // Placeholder translations (copy from en)
+    ...translations.en
+  },
+  de: {
+    // Placeholder translations (copy from en)
+    ...translations.en
+  },
+  fr: {
+    // Placeholder translations (copy from en)
+    ...translations.en
+  },
+  es: {
+    // Placeholder translations (copy from en)
+    ...translations.en
+  }
+
   }
 };
 
 let currentLang = localStorage.getItem('bozheman_lang') || 'en';
 
 export function initI18n() {
-  const toggleBtn = document.getElementById('lang-toggle');
-  
-  if (toggleBtn) {
-    toggleBtn.textContent = currentLang === 'en' ? 'ENG' : 'UKR';
-    toggleBtn.addEventListener('click', () => {
-      currentLang = currentLang === 'en' ? 'uk' : 'en';
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', () => {
+      currentLang = langSelect.value;
       localStorage.setItem('bozheman_lang', currentLang);
-      toggleBtn.textContent = currentLang === 'en' ? 'ENG' : 'UKR';
       applyTranslations();
     });
   }

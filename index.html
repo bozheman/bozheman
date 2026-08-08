@@ -12,6 +12,7 @@
   <title>BOZHEMAN ≡ PROTOCOL</title>
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
   <link rel="stylesheet" href="css/main.css" />
+<link rel="stylesheet" href="css/neon.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
@@ -66,7 +67,16 @@
   </script>
 
   <!-- ПЛАВАЮЩИЕ КНОПКИ УПРАВЛЕНИЯ -->
-  <button id="lang-toggle" class="lang-toggle">ENG</button>
+  <select id="lang-select" class="lang-select" aria-label="Select language">
+  <option value="en">English</option>
+  <option value="ru">Русский</option>
+  <option value="uk">Українська</option>
+  <option value="be">Беларуская</option>
+  <option value="pl">Polski</option>
+  <option value="de">Deutsch</option>
+  <option value="fr">Français</option>
+  <option value="es">Español</option>
+</select>
   <button id="sound-toggle" class="sound-toggle" aria-label="Toggle sound">
     SOUND: OFF
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="sound-icon">

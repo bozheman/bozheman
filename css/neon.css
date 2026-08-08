@@ -1,0 +1,103 @@
+/* =============================================
+   BOZHEMAN ≡ PROTOCOL  ‖  Neon Red Overhaul Stylesheet
+   ============================================= */
+
+/* 1. Global Red-Neon Glows & Color Overrides */
+body {
+  background-color: var(--clr-bg, #000000) !important;
+  color: var(--clr-primary, #ff3333);
+  text-shadow: 0 0 4px rgba(255, 51, 51, 0.4);
+}
+
+/* Enhanced Headings & Glowing Text */
+h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
+  color: var(--clr-primary, #ff3333);
+  text-shadow: 
+    0 0 5px var(--clr-primary, #ff3333),
+    0 0 15px rgba(255, 51, 51, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.4);
+}
+
+/* 2. Cyber-Punk Language Select Dropdown */
+.lang-select {
+  position: fixed;
+  bottom: 5%;
+  left: 5%;
+  background: var(--clr-surface, rgba(8, 0, 0, 0.85));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--clr-primary, #ff3333);
+  color: var(--clr-primary, #ff3333);
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-mono, 'Fira Code', monospace);
+  font-size: var(--fs-xs, 0.75rem);
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+  transition: all var(--t-med, 0.3s ease);
+  z-index: 100;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ff3333' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 1.8rem;
+}
+
+.lang-select:hover, .lang-select:focus {
+  background-color: var(--clr-primary-dim, #a30000);
+  color: var(--clr-white, #ffffff);
+  border-color: var(--clr-primary, #ff3333);
+  box-shadow: 0 0 18px rgba(255, 51, 51, 0.7);
+  transform: scale(1.03);
+}
+
+.lang-select option {
+  background-color: #0d0000;
+  color: var(--clr-primary, #ff3333);
+  font-family: var(--font-mono, monospace);
+  padding: 0.4rem;
+}
+
+/* 3. Intensified Glitch & Scanline Effects */
+.scanlines-effect::after {
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.08));
+  background-size: 100% 3px, 5px 100%;
+  animation: scanline 8s linear infinite !important;
+}
+
+.glitch-intense {
+  animation: glitch-anim 0.3s infinite alternate;
+  filter: contrast(1.5);
+}
+
+@keyframes glitch-anim {
+  0% {
+    text-shadow: 2px 0 #ff00de, -2px 0 #00ff88;
+  }
+  50% {
+    text-shadow: -3px 0 #ff3333, 3px 0 #00ff88;
+  }
+  100% {
+    text-shadow: 2px 0 #ff00de, -2px 0 #ff3333;
+  }
+}
+
+/* 4. Recolor Icons via Filters */
+svg, img.icon, .sound-icon {
+  filter: drop-shadow(0 0 4px var(--clr-primary, #ff3333));
+}
+
+/* 5. Cyber Buttons Neon Polish */
+.btn-glitch {
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+}
+
+.btn-glitch:hover {
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.6), 0 0 35px rgba(255, 0, 222, 0.3);
+}

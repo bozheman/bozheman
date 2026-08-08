@@ -1,4 +1,5 @@
 // manual_full.js – Handles full manual page interactions
+import './i18n.js';
 
 // Close button functionality: return to games page
 const closeBtn = document.getElementById('close-full-manual');
