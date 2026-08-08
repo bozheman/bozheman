@@ -7,10 +7,14 @@
   <meta property="og:title" content="BOZHEMAN ≡ SUPPORT" />
   <meta property="og:description" content="Поддержи проект — крипто, Steam и реферальные ссылки." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/images/gg.png" />
-  <meta name="theme-color" content="#ff3333" />
-  <title>BOZHEMAN ≡ SUPPORT</title>
+  <meta property="og:url" content="https://bozheman.com/refer.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BOZHEMAN ≡ SUPPORT" />
+  <meta name="twitter:description" content="Поддержи проект — крипто, Steam и реферальные ссылки." />
+  <meta name="twitter:image" content="assets/images/gg.png" />
+  <link rel="canonical" href="https://bozheman.com/refer.html" />
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
@@ -20,7 +24,7 @@
 </head>
 <body>
 
-  <canvas id="matrix-canvas"></canvas>
+  <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
   
   <main class="container">
     <a href="index.html" class="page-title" data-text="BOZHEMAN ≡ SUPPORT" data-i18n="support_title">BOZHEMAN ≡ SUPPORT</a>
@@ -87,9 +91,9 @@
     <a href="index.html" class="btn-glitch special" data-text="< BACK TO PROTOCOL" data-i18n="back_to_protocol">< BACK TO PROTOCOL</a>
   </main>
   
-  <div id="modal-overlay" class="modal-overlay" onclick="hideQR()">
+  <div id="modal-overlay" class="modal-overlay" onclick="hideQR()" role="dialog" aria-modal="true" aria-hidden="true">
       <div id="qr-modal" onclick="event.stopPropagation()">
-          <canvas id="qr-canvas"></canvas>
+          <canvas id="qr-canvas" aria-label="QR Code Display" role="img"></canvas>
           <p id="qr-address"></p>
       </div>
   </div>

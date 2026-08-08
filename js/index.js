@@ -152,9 +152,28 @@ function init() {
   setupMatrix('matrix-canvas');
   animate();
   
-  window.addEventListener('resize', onWindowResize);
+  let resizeTimeout = null;
+  window.addEventListener('resize', () => {
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(onWindowResize, 100);
+  });
+  
   sceneCanvas.addEventListener('click', onCanvasClick);
   if (soundToggle) soundToggle.addEventListener('click', toggleSound);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (ambientAudio && !ambientAudio.paused) {
+        ambientAudio.pause();
+        this._wasPlayingOnHide = true;
+      }
+    } else {
+      if (this._wasPlayingOnHide && ambientAudio) {
+        ambientAudio.play().catch(() => {});
+        this._wasPlayingOnHide = false;
+      }
+    }
+  });
 }
 
 function createMainObject() {

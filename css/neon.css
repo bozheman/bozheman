@@ -1,12 +1,50 @@
 /* =============================================
-   BOZHEMAN ≡ PROTOCOL  ‖  Neon Red Overhaul Stylesheet
+   BOZHEMAN ≡ PROTOCOL  ‖  Neon Red Overhaul & Accessibility v2.0
    ============================================= */
 
-/* 1. Global Red-Neon Glows & Color Overrides */
+/* 1. Global Reset & Accessibility Base */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background-color: var(--clr-bg, #000000) !important;
   color: var(--clr-primary, #ff3333);
   text-shadow: 0 0 4px rgba(255, 51, 51, 0.4);
+}
+
+/* Custom Cyberpunk Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080000;
+  border-left: 1px solid rgba(255, 51, 51, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-primary-dim, #a30000);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--clr-primary, #ff3333);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-primary, #ff3333);
+}
+
+/* Firefox scrollbar support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-primary-dim, #a30000) #080000;
+}
+
+/* Keyboard Focus States (WCAG AAA) */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--clr-primary, #ff3333) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 12px var(--clr-primary, #ff3333) !important;
 }
 
 /* Enhanced Headings & Glowing Text */
@@ -21,9 +59,9 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
 /* 2. Cyber-Punk Language Select Dropdown */
 .lang-select {
   position: fixed;
-  bottom: 5%;
-  left: 5%;
-  background: var(--clr-surface, rgba(8, 0, 0, 0.85));
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: var(--clr-surface, rgba(8, 0, 0, 0.9));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 2px solid var(--clr-primary, #ff3333);
@@ -37,7 +75,7 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
   transition: all var(--t-med, 0.3s ease);
-  z-index: 100;
+  z-index: 1000;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -63,17 +101,23 @@ h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
 }
 
 /* 3. Intensified Glitch & Scanline Effects */
+.scanlines-effect {
+  will-change: transform;
+}
+
 .scanlines-effect::after {
   background: 
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
     linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.08));
   background-size: 100% 3px, 5px 100%;
   animation: scanline 8s linear infinite !important;
+  will-change: background-position;
 }
 
 .glitch-intense {
   animation: glitch-anim 0.3s infinite alternate;
   filter: contrast(1.5);
+  will-change: transform, text-shadow;
 }
 
 @keyframes glitch-anim {
@@ -96,8 +140,39 @@ svg, img.icon, .sound-icon {
 /* 5. Cyber Buttons Neon Polish */
 .btn-glitch {
   box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+  will-change: transform, box-shadow;
 }
 
 .btn-glitch:hover {
   box-shadow: 0 0 20px rgba(255, 51, 51, 0.6), 0 0 35px rgba(255, 0, 222, 0.3);
+}
+
+/* 6. Responsive Fixes for Small Devices (< 480px) */
+@media (max-width: 480px) {
+  .lang-select {
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+    padding-right: 1.5rem;
+  }
+
+  #sound-toggle {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .btn-glitch {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .lang-select, #sound-toggle {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.5rem;
+  }
 }

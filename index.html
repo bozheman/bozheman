@@ -7,12 +7,30 @@
   <meta property="og:title" content="BOZHEMAN ≡ PROTOCOL" />
   <meta property="og:description" content="Стример, разработчик игр и контент-мейкер." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/images/gg.png" />
-  <meta name="theme-color" content="#ff3333" />
-  <title>BOZHEMAN ≡ PROTOCOL</title>
+  <meta property="og:url" content="https://bozheman.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BOZHEMAN ≡ PROTOCOL" />
+  <meta name="twitter:description" content="Стример, разработчик игр и контент-мейкер." />
+  <meta name="twitter:image" content="assets/images/gg.png" />
+  <link rel="canonical" href="https://bozheman.com/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "BOZHEMAN",
+    "url": "https://bozheman.com/",
+    "sameAs": [
+      "https://www.twitch.tv/Bozhemany",
+      "https://www.instagram.com/bozheman",
+      "https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw",
+      "https://www.tiktok.com/@bozheman_"
+    ]
+  }
+  </script>
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="css/main.css" />
-<link rel="stylesheet" href="css/neon.css" />
+  <link rel="stylesheet" href="css/neon.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
@@ -26,11 +44,11 @@
   </div>
 
   <!-- ФОНОВАЯ АНИМАЦИЯ (МАТРИЦА) -->
-  <canvas id="matrix-canvas"></canvas>
+  <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
   
   <!-- 3D СЦЕНА -->
   <div id="scene-container">
-    <canvas id="scene-canvas"></canvas>
+    <canvas id="scene-canvas" aria-label="Interactive 3D Object" role="img"></canvas>
   </div>
 
   <!-- ИНТЕРФЕЙС -->
@@ -86,6 +104,13 @@
   </button>
 
   <script type="module" src="js/index.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
 

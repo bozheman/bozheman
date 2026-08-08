@@ -98,8 +98,9 @@ class SlotMachine {
 
     // Keyboard shortcut: Space / Enter
     document.addEventListener('keydown', (e) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
       if ((e.code === 'Space' || e.code === 'Enter') &&
-          document.activeElement !== this.dom.betInput) {
+          !['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(activeTag)) {
         e.preventDefault();
         this._handleSpin();
       }
@@ -134,7 +135,7 @@ class SlotMachine {
           AudioEngine.click();
           const amount = chip.dataset.amount;
           if (amount === 'max') {
-            this.dom.betInput.value = this.balance;
+            this.dom.betInput.value = Math.max(10, Math.min(this.balance, 99999));
           } else {
             const cur = parseInt(this.dom.betInput.value, 10) || 10;
             const add = parseInt(amount, 10);
@@ -146,11 +147,16 @@ class SlotMachine {
     }
 
     // Persist bet on change + enforce min 10
-    this.dom.betInput.addEventListener('change', () => {
+    const sanitizeBet = () => {
       let v = parseInt(this.dom.betInput.value, 10);
       if (isNaN(v) || v < 10) v = 10;
+      if (v > 99999) v = 99999;
       this.dom.betInput.value = v;
       State.set({ lastBet: String(v) });
+    };
+    this.dom.betInput.addEventListener('change', sanitizeBet);
+    this.dom.betInput.addEventListener('input', () => {
+      this.dom.betInput.value = this.dom.betInput.value.replace(/[^0-9]/g, '');
     });
 
     // Pre-fill: default 10 or last bet

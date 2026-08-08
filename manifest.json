@@ -1,0 +1,18 @@
+{
+  "name": "BOZHEMAN ≡ PROTOCOL",
+  "short_name": "BOZHEMAN",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff3333",
+  "orientation": "any",
+  "description": "BOZHEMAN ≡ PROTOCOL — Streamer, Game Developer & Content Creator.",
+  "icons": [
+    {
+      "src": "assets/images/gg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

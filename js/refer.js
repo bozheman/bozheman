@@ -14,11 +14,11 @@ window.copyToClipboard = function(element) {
   }).catch(err => {
     console.error("Copy error: ", err);
     element.innerText = t('error');
-     setTimeout(() => {
+    setTimeout(() => {
       element.innerText = originalText;
     }, 1500);
   });
-}
+};
 
 const modalOverlay = document.getElementById('modal-overlay');
 const qrCanvas = document.getElementById('qr-canvas');
@@ -26,21 +26,49 @@ const qrAddress = document.getElementById('qr-address');
 let qrInstance = null;
 
 window.showQR = function(address) {
-    qrAddress.textContent = address;
-    if(qrInstance) {
-        qrInstance.set({ value: address });
-    } else {
-        qrInstance = new QRious({
-            element: qrCanvas,
-            value: address,
-            size: 256,
-            background: 'white',
-            foreground: 'black'
-        });
+  if (!qrAddress || !modalOverlay) return;
+  qrAddress.textContent = address;
+  
+  if (typeof QRious !== 'undefined') {
+    if (qrInstance) {
+      qrInstance.set({ value: address });
+    } else if (qrCanvas) {
+      qrInstance = new QRious({
+        element: qrCanvas,
+        value: address,
+        size: 256,
+        background: 'white',
+        foreground: 'black'
+      });
     }
-    modalOverlay.classList.add('visible');
-}
+  } else if (qrCanvas) {
+    // Fallback if QRious CDN failed to load
+    const ctx = qrCanvas.getContext('2d');
+    if (ctx) {
+      qrCanvas.width = 256;
+      qrCanvas.height = 256;
+      ctx.fillStyle = '#080000';
+      ctx.fillRect(0, 0, 256, 256);
+      ctx.fillStyle = '#ff3333';
+      ctx.font = '14px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('[ QR ENGINE OFFLINE ]', 128, 128);
+    }
+  }
+  
+  modalOverlay.classList.add('visible');
+  modalOverlay.setAttribute('aria-hidden', 'false');
+};
 
 window.hideQR = function() {
+  if (modalOverlay) {
     modalOverlay.classList.remove('visible');
-}
+    modalOverlay.setAttribute('aria-hidden', 'true');
+  }
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('visible')) {
+    window.hideQR();
+  }
+});
