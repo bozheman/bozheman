@@ -170,9 +170,9 @@ class SlotMachine {
         this.balance += 1000;
         this._saveBalance();
         this._refreshUI();
-        this.dom.refillBtn.textContent = '✓ +1000 ДОБАВЛЕНО';
+        this.dom.refillBtn.textContent = t('slots_refill_success');
         setTimeout(() => {
-          this.dom.refillBtn.textContent = '+ ПОЛУЧИТЬ 1000 МОНЕТ';
+          this.dom.refillBtn.textContent = t('slots_refill_btn');
         }, 2000);
       });
     }
@@ -184,16 +184,16 @@ class SlotMachine {
     const bet    = parseInt(rawBet, 10);
 
     if (rawBet === '' || isNaN(bet)) {
-      return { ok: false, msg: 'ВВЕДИТЕ РАЗМЕР СТАВКИ' };
+      return { ok: false, msg: t('slots_err_enter_bet') };
     }
     if (!Number.isFinite(bet) || bet < 10) {
-      return { ok: false, msg: 'МИНИМАЛЬНАЯ СТАВКА: 10' };
+      return { ok: false, msg: t('slots_err_min_bet') };
     }
     if (bet > this.balance) {
-      return { ok: false, msg: 'НЕДОСТАТОЧНО СРЕДСТВ НА БАЛАНСЕ' };
+      return { ok: false, msg: t('slots_err_no_funds') };
     }
     if (bet > 99999) {
-      return { ok: false, msg: 'МАКСИМАЛЬНАЯ СТАВКА: 99 999' };
+      return { ok: false, msg: t('slots_err_max_bet') };
     }
     return { ok: true, bet };
   }
@@ -270,8 +270,8 @@ class SlotMachine {
     const [a, b, c] = results;
     let multiplier = 0;
     let resultType = 'loss';
-    let label      = 'ПРОИГРЫШ';
-    let desc       = `Выпало: ${results.map(s => s.glyph).join(' ')}`;
+    let label      = t('slots_loss');
+    let desc       = t('slots_rolled', { symbols: results.map(s => s.glyph).join(' ') });
 
     const allSame  = a.id === b.id && b.id === c.id;
     const twoPairs = (a.id === b.id || b.id === c.id || a.id === c.id)
@@ -281,12 +281,12 @@ class SlotMachine {
       multiplier = PAY_TABLE[a.id] || 0;
       if (multiplier > 0) {
         resultType = multiplier === PAY_TABLE.seven ? 'jackpot' : 'win';
-        label      = multiplier === PAY_TABLE.seven ? '✦ JACKPOT ✦' : 'ПОБЕДА';
+        label      = multiplier === PAY_TABLE.seven ? t('slots_jackpot') : t('slots_win');
       }
     } else if (twoPairs) {
       multiplier = PAIR_MULT;
       resultType = 'win';
-      label      = 'ПАРА!';
+      label      = t('slots_pair');
     }
 
     const winnings = Math.floor(bet * multiplier);

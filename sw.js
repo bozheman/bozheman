@@ -1,6 +1,6 @@
-/* BOZHEMAN ≡ PROTOCOL - Service Worker v1.0 */
+/* BOZHEMAN ≡ PROTOCOL - Service Worker v2.0 */
 
-const CACHE_NAME = 'bozheman-cache-v1';
+const CACHE_NAME = 'bozheman-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -23,8 +23,26 @@ const ASSETS_TO_CACHE = [
   './js/matrix.js',
   './js/i18n.js',
   './js/state.js',
-  './manifest.json'
+  './js/firebase-config.js',
+  './js/manual_full.js',
+  './js/engine/audio.js',
+  './js/engine/constants.js',
+  './js/engine/particles.js',
+  './js/engine/reel.js',
+  './manifest.json',
+  './assets/images/gg.png',
+  './assets/images/avatar.png',
+  './assets/images/BNB.jpg',
+  './assets/images/BTC.jpg',
+  './assets/images/ETH.jpg',
+  './assets/images/USDT.jpg',
+  './assets/images/DM-LOGO.svg',
+  './assets/images/CSGOEMPIRE-LOGO.svg',
+  './assets/images/SWAPGG-LOGO.svg',
+  './assets/audio/omega.m4a',
+  './assets/audio/omega2.m4a'
 ];
+
 
 self.addEventListener('install', event => {
   event.waitUntil(

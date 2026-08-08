@@ -44,4 +44,9 @@ export const AudioEngine = {
     tone(180, 'sawtooth', 0.2,  0.14, 0.12);
   },
   error() { tone(160, 'square', 0.1, 0.15); },
+  glitch() {
+    [[300, 0], [150, 0.05], [800, 0.1], [120, 0.15], [950, 0.2], [200, 0.25], [60, 0.3]].forEach(([f, d]) =>
+      tone(f, 'sawtooth', 0.06, 0.25, d));
+  },
 };
+

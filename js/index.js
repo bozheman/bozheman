@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import TWEEN from 'three/addons/libs/tween.module.js';
 import { setupMatrix } from './matrix.js';
 import { t } from './i18n.js';
+import { AudioEngine } from './engine/audio.js';
+import { State } from './state.js';
 
 // --- НАСТРОЙКИ ---
 const PRELOADER_LINES = [
@@ -251,13 +253,7 @@ function onCanvasClick() {
 
 function activateSecretProtocol() {
   console.log("SECRET PROTOCOL ACTIVATED!");
-  if (glitchAudio) {
-    if (!glitchAudio.paused) {
-      glitchAudio.currentTime = 0;
-    } else {
-      glitchAudio.play().catch(e => console.warn(e));
-    }
-  }
+  AudioEngine.glitch();
   document.body.classList.add('glitch-out');
   setTimeout(() => {
     window.location.href = SECRET_LINK_URL;
@@ -270,9 +266,12 @@ function toggleSound() {
     ambientAudio.play().catch(e => console.error("Audio play failed:", e));
     soundToggle.classList.remove('muted');
     soundToggle.childNodes[0].nodeValue = t('sound_on');
+    State.set({ audioMuted: false });
   } else {
     ambientAudio.pause();
     soundToggle.classList.add('muted');
     soundToggle.childNodes[0].nodeValue = t('sound_off');
+    State.set({ audioMuted: true });
   }
 }
+
