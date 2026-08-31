@@ -2,7 +2,7 @@ import { setupMatrix } from './matrix.js';
 import { t } from './i18n.js';
 setupMatrix('matrix-canvas');
 
-window.copyToClipboard = function(element) {
+function copyToClipboard(element) {
   const originalText = element.innerText;
   navigator.clipboard.writeText(originalText).then(() => {
     element.classList.add('copy-feedback');
@@ -18,14 +18,15 @@ window.copyToClipboard = function(element) {
       element.innerText = originalText;
     }, 1500);
   });
-};
+}
 
 const modalOverlay = document.getElementById('modal-overlay');
 const qrCanvas = document.getElementById('qr-canvas');
 const qrAddress = document.getElementById('qr-address');
+const qrModal = document.getElementById('qr-modal');
 let qrInstance = null;
 
-window.showQR = function(address) {
+function showQR(address) {
   if (!qrAddress || !modalOverlay) return;
   qrAddress.textContent = address;
   
@@ -58,14 +59,34 @@ window.showQR = function(address) {
   
   modalOverlay.classList.add('visible');
   modalOverlay.setAttribute('aria-hidden', 'false');
-};
+}
 
-window.hideQR = function() {
+function hideQR() {
   if (modalOverlay) {
     modalOverlay.classList.remove('visible');
     modalOverlay.setAttribute('aria-hidden', 'true');
   }
-};
+}
+
+// Bind events
+document.querySelectorAll('.wallet-address').forEach(el => {
+  el.addEventListener('click', () => copyToClipboard(el));
+});
+
+document.querySelectorAll('.qr-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const address = btn.getAttribute('data-address');
+    if (address) showQR(address);
+  });
+});
+
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', hideQR);
+}
+
+if (qrModal) {
+  qrModal.addEventListener('click', (e) => e.stopPropagation());
+}
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('visible')) {

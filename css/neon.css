@@ -49,6 +49,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* Enhanced Headings & Glowing Text */
 h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
+  line-height: 1.2;
   color: var(--clr-primary, #ff3333);
   text-shadow: 
     0 0 5px var(--clr-primary, #ff3333),
@@ -160,6 +161,8 @@ svg, img.icon, .sound-icon {
     padding: 0.4rem 0.6rem;
     font-size: 0.7rem;
     padding-right: 1.5rem;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   #sound-toggle {
@@ -167,6 +170,8 @@ svg, img.icon, .sound-icon {
     right: 1rem;
     padding: 0.4rem 0.6rem;
     font-size: 0.7rem;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .btn-glitch {

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
   <meta name="description" content="BOZHEMAN SLOTS — слот-машина на платформе BOZHEMAN. Играйте и выигрывайте!" />
   <meta property="og:title" content="BOZHEMAN ≡ 777" />
   <meta property="og:description" content="Слот-машина BOZHEMAN. Спините и выигрывайте!" />
@@ -69,10 +70,10 @@
         </div>
         
         <div class="chip-row">
-          <button class="chip" data-amount="10" data-i18n="slots_min">MIN</button>
-          <button class="chip" data-amount="50">+50</button>
-          <button class="chip" data-amount="100">+100</button>
-          <button class="chip" data-amount="max" data-i18n="slots_max">MAX</button>
+          <button class="chip" data-amount="10" data-i18n="slots_min" aria-label="Минимальная ставка">MIN</button>
+          <button class="chip" data-amount="50" aria-label="Увеличить ставку на 50">+50</button>
+          <button class="chip" data-amount="100" aria-label="Увеличить ставку на 100">+100</button>
+          <button class="chip" data-amount="max" data-i18n="slots_max" aria-label="Максимальная ставка">MAX</button>
         </div>
 
         <button id="btn-spin" class="btn-spin" data-text="SPIN (SPACE)" data-i18n="slots_spin_btn">SPIN (SPACE)</button>

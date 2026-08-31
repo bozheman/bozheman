@@ -155,9 +155,7 @@ class SlotMachine {
       State.set({ lastBet: String(v) });
     };
     this.dom.betInput.addEventListener('change', sanitizeBet);
-    this.dom.betInput.addEventListener('input', () => {
-      this.dom.betInput.value = this.dom.betInput.value.replace(/[^0-9]/g, '');
-    });
+    this.dom.betInput.addEventListener('blur', sanitizeBet);
 
     // Pre-fill: default 10 or last bet
     const lastBet = State.read('lastBet');
@@ -373,10 +371,12 @@ class SlotMachine {
     const glyphs = results.map(s => s.glyph).join(' ');
     const net    = winnings > 0 ? `+${winnings}` : `-${bet}`;
 
-    entry.innerHTML = `
-      <span>${glyphs}</span>
-      <span>${net}</span>
-    `;
+    const spanGlyphs = document.createElement('span');
+    spanGlyphs.textContent = glyphs;
+    const spanNet = document.createElement('span');
+    spanNet.textContent = net;
+    entry.appendChild(spanGlyphs);
+    entry.appendChild(spanNet);
 
     list.insertBefore(entry, list.firstChild);
 

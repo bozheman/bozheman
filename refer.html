@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;">
   <meta name="description" content="BOZHEMAN Support — крипто-кошельки, Steam обмен, реферальные ссылки." />
   <meta property="og:title" content="BOZHEMAN ≡ SUPPORT" />
   <meta property="og:description" content="Поддержи проект — крипто, Steam и реферальные ссылки." />
@@ -34,23 +35,23 @@
         <div class="wallet-list">
             <div class="wallet-entry">
                 <strong>USDT (TRC20):</strong>
-                <span class="wallet-address" onclick="copyToClipboard(this)">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
-                <button class="qr-btn" onclick="showQR('TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa')">QR</button>
+                <span class="wallet-address" data-address="TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa">TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa</span>
+                <button class="qr-btn" data-address="TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa">QR</button>
             </div>
             <div class="wallet-entry">
                 <strong>BTC:</strong>
-                <span class="wallet-address" onclick="copyToClipboard(this)">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
-                <button class="qr-btn" onclick="showQR('125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH')">QR</button>
+                <span class="wallet-address" data-address="125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH">125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH</span>
+                <button class="qr-btn" data-address="125hh3cxk1PdgEcBf87H6jNdCfMCXK1vKH">QR</button>
             </div>
             <div class="wallet-entry">
                 <strong>ETH (ERC20):</strong>
-                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+                <span class="wallet-address" data-address="0xe1b3651e583a2eefd0f813a530cb55fda141eed2">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" data-address="0xe1b3651e583a2eefd0f813a530cb55fda141eed2">QR</button>
             </div>
             <div class="wallet-entry">
                 <strong>BNB (BEP20):</strong>
-                <span class="wallet-address" onclick="copyToClipboard(this)">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
-                <button class="qr-btn" onclick="showQR('0xe1b3651e583a2eefd0f813a530cb55fda141eed2')">QR</button>
+                <span class="wallet-address" data-address="0xe1b3651e583a2eefd0f813a530cb55fda141eed2">0xe1b3651e583a2eefd0f813a530cb55fda141eed2</span>
+                <button class="qr-btn" data-address="0xe1b3651e583a2eefd0f813a530cb55fda141eed2">QR</button>
             </div>
         </div>
     </section>
@@ -91,8 +92,8 @@
     <a href="index.html" class="btn-glitch special" data-text="< BACK TO PROTOCOL" data-i18n="back_to_protocol">< BACK TO PROTOCOL</a>
   </main>
   
-  <div id="modal-overlay" class="modal-overlay" onclick="hideQR()" role="dialog" aria-modal="true" aria-hidden="true">
-      <div id="qr-modal" onclick="event.stopPropagation()">
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+      <div id="qr-modal">
           <canvas id="qr-canvas" aria-label="QR Code Display" role="img"></canvas>
           <p id="qr-address"></p>
       </div>

@@ -156,6 +156,7 @@ if (notifyBtn) {
     const originalText = notifyBtn.textContent;
     notifyBtn.textContent = t('game_1_btn_connecting');
 
+    let success = false;
     try {
       const provider = new GoogleAuthProvider();
       const result   = await signInWithPopup(auth, provider);
@@ -181,7 +182,7 @@ if (notifyBtn) {
           showToast(t('toast_already'), 'info');
           notifyBtn.textContent = t('game_1_btn_already');
         }
-        // Don't re-enable — user is subscribed
+        success = true;
       }
     } catch (error) {
       console.error('Auth error:', error);
@@ -189,8 +190,11 @@ if (notifyBtn) {
         ? t('toast_auth_closed')
         : t('toast_auth_error');
       showToast(msg, 'error');
-      notifyBtn.textContent = originalText;
-      notifyBtn.disabled = false;
+    } finally {
+      if (!success) {
+        notifyBtn.textContent = originalText;
+        notifyBtn.disabled = false;
+      }
     }
   });
 }
