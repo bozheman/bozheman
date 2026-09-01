@@ -265,12 +265,14 @@ function toggleSound() {
   if (ambientAudio.paused) {
     ambientAudio.play().catch(e => console.error("Audio play failed:", e));
     soundToggle.classList.remove('muted');
-    soundToggle.childNodes[0].nodeValue = t('sound_on');
+    soundToggle.querySelector('span').setAttribute('data-i18n', 'sound_on');
+    soundToggle.querySelector('span').textContent = t('sound_on');
     State.set({ audioMuted: false });
   } else {
     ambientAudio.pause();
     soundToggle.classList.add('muted');
-    soundToggle.childNodes[0].nodeValue = t('sound_off');
+    soundToggle.querySelector('span').setAttribute('data-i18n', 'sound_off');
+    soundToggle.querySelector('span').textContent = t('sound_off');
     State.set({ audioMuted: true });
   }
 }

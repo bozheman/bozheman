@@ -86,10 +86,11 @@ class SlotMachine {
   }
 
   _refreshUI() {
-    this.dom.balanceDisplay.textContent = this.balance;
-    this.dom.spinsDisplay.textContent   = this.stats.spins;
+    const formatter = new Intl.NumberFormat(document.documentElement.lang, { style: 'decimal', maximumFractionDigits: 0 });
+    this.dom.balanceDisplay.textContent = formatter.format(this.balance);
+    this.dom.spinsDisplay.textContent   = formatter.format(this.stats.spins);
     const lb = State.read('lastBet');
-    this.dom.lastBetDisplay.textContent = lb || '—';
+    this.dom.lastBetDisplay.textContent = lb ? formatter.format(lb) : '—';
     this._checkRefill();
   }
 
@@ -220,8 +221,9 @@ class SlotMachine {
     this.balance -= bet;
     this._saveBalance();
     State.set({ lastBet: String(bet) });
-    this.dom.balanceDisplay.textContent = this.balance;
-    this.dom.lastBetDisplay.textContent = bet;
+    const formatter = new Intl.NumberFormat(document.documentElement.lang, { style: 'decimal', maximumFractionDigits: 0 });
+    this.dom.balanceDisplay.textContent = formatter.format(this.balance);
+    this.dom.lastBetDisplay.textContent = formatter.format(bet);
 
     AudioEngine.spinStart();
 
@@ -347,9 +349,10 @@ class SlotMachine {
       toast.classList.add(type);
 
       this.dom.toastLabel.textContent  = label;
+      const formatter = new Intl.NumberFormat(document.documentElement.lang, { style: 'decimal', maximumFractionDigits: 0, signDisplay: 'always' });
       this.dom.toastAmount.textContent = winnings > 0
-        ? `+${winnings}`
-        : `-${bet}`;
+        ? formatter.format(winnings)
+        : formatter.format(-bet);
       this.dom.toastDesc.textContent   = desc;
       this.dom.toastAmount.style.color = 'var(--clr-primary, #ff3333)';
 
@@ -369,7 +372,8 @@ class SlotMachine {
     entry.className = `history-entry ${winnings > 0 ? 'win-entry' : 'loss-entry'}`;
 
     const glyphs = results.map(s => s.glyph).join(' ');
-    const net    = winnings > 0 ? `+${winnings}` : `-${bet}`;
+    const formatter = new Intl.NumberFormat(document.documentElement.lang, { style: 'decimal', maximumFractionDigits: 0, signDisplay: 'always' });
+    const net    = winnings > 0 ? formatter.format(winnings) : formatter.format(-bet);
 
     const spanGlyphs = document.createElement('span');
     spanGlyphs.textContent = glyphs;

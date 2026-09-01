@@ -198,7 +198,7 @@ button { font-family: var(--font-mono); }
   max-width: var(--max-w-content);
   left: 50%;
   transform: translateX(-50%);
-  padding: 0 var(--sp-4);
+  padding-inline: var(--sp-4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -307,8 +307,9 @@ button { font-family: var(--font-mono); }
   gap: var(--sp-4);
   width: 100%;
   max-width: var(--max-w-content);
-  padding: var(--sp-8) var(--sp-4);
-  margin: 0 auto;
+  padding-block: var(--sp-8);
+  padding-inline: var(--sp-4);
+  margin-inline: auto;
   z-index: 5;
   position: relative;
 }
@@ -317,12 +318,13 @@ button { font-family: var(--font-mono); }
 #monetization-banner {
   width: 100%;
   max-width: var(--max-w-content);
-  padding: 0 var(--sp-4) var(--sp-6);
+  padding-inline: var(--sp-4);
+  padding-block-end: var(--sp-6);
   z-index: 5;
   position: relative;
   display: flex;
   justify-content: center;
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 #monetization-banner .banner-text {
