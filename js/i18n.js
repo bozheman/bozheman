@@ -174,4 +174,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initI18n);
 } else {
   initI18n();
-
+}

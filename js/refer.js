@@ -90,6 +90,6 @@ if (qrModal) {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('visible')) {
-    window.hideQR();
+    hideQR();
   }
 });

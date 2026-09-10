@@ -137,6 +137,8 @@ class SlotMachine {
           const amount = chip.dataset.amount;
           if (amount === 'max') {
             this.dom.betInput.value = Math.max(10, Math.min(this.balance, 99999));
+          } else if (amount === 'min') {
+            this.dom.betInput.value = 10;
           } else {
             const cur = parseInt(this.dom.betInput.value, 10) || 10;
             const add = parseInt(amount, 10);
