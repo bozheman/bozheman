@@ -95,8 +95,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Init main site QR
+const mainQrCanvas = document.getElementById('main-qr-canvas');
+if (mainQrCanvas && typeof QRious !== 'undefined') {
+  new QRious({
+    element: mainQrCanvas,
+    value: 'https://bozheman.com',
+    size: 150,
+    background: 'black',
+    foreground: '#ff3333'
+  });
+}
+
 // --- CRT TOGGLE ---
-import { t } from './i18n.js';
 let crtEnabled = true;
 const crtToggle = document.getElementById('crt-toggle');
 const crtOverlay = document.getElementById('crt-overlay');
