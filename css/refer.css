@@ -137,8 +137,8 @@ body {
 /* ─── REFERRAL GRID ──────────────────────────────────────────── */
 .referral-links {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(130px, 40%), 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 1rem;
   margin-top: 0.5rem;
   width: 100%;
 }
@@ -160,25 +160,75 @@ body {
 /* ─── SPONSOR CARDS ──────────────────────────────────────────── */
 .sponsor-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.75rem 0.4rem;
-  border: 1px solid var(--clr-border);
+  justify-content: flex-start;
+  gap: 1.2rem;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid var(--clr-primary-dim, rgba(255,51,51,0.4));
+  background: rgba(10, 0, 0, 0.6);
   text-decoration: none;
   color: var(--clr-primary);
-  min-height: 44px;
-  font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+  min-height: 60px;
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.sponsor-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%; width: 4px;
+  background: var(--clr-primary);
+  transition: width 0.3s ease, opacity 0.3s ease;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+.sponsor-card:hover {
+  background: rgba(255, 51, 51, 0.1);
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.3), inset 0 0 15px rgba(255, 51, 51, 0.15);
+  transform: translateY(-2px);
+}
+
+.sponsor-card:hover::before {
+  width: 100%;
+  opacity: 0.15;
 }
 
 .sponsor-card img {
-  max-width: clamp(50px, 12vw, 80px);
-  max-height: 36px;
-  filter: drop-shadow(0 0 4px #ff3333);
-  opacity: 0.8;
+  max-width: clamp(60px, 15vw, 100px);
+  max-height: 40px;
+  filter: drop-shadow(0 0 4px rgba(255,51,51,0.5));
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
-.sponsor-card:hover img { opacity: 1; }
+
+.sponsor-card:hover img { 
+  opacity: 1; 
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 10px rgba(255,51,51,0.8));
+}
+
+.sponsor-card span {
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px rgba(255,51,51,0.3);
+  transition: text-shadow 0.3s ease;
+}
+
+.sponsor-card:hover span {
+  text-shadow: 0 0 10px rgba(255,51,51,0.8);
+}
 
 /* ─── QR MODAL ───────────────────────────────────────────────── */
 .modal-overlay {
@@ -232,7 +282,7 @@ body {
   .wallet-entry { flex-direction: column; align-items: flex-start; }
   .wallet-entry strong { min-width: auto; text-align: left; }
   .wallet-address { font-size: 0.6rem; }
-  .referral-links { grid-template-columns: repeat(2, 1fr); }
+  .referral-links { grid-template-columns: 1fr; gap: 0.5rem; }
 }
 
 /* Phones (360-767px) */
@@ -245,6 +295,6 @@ body {
 @media (min-width: 2560px) {
   .container { max-width: 1400px; }
   .wallet-address { font-size: 1rem; }
-  .referral-links { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  .referral-links { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
   .sponsor-card img { max-width: 120px; max-height: 60px; }
 }

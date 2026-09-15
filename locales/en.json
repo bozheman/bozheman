@@ -1,4 +1,4 @@
-﻿{
+{
   "title_main": "BOZHEMAN",
   "sound_off": "SOUND: OFF ",
   "sound_on": "SOUND: ON ",
@@ -55,7 +55,7 @@
   "manual_full_title": "GrowerSim – Full System Manual",
   "support_title": "BOZHEMAN ≡ SUPPORT",
   "crypto_gateways": "CRYPTO GATEWAYS",
-  "steam_protocol": "STEAM PROTOCOL",
+  "steam_send_items": "STEAM SEND ITEMS",
   "steam_send": "SEND ITEMS",
   "referral_systems": "REFERRAL SYSTEMS",
   "ref_dmarket_inv": "DMarket: Inventory (My Skins)",

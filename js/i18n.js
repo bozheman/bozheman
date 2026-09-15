@@ -94,7 +94,17 @@ const fallbackEn = {
   "select_language": "Select language",
   "meta_desc": "Streamer, game developer, and content maker.",
   "crt_on": "CRT: ON",
-  "crt_off": "CRT: OFF"
+  "crt_off": "CRT: OFF",
+  "support_title": "BOZHEMAN ≡ SUPPORT",
+  "crypto_gateways": "CRYPTO GATEWAYS",
+  "steam_send_items": "STEAM SEND ITEMS",
+  "steam_send": "SEND ITEMS",
+  "referral_systems": "REFERRAL SYSTEMS",
+  "ref_dmarket_inv": "DMarket: Inventory (My Skins)",
+  "ref_disclaimer": "* Partner links generate revenue upon registration",
+  "back_to_protocol": "< BACK TO PROTOCOL",
+  "copied": "COPIED!",
+  "error": "ERROR"
 };
 
 const dictionaryCache = { en: fallbackEn };
