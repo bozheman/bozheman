@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "skills": {
+    "dotnet-create-blazor-project": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-15T13:16:47.190Z",
+      "platform": "gemini"
+    },
+    "github-copilot-azure-static-web-apps": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-15T13:22:46.440Z",
+      "platform": "gemini",
+      "contentHash": "e893b0b968eef7c1587895450207c999b85ea04215a2ccd68fe477ac5d732c99"
+    },
+    "lifeos-webdesign": {
+      "version": "1.2.3",
+      "installedAt": "2026-09-15T13:22:48.563Z",
+      "platform": "gemini",
+      "contentHash": "2175d9d20e17ca1c85f9aad9bc09e25284eaf77867ea599ab096b90dd1e7553a"
+    },
+    "astrolicious-astro": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-15T13:22:50.146Z",
+      "platform": "gemini"
+    },
+    "vercel-agent-browser-webmcp-gen": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-15T13:22:51.710Z",
+      "platform": "gemini",
+      "contentHash": "3d08c0f5c3836fd53e0d47be53a0442d18742d6c427d5da39328c5d9bf181c6d"
+    },
+    "alirezarezvani-landing-page-generator": {
+      "version": "1.0.1",
+      "installedAt": "2026-09-15T13:22:53.306Z",
+      "platform": "gemini"
+    }
+  }
+}

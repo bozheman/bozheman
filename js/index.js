@@ -179,6 +179,8 @@ function init() {
   });
 }
 
+let innerObject;
+
 function createMainObject() {
   const geometry = new THREE.IcosahedronGeometry(1.2, 1);
   const material = new THREE.MeshStandardMaterial({
@@ -191,6 +193,19 @@ function createMainObject() {
   });
   mainObject = new THREE.Mesh(geometry, material);
   scene.add(mainObject);
+
+  // Add inner geometric core
+  const innerGeometry = new THREE.OctahedronGeometry(0.7, 0);
+  const innerMaterial = new THREE.MeshStandardMaterial({
+    color: 0x00ff88,
+    emissive: 0x00ff88,
+    emissiveIntensity: 1.2,
+    metalness: 1.0,
+    roughness: 0.1,
+    wireframe: true
+  });
+  innerObject = new THREE.Mesh(innerGeometry, innerMaterial);
+  mainObject.add(innerObject);
 }
 
 function createLinkButtons() {
@@ -210,6 +225,14 @@ function createLinkButtons() {
     if (link.isSpecial) {
       a.classList.add('special');
     }
+    
+    // Play sound on hover
+    a.addEventListener('mouseenter', () => {
+      if (!State.get().audioMuted) {
+        AudioEngine.tick();
+      }
+    });
+
     linksContainer.appendChild(a);
   });
 }
@@ -219,6 +242,10 @@ function animate() {
   if (mainObject) {
     mainObject.rotation.x += 0.005;
     mainObject.rotation.y += 0.008;
+  }
+  if (innerObject) {
+    innerObject.rotation.x -= 0.01;
+    innerObject.rotation.y -= 0.015;
   }
   controls.update();
   TWEEN.update();
@@ -235,6 +262,10 @@ function onWindowResize() {
 function onCanvasClick() {
   secretClickCounter++;
   
+  if (!State.get().audioMuted) {
+    AudioEngine.snap();
+  }
+
   if (mainObject) {
     const originalIntensity = mainObject.material.emissiveIntensity;
     new TWEEN.Tween({ intensity: originalIntensity })
@@ -245,6 +276,17 @@ function onCanvasClick() {
       .onUpdate((obj) => { mainObject.material.emissiveIntensity = obj.intensity; })
       .start();
   }
+  
+  if (innerObject) {
+    const origInner = innerObject.material.emissiveIntensity;
+    new TWEEN.Tween({ intensity: origInner })
+      .to({ intensity: 3.0 }, 100)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .yoyo(true)
+      .repeat(1)
+      .onUpdate((obj) => { innerObject.material.emissiveIntensity = obj.intensity; })
+      .start();
+  }
 
   if (secretClickCounter >= SECRET_CLICK_COUNT) {
     activateSecretProtocol();
@@ -253,8 +295,26 @@ function onCanvasClick() {
 
 function activateSecretProtocol() {
   console.log("SECRET PROTOCOL ACTIVATED!");
-  AudioEngine.glitch();
+  if (!State.get().audioMuted) {
+    AudioEngine.glitch();
+    AudioEngine.win();
+  }
   document.body.classList.add('glitch-out');
+  
+  // Fast spin before redirect
+  if (mainObject) {
+    new TWEEN.Tween(mainObject.rotation)
+      .to({ x: mainObject.rotation.x + Math.PI * 4, y: mainObject.rotation.y + Math.PI * 4 }, 1500)
+      .easing(TWEEN.Easing.Exponential.In)
+      .start();
+  }
+  if (innerObject) {
+    new TWEEN.Tween(innerObject.rotation)
+      .to({ x: innerObject.rotation.x - Math.PI * 8, y: innerObject.rotation.y - Math.PI * 8 }, 1500)
+      .easing(TWEEN.Easing.Exponential.In)
+      .start();
+  }
+
   setTimeout(() => {
     window.location.href = SECRET_LINK_URL;
   }, 1500);
@@ -277,3 +337,28 @@ function toggleSound() {
   }
 }
 
+
+// --- CRT TOGGLE ---
+const crtToggle = document.getElementById('crt-toggle');
+const crtOverlay = document.getElementById('crt-overlay');
+if (crtToggle && crtOverlay) {
+  crtToggle.addEventListener('click', () => {
+    crtOverlay.style.display = crtOverlay.style.display === 'none' ? 'block' : 'none';
+    crtToggle.querySelector('span').textContent = crtOverlay.style.display === 'none' ? 'CRT: OFF' : 'CRT: ON';
+    if (!State.get().audioMuted) AudioEngine.click();
+  });
+}
+
+// --- TERMINAL WIDGET LOGIC ---
+const terminalWidget = document.getElementById('terminal-widget');
+if (terminalWidget) {
+  const logs = ['> Establishing secure connection...', '> Bypassing ICE...', '> Fetching node data...', '> Loading modules...', '> Analyzing traffic...', '> Protocol BOZHEMAN active.'];
+  let currentLog = 0;
+  setInterval(() => {
+    const p = document.createElement('div');
+    p.textContent = logs[currentLog % logs.length] + ' [OK]';
+    terminalWidget.appendChild(p);
+    if (terminalWidget.children.length > 6) terminalWidget.removeChild(terminalWidget.firstChild);
+    currentLog++;
+  }, 2500);
+}
