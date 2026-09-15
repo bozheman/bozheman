@@ -100,16 +100,23 @@
   <div id="error-bar"></div>
 
   
-  <select id="lang-select" class="lang-select" aria-label="Select language">
-    <option value="en">English</option>
-    <option value="ru">Русский</option>
-    <option value="uk">Українська</option>
-    <option value="be">Беларуская</option>
-    <option value="pl">Polski</option>
-    <option value="de">Deutsch</option>
-    <option value="fr">Français</option>
-    <option value="es">Español</option>
-  </select>
+  <!-- CRT OVERLAY -->
+  <div id="crt-overlay" class="crt-overlay"></div>
+
+  <!-- HUD CONTROLS -->
+  <div id="hud-controls">
+    <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="be">Беларуская</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+    </select>
+    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT">CRT: ON</button>
+  </div>
 
   <script type="module" src="js/roulette.js"></script>
 </body>

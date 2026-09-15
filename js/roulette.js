@@ -430,3 +430,25 @@ if (document.readyState === 'loading') {
 } else {
   new SlotMachine();
 }
+
+// ─── CRT TOGGLE ────────────────────────────────────────────────
+let crtEnabled = true;
+const crtToggle  = document.getElementById('crt-toggle');
+const crtOverlay = document.getElementById('crt-overlay');
+
+function updateCrtLabel() {
+  if (!crtToggle) return;
+  const key = crtEnabled ? 'crt_on' : 'crt_off';
+  crtToggle.textContent = t(key);
+  crtToggle.setAttribute('data-i18n', key);
+}
+
+if (crtToggle && crtOverlay) {
+  crtToggle.addEventListener('click', () => {
+    crtEnabled = !crtEnabled;
+    crtOverlay.style.display = crtEnabled ? 'block' : 'none';
+    updateCrtLabel();
+  });
+}
+
+document.addEventListener('languagechange', updateCrtLabel);

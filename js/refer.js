@@ -2,6 +2,7 @@ import { setupMatrix } from './matrix.js';
 import { t } from './i18n.js';
 setupMatrix('matrix-canvas');
 
+
 function copyToClipboard(element) {
   const originalText = element.innerText;
   navigator.clipboard.writeText(originalText).then(() => {
@@ -93,3 +94,27 @@ document.addEventListener('keydown', (e) => {
     hideQR();
   }
 });
+
+// --- CRT TOGGLE ---
+import { t } from './i18n.js';
+let crtEnabled = true;
+const crtToggle = document.getElementById('crt-toggle');
+const crtOverlay = document.getElementById('crt-overlay');
+
+function updateCrtLabel() {
+  if (!crtToggle) return;
+  const key = crtEnabled ? 'crt_on' : 'crt_off';
+  crtToggle.textContent = t(key);
+  crtToggle.setAttribute('data-i18n', key);
+}
+
+if (crtToggle && crtOverlay) {
+  crtToggle.addEventListener('click', () => {
+    crtEnabled = !crtEnabled;
+    crtOverlay.style.display = crtEnabled ? 'block' : 'none';
+    updateCrtLabel();
+  });
+}
+
+document.addEventListener('languagechange', updateCrtLabel);
+

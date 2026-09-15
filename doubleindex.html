@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
-  <title>BOZHEMAN ≡ ИЛЛЮЗИЯ</title>
-  <meta name="description" content="BOZHEMAN ≡ ИЛЛЮЗИЯ — терминал протокола." />
-  <meta property="og:title" content="BOZHEMAN ≡ ИЛЛЮЗИЯ" />
-  <meta property="og:description" content="Терминал протокола BOZHEMAN." />
+  <title>BOZHEMAN ≡ ILLUSION</title>
+  <meta name="description" content="BOZHEMAN ≡ ILLUSION — terminal protocol." />
+  <meta property="og:title" content="BOZHEMAN ≡ ILLUSION" />
+  <meta property="og:description" content="BOZHEMAN Protocol Terminal." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bozheman.com/doubleindex.html" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="BOZHEMAN ≡ ИЛЛЮЗИЯ" />
+  <meta name="twitter:title" content="BOZHEMAN ≡ ILLUSION" />
   <meta name="twitter:image" content="assets/images/gg.png" />
   <link rel="canonical" href="https://bozheman.com/doubleindex.html" />
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
@@ -29,33 +29,37 @@
   <main class="terminal-window" id="terminal">
     <h1 data-text="ILLUSION" data-i18n="illusion_title">ILLUSION</h1>
     <div id="fragment-display">
-        <p data-i18n="illusion_click">[CLICK TO BEHOLD]</p>
+      <p data-i18n="illusion_click">[CLICK TO BEHOLD]</p>
     </div>
     <div id="countdown-timer">
-        <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span>
-        <div id="progress-bar">
-            <div id="progress-bar-inner"></div>
-        </div>
+      <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span>
+      <div id="progress-bar">
+        <div id="progress-bar-inner"></div>
+      </div>
     </div>
   </main>
-  
+
   <audio id="ambient-audio" preload="auto" loop>
     <source src="assets/audio/omega2.m4a" type="audio/mp4" />
   </audio>
-  
-  <select id="lang-select" class="lang-select" aria-label="Select language">
-    <option value="en">English</option>
-    <option value="ru">Русский</option>
-    <option value="uk">Українська</option>
-    <option value="be">Беларуская</option>
-    <option value="pl">Polski</option>
-    <option value="de">Deutsch</option>
-    <option value="fr">Français</option>
-    <option value="es">Español</option>
-  </select>
-  
-  <script type="module" src="js/doubleindex.js"></script>
 
+  <!-- SKIP BUTTON -->
+  <button id="skip-btn" class="hud-btn skip-btn" data-i18n="preloader_skip" aria-label="Skip to roulette">[ SKIP ]</button>
+
+  <!-- HUD CONTROLS -->
+  <div id="hud-controls">
+    <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="be">Беларуская</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+
+  <script type="module" src="js/doubleindex.js"></script>
 </body>
 </html>
-
