@@ -1,4 +1,4 @@
-{
+﻿{
   "title_main": "BOZHEMAN",
   "sound_off": "SOUND: OFF ",
   "sound_on": "SOUND: ON ",
@@ -88,4 +88,12 @@
   "illusion_title": "ILLUSION",
   "illusion_click": "[CLICK TO BEHOLD]",
   "illusion_redirect": "REDIRECTING PROTOCOL..."
+,
+  "sound_toggle_aria": "Basculer le son",
+  "crt_on": "CRT: ON",
+  "meta_desc": "Streameur, développeur de jeux et créateur de contenu.",
+  "crt_off": "CRT: OFF",
+  "canvas_matrix": "Animation Matrix en arrière-plan",
+  "canvas_scene": "Objet 3D interactif",
+  "select_language": "Choisir la langue"
 }

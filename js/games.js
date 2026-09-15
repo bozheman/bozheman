@@ -200,29 +200,44 @@ if (notifyBtn) {
 }
 
 // --- CRT TOGGLE ---
+let crtEnabled = true;
 const crtToggle = document.getElementById('crt-toggle');
 const crtOverlay = document.getElementById('crt-overlay');
+
+function updateCrtLabel() {
+  if (!crtToggle) return;
+  const key = crtEnabled ? 'crt_on' : 'crt_off';
+  crtToggle.textContent = t(key);
+  crtToggle.setAttribute('data-i18n', key);
+}
+
 if (crtToggle && crtOverlay) {
   crtToggle.addEventListener('click', () => {
-    crtOverlay.style.display = crtOverlay.style.display === 'none' ? 'block' : 'none';
-    crtToggle.querySelector('span').textContent = crtOverlay.style.display === 'none' ? 'CRT: OFF' : 'CRT: ON';
+    crtEnabled = !crtEnabled;
+    crtOverlay.style.display = crtEnabled ? 'block' : 'none';
+    updateCrtLabel();
   });
 }
 
-// --- 3D HOVER EFFECTS ---
-const cards = document.querySelectorAll('.game-card');
-cards.forEach(card => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-    card.style.transform = \perspective(1000px) scale(1.02) rotateX(\deg) rotateY(\deg)\;
+// Re-apply CRT label on language change
+document.addEventListener('languagechange', updateCrtLabel);
+
+// --- 3D HOVER EFFECTS (desktop only) ---
+if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  const cards = document.querySelectorAll('.game-card:not(.dummy-card)');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
+      card.style.transform = `perspective(1000px) scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = `perspective(1000px) scale(1) rotateX(0deg) rotateY(0deg)`;
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = \perspective(1000px) scale(1) rotateX(0) rotateY(0)\;
-  });
-});
+}

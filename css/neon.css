@@ -1,188 +1,51 @@
 /* =============================================
-   BOZHEMAN ≡ PROTOCOL  ‖  Neon Red Overhaul & Accessibility v2.0
+   BOZHEMAN ≡ PROTOCOL  ‖  Neon Effects v3.0
+   Global neon polish — imported AFTER main.css
    ============================================= */
 
-/* 1. Global Reset & Accessibility Base */
-*, *::before, *::after {
-  -webkit-tap-highlight-color: transparent;
-}
+/* 1. Cyberpunk Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #080000; border-left: 1px solid rgba(255,51,51,0.2); }
+::-webkit-scrollbar-thumb { background: var(--clr-primary-dim, #a30000); border-radius: 2px; box-shadow: 0 0 8px var(--clr-primary, #ff3333); }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-primary, #ff3333); }
+* { scrollbar-width: thin; scrollbar-color: var(--clr-primary-dim, #a30000) #080000; }
 
-body {
-  background-color: var(--clr-bg, #000000) !important;
-  color: var(--clr-primary, #ff3333);
-  text-shadow: 0 0 4px rgba(255, 51, 51, 0.4);
-}
-
-/* Custom Cyberpunk Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #080000;
-  border-left: 1px solid rgba(255, 51, 51, 0.2);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--clr-primary-dim, #a30000);
-  border-radius: 2px;
-  box-shadow: 0 0 8px var(--clr-primary, #ff3333);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--clr-primary, #ff3333);
-}
-
-/* Firefox scrollbar support */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--clr-primary-dim, #a30000) #080000;
-}
-
-/* Keyboard Focus States (WCAG AAA) */
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 2px solid var(--clr-primary, #ff3333) !important;
-  outline-offset: 3px !important;
-  box-shadow: 0 0 12px var(--clr-primary, #ff3333) !important;
-}
-
-/* Enhanced Headings & Glowing Text */
+/* 2. Glowing Headings */
 h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
   line-height: 1.2;
   color: var(--clr-primary, #ff3333);
-  text-shadow: 
+  text-shadow:
     0 0 5px var(--clr-primary, #ff3333),
-    0 0 15px rgba(255, 51, 51, 0.6),
-    0 0 30px rgba(255, 0, 0, 0.4);
+    0 0 15px rgba(255,51,51,0.6),
+    0 0 30px rgba(255,0,0,0.4);
 }
 
-/* 2. Cyber-Punk Language Select Dropdown */
-.lang-select {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  background: var(--clr-surface, rgba(8, 0, 0, 0.9));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 2px solid var(--clr-primary, #ff3333);
-  color: var(--clr-primary, #ff3333);
-  padding: 0.5rem 0.8rem;
-  font-family: var(--font-mono, 'Fira Code', monospace);
-  font-size: var(--fs-xs, 0.75rem);
-  font-weight: bold;
-  cursor: pointer;
-  outline: none;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
-  transition: all var(--t-med, 0.3s ease);
-  z-index: 1000;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ff3333' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 0.6rem center;
-  padding-right: 1.8rem;
-}
+/* 3. Button Neon Polish */
+.btn-glitch { box-shadow: 0 0 10px rgba(255,51,51,0.2); will-change: transform, box-shadow; }
 
-.lang-select:hover, .lang-select:focus {
-  background-color: var(--clr-primary-dim, #a30000);
-  color: var(--clr-primary, #ff3333);
-  border-color: var(--clr-primary, #ff3333);
-  box-shadow: 0 0 18px rgba(255, 51, 51, 0.7);
-  transform: scale(1.03);
-}
+/* 4. Icon filter */
+svg, .sound-icon { filter: drop-shadow(0 0 4px var(--clr-primary, #ff3333)); }
 
-.lang-select option {
-  background-color: #0d0000;
-  color: var(--clr-primary, #ff3333);
-  font-family: var(--font-mono, monospace);
-  padding: 0.4rem;
-}
-
-/* 3. Intensified Glitch & Scanline Effects */
-.scanlines-effect {
-  will-change: transform;
-}
-
+/* 5. Scanlines intensity tweak */
 .scanlines-effect::after {
-  background: 
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.08), rgba(0, 0, 0, 0.02), rgba(255, 0, 0, 0.08));
+  background:
+    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.35) 50%),
+    linear-gradient(90deg, rgba(255,0,0,0.08), rgba(0,0,0,0.02), rgba(255,0,0,0.08));
   background-size: 100% 3px, 5px 100%;
   animation: scanline 8s linear infinite !important;
-  will-change: background-position;
 }
 
+/* 6. Body subtle glow */
+body { text-shadow: 0 0 4px rgba(255,51,51,0.4); }
+
+/* 7. Glitch-intense animation class */
 .glitch-intense {
   animation: glitch-anim 0.3s infinite alternate;
   filter: contrast(1.5);
-  will-change: transform, text-shadow;
-}
-
-@keyframes scanline {
-  from { background-position: 0 0; }
-  to   { background-position: 0 -100vh; }
 }
 
 @keyframes glitch-anim {
-  0% {
-    text-shadow: 2px 0 #ff0000, -2px 0 #a30000;
-  }
-  50% {
-    text-shadow: -3px 0 #ff3333, 3px 0 #600000;
-  }
-  100% {
-    text-shadow: 2px 0 #ff0000, -2px 0 #ff3333;
-  }
-}
-
-/* 4. Recolor Icons via Filters */
-svg, img.icon, .sound-icon {
-  filter: drop-shadow(0 0 4px var(--clr-primary, #ff3333));
-}
-
-/* 5. Cyber Buttons Neon Polish */
-.btn-glitch {
-  box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
-  will-change: transform, box-shadow;
-}
-
-.btn-glitch:hover {
-  box-shadow: 0 0 20px rgba(255, 51, 51, 0.6), 0 0 35px rgba(255, 0, 222, 0.3);
-}
-
-/* 6. Responsive Fixes for Small Devices (< 480px) */
-@media (max-width: 480px) {
-  .lang-select {
-    bottom: 1rem;
-    left: 1rem;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.7rem;
-    padding-right: 1.5rem;
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  #sound-toggle {
-    bottom: 1rem;
-    right: 1rem;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.7rem;
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .btn-glitch {
-    padding: 0.75rem;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .lang-select, #sound-toggle {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.5rem;
-  }
+  0%   { text-shadow: 2px 0 #ff0000, -2px 0 #a30000; }
+  50%  { text-shadow: -3px 0 #ff3333, 3px 0 #600000; }
+  100% { text-shadow: 2px 0 #ff0000, -2px 0 #ff3333; }
 }

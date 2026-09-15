@@ -1,4 +1,4 @@
-{
+﻿{
   "title_main": "BOZHEMAN",
   "sound_off": "SOUND: OFF ",
   "sound_on": "SOUND: ON ",
@@ -88,4 +88,12 @@
   "illusion_title": "ИЛЛЮЗИЯ",
   "illusion_click": "[КЛИКНИТЕ, ЧТОБЫ УВИДЕТЬ]",
   "illusion_redirect": "ПЕРЕАДРЕСАЦИЯ ПРОТОКОЛА..."
+,
+  "sound_toggle_aria": "Пераключыць гук",
+  "crt_on": "CRT: УКЛ",
+  "meta_desc": "Стрымер, распрацоўшчык гульняў і кантэнт-мэйкер.",
+  "crt_off": "CRT: ВЫКЛ",
+  "canvas_matrix": "Фонавая анімацыя матрыцы",
+  "canvas_scene": "Інтэрактыўны 3D аб'ект",
+  "select_language": "Выбраць мову"
 }

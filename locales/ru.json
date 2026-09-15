@@ -87,5 +87,12 @@
   "slots_refill_success": "✓ +1000 ДОБАВЛЕНО",
   "illusion_title": "ИЛЛЮЗИЯ",
   "illusion_click": "[КЛИКНИТЕ, ЧТОБЫ УВИДЕТЬ]",
-  "illusion_redirect": "ПЕРЕАДРЕСАЦИЯ ПРОТОКОЛА..."
+  "illusion_redirect": "ПЕРЕАДРЕСАЦИЯ ПРОТОКОЛА...",
+  "sound_toggle_aria": "Переключить звук",
+  "canvas_matrix": "Фоновая анимация матрицы",
+  "canvas_scene": "Интерактивный 3D объект",
+  "select_language": "Выбрать язык",
+  "meta_desc": "Стример, разработчик игр и контент-мейкер.",
+  "crt_on": "CRT: ВКЛ",
+  "crt_off": "CRT: ВЫКЛ"
 }

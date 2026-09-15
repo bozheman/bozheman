@@ -485,21 +485,83 @@ body {
   border-color: var(--clr-primary);
 }
 
+/* ─── DUMMY CARDS (CLASSIFIED/IN DEV) ──────────────────────── */
+.dummy-card {
+  opacity: 0.55;
+  border-style: dashed;
+  cursor: not-allowed;
+  user-select: none;
+}
+.dummy-card:hover {
+  transform: none !important;
+  opacity: 0.65;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
-@media (max-width: 768px) {
+
+/* Feature phones (240-359px) */
+@media (max-width: 359px) {
+  .container { padding: 0 var(--sp-2); gap: var(--sp-3); }
+  .page-title { font-size: 1rem; }
+  .games-grid { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .game-card { padding: var(--sp-3); }
+  .game-title { font-size: 1rem; }
+  .card-actions { flex-direction: column; }
+  .modal-window { max-height: 96vh; margin: 0.5rem; }
+  .modal-body { padding: var(--sp-3); }
+  .modal-footer { flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+  .manual-nav { flex-direction: column; }
+  .manual-tab { font-size: 0.65rem; padding: var(--sp-2); }
+}
+
+/* Small phones (360-479px) */
+@media (min-width: 360px) and (max-width: 479px) {
+  .page-title { font-size: 1.1rem; }
+  .games-grid { grid-template-columns: 1fr; }
+  .game-card { padding: var(--sp-4); }
+  .modal-window { max-height: 94vh; }
+  .modal-footer { flex-direction: column; align-items: center; gap: var(--sp-2); }
+  .card-actions { flex-direction: column; width: 100%; }
+  .manual-tab { font-size: 0.7rem; padding: var(--sp-2) var(--sp-3); }
+}
+
+/* Phones (480-767px) */
+@media (max-width: 767px) {
   .page-title { font-size: var(--fs-lg); }
   .games-grid { grid-template-columns: 1fr; }
   .modal-window { max-height: 92vh; }
-  .modal-footer { flex-direction: column; align-items: center; }
   .card-actions { flex-direction: column; width: 100%; }
 }
 
-@media (max-width: 480px) {
-  .container { padding: 0 var(--sp-2); }
-  .game-card { padding: var(--sp-4); }
+/* Tablets (768-1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .games-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* --- MAN-PAGE STYLING --------------------------------------- */
+/* Desktop (1024-1919px) */
+@media (min-width: 1024px) {
+  .games-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+}
+
+/* Large desktop (1920px+) */
+@media (min-width: 1920px) {
+  .games-grid { grid-template-columns: repeat(3, 1fr); gap: var(--sp-8); }
+  .game-card { padding: var(--sp-8); }
+  .game-title { font-size: 2rem; }
+  .game-description { font-size: 1rem; }
+}
+
+/* 4K (2560px+) */
+@media (min-width: 2560px) {
+  .games-grid { grid-template-columns: repeat(3, 1fr); gap: var(--sp-10); }
+  .game-card { padding: var(--sp-10); }
+  .game-title { font-size: 2.5rem; }
+  .game-description { font-size: 1.1rem; }
+  .tag { font-size: 0.85rem; }
+  .modal-window { max-width: 1000px; }
+}
+
+/* ─── MAN-PAGE STYLING ─────────────────────────────────────── */
 .manual-page .manual-content {
   background: rgba(0, 15, 0, 0.9);
   border: 1px solid #00ff00;
@@ -510,23 +572,29 @@ body {
   box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
   width: 100%;
 }
+
 .manual-page h2 {
   text-transform: uppercase;
   border-bottom: 1px dashed #00ff00;
   padding-bottom: 10px;
   margin-bottom: 20px;
+  color: #00ff00;
+  text-shadow: 0 0 10px rgba(0,255,0,0.5);
 }
+
 .manual-page .full-tab h3 {
   color: #fff;
   background: #008800;
   display: inline-block;
   padding: 2px 8px;
   margin-top: 20px;
+  text-shadow: none;
 }
+
 .manual-page li {
   margin-bottom: 8px;
   list-style: square inside;
 }
-.manual-page li strong {
-  color: #afffaf;
-}
+
+.manual-page li strong { color: #afffaf; }
+

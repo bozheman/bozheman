@@ -179,23 +179,24 @@
     </div>
   </div>
 
-  <!-- CRT OVERLAY & TOGGLE -->
+  <!-- CRT OVERLAY -->
   <div id="crt-overlay" class="crt-overlay"></div>
-  <button id="crt-toggle" class="sound-toggle" style="top: 20px;" aria-label="Toggle CRT">
-    <span>CRT: ON</span>
-  </button>
 
-  <select id="lang-select" class="lang-select" aria-label="Select language">
-    <option value="en">English</option>
-    <option value="ru">Русский</option>
-    <option value="uk">Українська</option>
-    <option value="be">Беларуская</option>
-    <option value="pl">Polski</option>
-    <option value="de">Deutsch</option>
-    <option value="fr">Français</option>
-    <option value="es">Español</option>
-  </select>
+  <!-- HUD CONTROLS -->
+  <div id="hud-controls">
+    <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="be">Беларуская</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+    </select>
+    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT">CRT: ON</button>
+  </div>
 
   <script type="module" src="js/games.js"></script>
 </body>
-</html>
+</html>

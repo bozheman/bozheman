@@ -92,7 +92,9 @@ const fallbackEn = {
   "canvas_matrix": "Matrix Code Rain Background Animation",
   "canvas_scene": "Interactive 3D Object",
   "select_language": "Select language",
-  "meta_desc": "Streamer, game developer, and content maker."
+  "meta_desc": "Streamer, game developer, and content maker.",
+  "crt_on": "CRT: ON",
+  "crt_off": "CRT: OFF"
 };
 
 const dictionaryCache = { en: fallbackEn };
