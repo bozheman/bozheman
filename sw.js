@@ -1,6 +1,6 @@
-/* BOZHEMAN ≡ PROTOCOL - Service Worker v2.0 */
+/* BOZHEMAN ≡ PROTOCOL - Service Worker v3.0 */
 
-const CACHE_NAME = 'bozheman-cache-v2';
+const CACHE_NAME = 'bozheman-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -23,12 +23,21 @@ const ASSETS_TO_CACHE = [
   './js/matrix.js',
   './js/i18n.js',
   './js/state.js',
+  './js/hud.js',
   './js/firebase-config.js',
   './js/manual_full.js',
   './js/engine/audio.js',
   './js/engine/constants.js',
   './js/engine/particles.js',
   './js/engine/reel.js',
+  './locales/ru.json',
+  './locales/en.json',
+  './locales/uk.json',
+  './locales/be.json',
+  './locales/pl.json',
+  './locales/de.json',
+  './locales/fr.json',
+  './locales/es.json',
   './manifest.json',
   './assets/images/gg.png',
   './assets/images/avatar.png',
@@ -42,7 +51,6 @@ const ASSETS_TO_CACHE = [
   './assets/audio/omega.m4a',
   './assets/audio/omega2.m4a'
 ];
-
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -64,11 +72,10 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  
+
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       if (cachedResponse) {
-        // Fetch fresh copy in background
         fetch(event.request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse));

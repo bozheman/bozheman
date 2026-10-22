@@ -10,17 +10,18 @@
   /* Palette */
   --clr-bg:            #000000;
   --clr-surface:       rgba(8, 0, 0, 0.45);
-  --clr-surface-heavy: rgba(8, 0, 0, 0.72);
+  --clr-surface-heavy: rgba(8, 0, 0, 0.78);
   --clr-border:        rgba(255, 51, 51, 0.28);
-  --clr-border-bright: rgba(255, 51, 51, 0.55);
+  --clr-border-bright: rgba(255, 51, 51, 0.65);
   --clr-primary:       #ff3333;
   --clr-primary-dim:   #a30000;
-  --clr-white:         #ff3333;
-  --clr-success:       #ff3333;
+  --clr-white:         #ffffff;
+  --clr-success:       #00ff88;
+  --clr-pink:          #ff00de;
   --clr-glow:          #ff0000;
-  --clr-gold:          #ff4d4d;
+  --clr-gold:          #ffd700;
   --clr-matrix:        #a30000;
-  --clr-text-muted:    rgba(255, 51, 51, 0.6);
+  --clr-text-muted:    rgba(255, 51, 51, 0.62);
 
   /* Typography — fluid scale */
   --font-mono:  'Fira Code', 'Courier New', monospace;
@@ -497,22 +498,202 @@ body.glitch-out::after {
 
 
 /* ──────────────────────────────────────────────
-   11. TERMINAL WIDGET
+   11. INTERACTIVE CYBER TERMINAL & ACHIEVEMENTS
    ────────────────────────────────────────────── */
-#terminal-widget {
+.hud-btn.active-hud {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.45);
+}
+
+#terminal-widget.cyber-terminal {
   position: fixed;
-  bottom: clamp(5rem, 12vh, 8rem);
+  bottom: clamp(0.75rem, 2vh, 1.5rem);
   left: clamp(0.75rem, 2vw, 1.5rem);
-  width: clamp(180px, 25vw, 280px);
-  max-height: 120px;
-  font-size: clamp(0.55rem, 1.3vw, 0.72rem);
-  color: var(--clr-primary-dim);
+  width: clamp(230px, 28vw, 340px);
+  background: rgba(6, 0, 0, 0.82);
+  border: 1px solid rgba(255, 51, 51, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+  color: var(--clr-primary);
   text-align: left;
+  z-index: 210;
+  pointer-events: all;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.85), 0 0 10px rgba(255, 51, 51, 0.18);
+  transition: width 0.25s ease, max-height 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+  opacity: 0.88;
+  border-radius: 3px;
   overflow: hidden;
+}
+
+#terminal-widget.cyber-terminal:hover,
+#terminal-widget.cyber-terminal.expanded {
+  opacity: 1;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 25px rgba(255, 51, 51, 0.4);
+}
+
+#terminal-widget.cyber-terminal.expanded {
+  width: min(520px, calc(100vw - 1.5rem));
+  z-index: 950;
+}
+
+.cyber-term-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  background: rgba(163, 0, 0, 0.28);
+  border-bottom: 1px solid rgba(255, 51, 51, 0.3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.cyber-term-title {
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--clr-primary);
+}
+
+.cyber-term-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cyber-term-ping {
+  font-size: 0.6rem;
+  color: var(--clr-success);
+  opacity: 0.85;
+}
+
+.cyber-term-expand {
+  color: var(--clr-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0 0.2rem;
+}
+
+.cyber-term-logs {
+  padding: 0.45rem 0.6rem;
+  max-height: 92px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  font-family: var(--font-mono);
+}
+
+#terminal-widget.cyber-terminal.expanded .cyber-term-logs {
+  max-height: 240px;
+}
+
+.cyber-log-line {
+  line-height: 1.35;
+  word-break: break-word;
+}
+.cyber-log-line.log-sys       { color: rgba(255, 51, 51, 0.72); }
+.cyber-log-line.log-info      { color: #ff8080; }
+.cyber-log-line.log-highlight { color: var(--clr-gold); text-shadow: 0 0 6px rgba(255, 215, 0, 0.4); }
+.cyber-log-line.log-cmd       { color: var(--clr-success); font-weight: 700; }
+.cyber-log-line.log-err       { color: var(--clr-pink); }
+
+.cyber-term-form {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-top: 1px dashed rgba(255, 51, 51, 0.35);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+#terminal-widget.cyber-terminal.expanded .cyber-term-form {
+  display: flex;
+}
+
+.cyber-term-prompt {
+  color: var(--clr-success);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.cyber-term-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--clr-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  outline: none;
+}
+
+.cyber-term-input::placeholder {
+  color: rgba(255, 51, 51, 0.4);
+}
+
+/* Achievement Toast */
+.ach-toast {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.1rem;
+  background: rgba(10, 0, 0, 0.95);
+  border: 2px solid var(--clr-gold);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 12px rgba(255, 51, 51, 0.2);
+  color: var(--clr-primary);
+  max-width: min(360px, 92vw);
+  text-align: left;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   pointer-events: none;
-  z-index: 50;
-  text-shadow: 0 0 5px var(--clr-primary-dim);
-  opacity: 0.7;
+}
+
+.ach-toast.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.ach-toast-icon {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 8px var(--clr-gold));
+}
+
+.ach-toast-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--clr-gold);
+  font-weight: 700;
+}
+
+.ach-toast-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 8px var(--clr-primary);
+}
+
+.ach-toast-desc {
+  font-size: 0.68rem;
+  color: rgba(255, 51, 51, 0.85);
+}
+
+/* Live balance badge on navigation buttons */
+.nav-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.08rem 0.4rem;
+  font-size: 0.68em;
+  border: 1px solid var(--clr-gold);
+  color: var(--clr-gold);
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 2px;
+  vertical-align: middle;
 }
 
 
@@ -539,7 +720,7 @@ body.glitch-out::after {
 
 
 /* ──────────────────────────────────────────────
-   13. RESPONSIVE BREAKPOINTS
+   13. RESPONSIVE BREAKPOINTS & REDUCED MOTION
    ────────────────────────────────────────────── */
 
 /* --- Feature phones / very small (240–359px) --- */
@@ -551,13 +732,13 @@ body.glitch-out::after {
   .preloader-skip-hint { bottom: 1.5rem; font-size: 0.55rem; }
   #hud-controls { gap: 0.25rem; }
   .hud-btn, .lang-select { font-size: 0.6rem; padding: 0.3rem 0.5rem; min-height: 1.8rem; }
-  #terminal-widget { display: none; }
+  #terminal-widget.cyber-terminal:not(.expanded) { display: none; }
 }
 
 /* --- Small phones (360–479px) --- */
 @media (min-width: 360px) and (max-width: 479px) {
   #links-container { grid-template-columns: 1fr; }
-  #terminal-widget { display: none; }
+  #terminal-widget.cyber-terminal:not(.expanded) { display: none; }
 }
 
 /* --- Standard phones (480–767px) --- */
@@ -565,6 +746,7 @@ body.glitch-out::after {
   #scene-container { height: clamp(180px, 36vh, 320px); }
   #links-container { grid-template-columns: 1fr; padding-inline: var(--sp-3); }
   .hud-btn, .lang-select { font-size: 0.65rem; }
+  #terminal-widget.cyber-terminal:not(.expanded) { max-width: 210px; }
 }
 
 /* --- Tablets (768–1023px) --- */
@@ -591,6 +773,14 @@ body.glitch-out::after {
   #links-container { max-width: var(--max-w-content); grid-template-columns: repeat(3, 1fr); gap: var(--sp-8); }
   #monetization-banner { max-width: var(--max-w-content); }
   .hud-btn, .lang-select { min-height: 3rem; padding: 0.6rem 1rem; }
-  #terminal-widget { width: 360px; font-size: 0.9rem; }
+  #terminal-widget.cyber-terminal { width: 420px; font-size: 0.9rem; }
   .crt-overlay { background-size: 100% 3px, 4px 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

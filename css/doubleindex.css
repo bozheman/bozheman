@@ -160,3 +160,42 @@ h1 {
   #fragment-display { font-size: 1.4rem; min-height: 320px; }
   .fragment-title { font-size: 1.3rem; }
 }
+
+/* ─── v3.0 FRAGMENT PROGRESS & NAVIGATION CONTROLS ────────── */
+.fragment-meta {
+  font-size: var(--fs-xs);
+  color: var(--clr-gold);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+.fragment-controls {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  z-index: 10;
+}
+
+.frag-btn {
+  background: rgba(255, 51, 51, 0.12);
+  border: 1px solid var(--clr-primary);
+  color: var(--clr-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.frag-btn:hover {
+  background: var(--clr-primary-dim);
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.5);
+}
+
+.frag-btn.active {
+  border-color: var(--clr-gold);
+  color: var(--clr-gold);
+}

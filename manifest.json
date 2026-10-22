@@ -6,13 +6,36 @@
   "background_color": "#000000",
   "theme_color": "#ff3333",
   "orientation": "any",
-  "description": "BOZHEMAN ≡ PROTOCOL — Streamer, Game Developer & Content Creator.",
+  "description": "BOZHEMAN ≡ PROTOCOL v7.0 — Cyberpunk Hub, Slots 777, GrowerSim & Game Dev.",
   "icons": [
     {
       "src": "assets/images/gg.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "BOZHEMAN SLOTS 777",
+      "short_name": "Slots 777",
+      "description": "Play BOZHEMAN Cyberpunk Slots 777",
+      "url": "./roulet.html",
+      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "GAMES HUB",
+      "short_name": "Games Hub",
+      "description": "Explore BOZHEMAN Games & Telegram Bots",
+      "url": "./games.html",
+      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "SUPPORT & CRYPTO",
+      "short_name": "Support",
+      "description": "Crypto Gateways & Referral Links",
+      "url": "./refer.html",
+      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
     }
   ]
 }

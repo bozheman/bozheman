@@ -561,33 +561,108 @@ body {
   .modal-window { max-width: 1000px; }
 }
 
-/* ─── MAN-PAGE STYLING ─────────────────────────────────────── */
+/* ─── SEARCH & FILTER CONTROLS ─────────────────────────────── */
+.search-wrap {
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+}
+
+.project-search {
+  width: 100%;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  padding: 0.55rem 0.9rem;
+  outline: none;
+  transition: all var(--t-fast);
+}
+
+.project-search::placeholder {
+  color: rgba(255, 51, 51, 0.45);
+}
+
+.project-search:focus {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.4);
+}
+
+.filter-count {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  font-size: 0.6rem;
+  background: rgba(255, 51, 51, 0.18);
+  border-radius: 2px;
+  color: var(--clr-gold);
+}
+
+/* Dev progress bar */
+.dev-progress-wrap {
+  width: 100%;
+  margin-bottom: var(--sp-3);
+  text-align: left;
+}
+.dev-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--clr-text-muted);
+  margin-bottom: 4px;
+}
+.dev-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 51, 51, 0.12);
+  border: 1px solid var(--clr-border);
+  overflow: hidden;
+}
+.dev-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--clr-primary-dim), var(--clr-primary));
+  box-shadow: 0 0 8px var(--clr-primary);
+}
+
+.slots-card {
+  border-color: rgba(255, 215, 0, 0.45);
+}
+.slots-card:hover {
+  border-color: var(--clr-gold);
+  box-shadow: 0 0 22px rgba(255, 215, 0, 0.35);
+}
+
+/* ─── MAN-PAGE STYLING (UNIFIED CYBERPUNK RED/GOLD/GREEN) ──── */
 .manual-page .manual-content {
-  background: rgba(0, 15, 0, 0.9);
-  border: 1px solid #00ff00;
-  color: #00ff00;
+  background: rgba(8, 0, 0, 0.88);
+  border: 1px solid var(--clr-border-bright);
+  color: var(--clr-primary);
   padding: var(--sp-6);
   text-align: left;
   font-family: var(--font-mono);
-  box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 25px rgba(255, 51, 51, 0.2), inset 0 0 20px rgba(255, 51, 51, 0.1);
   width: 100%;
+  backdrop-filter: blur(8px);
 }
 
 .manual-page h2 {
   text-transform: uppercase;
-  border-bottom: 1px dashed #00ff00;
+  border-bottom: 1px dashed var(--clr-primary);
   padding-bottom: 10px;
   margin-bottom: 20px;
-  color: #00ff00;
-  text-shadow: 0 0 10px rgba(0,255,0,0.5);
+  color: var(--clr-primary);
+  text-shadow: var(--shadow-primary);
 }
 
 .manual-page .full-tab h3 {
-  color: #fff;
-  background: #008800;
+  color: #000000;
+  background: var(--clr-primary);
   display: inline-block;
-  padding: 2px 8px;
+  padding: 2px 10px;
   margin-top: 20px;
+  margin-bottom: 8px;
+  font-weight: 700;
   text-shadow: none;
 }
 
@@ -596,5 +671,56 @@ body {
   list-style: square inside;
 }
 
-.manual-page li strong { color: #afffaf; }
+.manual-page li strong { color: var(--clr-gold); }
+
+/* Interactive Harvest & Genetics Calculator */
+.calc-box {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border: 1px solid var(--clr-gold);
+  background: rgba(20, 0, 0, 0.65);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+}
+
+.calc-box h3 {
+  color: var(--clr-gold) !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: var(--fs-xs);
+}
+
+.calc-field select,
+.calc-field input {
+  background: #080000;
+  border: 1px solid var(--clr-primary);
+  color: var(--clr-primary);
+  padding: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+
+.calc-result {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-left: 3px solid var(--clr-success);
+  background: rgba(0, 255, 136, 0.07);
+  color: var(--clr-success);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
 

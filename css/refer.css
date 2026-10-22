@@ -298,3 +298,71 @@ body {
   .referral-links { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
   .sponsor-card img { max-width: 120px; max-height: 60px; }
 }
+
+/* ─── v3.0 CRYPTO ICONS, NETWORK BADGES & QR ACTIONS ───────── */
+.coin-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 155px;
+  flex-shrink: 0;
+}
+
+.coin-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--clr-primary);
+  box-shadow: 0 0 8px rgba(255, 51, 51, 0.45);
+}
+
+.net-badge {
+  font-size: 0.58rem;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--clr-gold);
+  color: var(--clr-gold);
+  background: rgba(255, 215, 0, 0.08);
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.copy-btn {
+  background: rgba(255, 51, 51, 0.12);
+  border: 1px solid var(--clr-primary);
+  color: var(--clr-primary);
+  font-family: var(--font-mono);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-height: 36px;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+  font-weight: 700;
+}
+
+.copy-btn:hover {
+  background: var(--clr-primary-dim);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+.qr-modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.qr-net-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-gold);
+  letter-spacing: 0.08em;
+}

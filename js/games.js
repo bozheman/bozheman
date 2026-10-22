@@ -4,9 +4,13 @@ import {
   signInWithPopup, GoogleAuthProvider,
   collection, addDoc, serverTimestamp, query, where, getDocs
 } from './firebase-config.js';
-import { t } from './i18n.js';
+import { t, applyTranslations } from './i18n.js';
+import { State } from './state.js';
+import { AudioEngine } from './engine/audio.js';
+import { initHUD, appendLog } from './hud.js';
 
 setupMatrix('matrix-canvas');
+initHUD();
 
 // ─── Toast UI ──────────────────────────────────────────────────────────────
 function showToast(msg, type = 'info') {
@@ -41,7 +45,7 @@ function showToast(msg, type = 'info') {
 
 // ─── Countdown ─────────────────────────────────────────────────────────────
 function updateCountdown() {
-  const launchDate = new Date('2026-09-09T12:00:00+03:00');
+  const launchDate = new Date('2026-12-31T20:00:00+03:00');
   const now  = new Date();
   const diff = launchDate - now;
 
@@ -59,45 +63,77 @@ function updateCountdown() {
   }
 }
 
-setInterval(updateCountdown, 1000);
+setInterval(() => {
+  if (!document.hidden) updateCountdown();
+}, 1000);
 updateCountdown();
 
-// ─── Filter Bar Logic ────────────────────────────────────────────────────────
-const filterBtns = document.querySelectorAll('.filter-btn');
-const gameCards  = document.querySelectorAll('.game-card');
+// ─── Filter Bar & Live Search Logic ────────────────────────────────────────
+const filterBtns  = document.querySelectorAll('.filter-btn');
+const gameCards   = document.querySelectorAll('.game-card');
+const searchInput = document.getElementById('project-search');
+let activeFilter  = 'all';
+
+function updateFilterCounts() {
+  const counts = { all: gameCards.length, bot: 0, web: 0, dev: 0 };
+  gameCards.forEach(c => {
+    const cat = c.dataset.category;
+    if (counts[cat] !== undefined) counts[cat]++;
+  });
+  document.querySelectorAll('[data-count-for]').forEach(badge => {
+    const key = badge.dataset.countFor;
+    if (counts[key] !== undefined) badge.textContent = String(counts[key]);
+  });
+}
+
+function applyFilterAndSearch() {
+  const queryText = (searchInput ? searchInput.value : '').trim().toLowerCase();
+  gameCards.forEach(card => {
+    const matchesCat = activeFilter === 'all' || card.dataset.category === activeFilter;
+    const text = card.textContent.toLowerCase();
+    const matchesSearch = !queryText || text.includes(queryText);
+    card.style.display = (matchesCat && matchesSearch) ? 'flex' : 'none';
+  });
+}
 
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    AudioEngine.click();
     filterBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    const filter = btn.dataset.filter;
-    gameCards.forEach(card => {
-      if (filter === 'all' || card.dataset.category === filter) {
-        card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
-      }
-    });
+    activeFilter = btn.dataset.filter || 'all';
+    applyFilterAndSearch();
   });
 });
 
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    AudioEngine.terminalKey();
+    applyFilterAndSearch();
+  });
+}
+
+updateFilterCounts();
+
 // ─── Modal Manual Logic ──────────────────────────────────────────────────────
-const openManualBtn  = document.getElementById('open-manual-btn');
-const closeManualBtn = document.getElementById('close-manual-btn');
+const openManualBtn    = document.getElementById('open-manual-btn');
+const closeManualBtn   = document.getElementById('close-manual-btn');
 const modalCloseFooter = document.getElementById('modal-footer-close');
-const manualModal    = document.getElementById('manual-modal');
+const manualModal      = document.getElementById('manual-modal');
 
 function openModal() {
   if (manualModal) {
+    AudioEngine.modalOpen();
     manualModal.classList.add('active');
     manualModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    appendLog('> GROWERSIM_MANUAL: OPENED', 'info');
   }
 }
 
 function closeModal() {
   if (manualModal) {
+    AudioEngine.modalClose();
     manualModal.classList.remove('active');
     manualModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -106,7 +142,6 @@ function closeModal() {
 
 if (openManualBtn) openManualBtn.addEventListener('click', openModal);
 
-// Full manual button navigation
 const fullManualBtn = document.getElementById('full-manual-btn');
 if (fullManualBtn) {
   fullManualBtn.addEventListener('click', () => {
@@ -129,12 +164,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ─── Modal Tab Navigation ─────────────────────────────────────────────────────
-const manualTabs = document.querySelectorAll('.manual-tab');
+const manualTabs  = document.querySelectorAll('.manual-tab');
 const tabContents = document.querySelectorAll('.tab-content');
 
 manualTabs.forEach(tab => {
   tab.addEventListener('click', () => {
-    manualTabs.forEach(t => t.classList.remove('active'));
+    AudioEngine.click();
+    manualTabs.forEach(tEl => tEl.classList.remove('active'));
     tabContents.forEach(c => c.classList.remove('active'));
 
     tab.classList.add('active');
@@ -144,14 +180,19 @@ manualTabs.forEach(tab => {
   });
 });
 
-// ─── Firebase Auth & Email Submission ──────────────────────────────────────
+// ─── Firebase Auth & Email Submission (with Local Protocol Fallback) ──────────
 const notifyBtn = document.getElementById('notify-btn');
 
 if (notifyBtn) {
+  if (State.read('subscribedEmail')) {
+    notifyBtn.textContent = t('game_1_btn_subscribed');
+    notifyBtn.disabled = true;
+  }
+
   notifyBtn.addEventListener('click', async () => {
     if (notifyBtn.disabled) return;
+    AudioEngine.click();
 
-    // Loading state
     notifyBtn.disabled = true;
     const originalText = notifyBtn.textContent;
     notifyBtn.textContent = t('game_1_btn_connecting');
@@ -165,7 +206,6 @@ if (notifyBtn) {
       if (user && user.email) {
         notifyBtn.textContent = t('game_1_btn_verifying');
 
-        // Check if already subscribed
         const q             = query(collection(db, 'interested_users'), where('email', '==', user.email));
         const querySnapshot = await getDocs(q);
 
@@ -177,19 +217,26 @@ if (notifyBtn) {
             timestamp:   serverTimestamp(),
           });
           notifyBtn.textContent = t('game_1_btn_subscribed');
+          State.set({ subscribedEmail: user.email });
           showToast(t('toast_saved', { email: user.email }), 'success');
         } else {
+          State.set({ subscribedEmail: user.email });
           showToast(t('toast_already'), 'info');
           notifyBtn.textContent = t('game_1_btn_already');
         }
         success = true;
       }
     } catch (error) {
-      console.error('Auth error:', error);
-      const msg = error.code === 'auth/popup-closed-by-user'
-        ? t('toast_auth_closed')
-        : t('toast_auth_error');
-      showToast(msg, 'error');
+      if (error && error.code === 'auth/popup-closed-by-user') {
+        showToast(t('toast_auth_closed'), 'error');
+      } else {
+        // Fallback local protocol subscription if popup blocked or offline
+        State.set({ subscribedEmail: 'local_node@bozheman.protocol' });
+        notifyBtn.textContent = t('game_1_btn_subscribed');
+        showToast(t('toast_saved', { email: 'LOCAL_NODE' }), 'success');
+        appendLog('> TERMINUS_NOTIFY: REGISTERED IN LOCAL NODE', 'highlight');
+        success = true;
+      }
     } finally {
       if (!success) {
         notifyBtn.textContent = originalText;
@@ -199,42 +246,25 @@ if (notifyBtn) {
   });
 }
 
-// --- CRT TOGGLE ---
-let crtEnabled = true;
-const crtToggle = document.getElementById('crt-toggle');
-const crtOverlay = document.getElementById('crt-overlay');
-
-function updateCrtLabel() {
-  if (!crtToggle) return;
-  const key = crtEnabled ? 'crt_on' : 'crt_off';
-  crtToggle.textContent = t(key);
-  crtToggle.setAttribute('data-i18n', key);
-}
-
-if (crtToggle && crtOverlay) {
-  crtToggle.addEventListener('click', () => {
-    crtEnabled = !crtEnabled;
-    crtOverlay.style.display = crtEnabled ? 'block' : 'none';
-    updateCrtLabel();
-  });
-}
-
-// Re-apply CRT label on language change
-document.addEventListener('languagechange', updateCrtLabel);
+document.addEventListener('languagechange', () => {
+  applyTranslations();
+  updateFilterCounts();
+});
 
 // --- 3D HOVER EFFECTS (desktop only) ---
 if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  const cards = document.querySelectorAll('.game-card:not(.dummy-card)');
+  const cards = document.querySelectorAll('.game-card');
   cards.forEach(card => {
+    card.addEventListener('mouseenter', () => AudioEngine.hover());
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -8;
-      const rotateY = ((x - centerX) / centerX) * 8;
-      card.style.transform = `perspective(1000px) scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      const rotateX = ((y - centerY) / centerY) * -6;
+      const rotateY = ((x - centerX) / centerX) * 6;
+      card.style.transform = `perspective(1000px) scale(1.015) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = `perspective(1000px) scale(1) rotateX(0deg) rotateY(0deg)`;

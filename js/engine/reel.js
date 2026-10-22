@@ -1,9 +1,11 @@
 /**
- * BOZHEMAN ≡ 777  —  Canvas Reel Engine Module
- * Uses delta-time (frame-rate independent physics) to animate vertical symbol strips.
+ * BOZHEMAN ≡ 777  —  Canvas Reel Engine Module v3.0
+ * HiDPI/Retina delta-time vertical symbol strip renderer with spring bounce,
+ * cell scan dividers, and audio reel ticks.
  */
 
 import { SYMBOLS } from './constants.js';
+import { AudioEngine } from './audio.js';
 
 export class ReelEngine {
   /**
@@ -14,27 +16,34 @@ export class ReelEngine {
     this.canvas   = canvas;
     this.ctx      = canvas.getContext('2d');
     this.delay    = delayMs;
+    this.dpr      = 1;
+    this.viewW    = 0;
+    this.viewH    = 0;
 
     // Layout
-    this.SYMBOL_H = 0; // set in resize()
-    this.STRIP_LEN = SYMBOLS.length * 3; // 3 full cycles on the strip
+    this.SYMBOL_H  = 0;
+    this.STRIP_LEN = SYMBOLS.length * 3;
 
-    // Reel strip (pre-shuffled sequence repeated)
+    // Reel strip
     this.strip = this._buildStrip();
 
     // Render state
-    this.offset   = 0;      // current scroll offset in px (float)
-    this.velocity = 0;      // px/frame base (at 60fps)
-    this.targetOffset = 0;  // where we want to land
-    this.finalSymbolIndex = 0;
+    this.offset            = 0;
+    this.velocity          = 0;
+    this.targetOffset      = 0;
+    this.finalSymbolIndex  = 0;
+    this.lastTickCell      = -1;
+    this.springPhase       = 0;
+    this.pulsePhase        = 0;
 
     // State
     this.spinning  = false;
     this.snapping  = false;
-    this.settled   = false;
+    this.settled   = true;
+    this.winning   = false;
     this.rafId     = null;
-    this.onSettle  = null; // callback when snapped
-    this._lastTs   = 0;     // Timestamp for delta time
+    this.onSettle  = null;
+    this._lastTs   = 0;
 
     // Visual extras
     this.blurAmount = 0;
@@ -42,16 +51,15 @@ export class ReelEngine {
     this.resize();
     this.resizeHandler = () => this.resize();
     window.addEventListener('resize', this.resizeHandler, { passive: true });
+    window.addEventListener('orientationchange', this.resizeHandler, { passive: true });
     this._loop();
   }
 
   _buildStrip() {
-    // Build a shuffled strip of length STRIP_LEN
     const arr = [];
     for (let i = 0; i < this.STRIP_LEN; i++) {
       arr.push(SYMBOLS[i % SYMBOLS.length]);
     }
-    // Shuffle
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -60,48 +68,54 @@ export class ReelEngine {
   }
 
   resize() {
-    const wrap   = this.canvas.parentElement;
+    const wrap = this.canvas ? this.canvas.parentElement : null;
     if (!wrap) return;
-    const w      = wrap.clientWidth;
-    const h      = wrap.clientHeight;
-    this.canvas.width  = w;
-    this.canvas.height = h;
+    const w = wrap.clientWidth || 100;
+    const h = wrap.clientHeight || 120;
+    this.dpr   = Math.min(window.devicePixelRatio || 1, 2);
+    this.viewW = w;
+    this.viewH = h;
+    this.canvas.width  = Math.floor(w * this.dpr);
+    this.canvas.height = Math.floor(h * this.dpr);
+    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     this.SYMBOL_H = h;
     this.TOTAL_H  = this.SYMBOL_H * this.strip.length;
     this._render();
   }
 
   /** Spin: accelerate to full velocity, then coast, then snap to target */
-  spin(targetSymbol, onSettle) {
+  spin(targetSymbol, onSettle, turbo = false) {
     this.settled   = false;
     this.snapping  = false;
+    this.winning   = false;
     this.onSettle  = onSettle;
     this.finalSymbolIndex = this.strip.findIndex(s => s.id === targetSymbol.id);
     if (this.finalSymbolIndex < 0) this.finalSymbolIndex = 0;
 
-    // Delay stagger
+    const effectiveDelay = turbo ? Math.floor(this.delay * 0.35) : this.delay;
     setTimeout(() => {
       this.spinning = true;
-      this.velocity = 45 + Math.random() * 12; // px/frame @ 60fps base
-      this._lastTs = 0; // reset timestamp on spin start to prevent physics jump
-    }, this.delay);
+      this.velocity = (turbo ? 62 : 46) + Math.random() * 12;
+      this._lastTs  = 0;
+    }, effectiveDelay);
+  }
+
+  setWinning(isWin) {
+    this.winning = Boolean(isWin);
   }
 
   _resolveSnap() {
-    // Target offset: the symbol at finalSymbolIndex should be centred in viewport
-    const centreY = this.canvas.height / 2;
+    const centreY   = this.viewH / 2;
     const symCentre = (this.finalSymbolIndex + 0.5) * this.SYMBOL_H;
-    // We want: offset such that symCentre - offset == centreY
-    // => offset = symCentre - centreY
-    // Add enough full rotations so target > current (always scroll forward)
-    let target = symCentre - centreY;
+    let target      = symCentre - centreY;
     const fullRotation = this.TOTAL_H;
-    while (target < this.offset + fullRotation * 1.5) target += fullRotation;
+    while (target < this.offset + fullRotation * 1.1) target += fullRotation;
     this.targetOffset = target;
   }
 
   _loop(timestamp) {
     this.rafId = requestAnimationFrame((ts) => this._loop(ts));
+    if (document.hidden) return;
     const now = timestamp || performance.now();
     if (!this._lastTs) {
       this._lastTs = now;
@@ -109,31 +123,39 @@ export class ReelEngine {
     }
     const elapsed = now - this._lastTs;
     this._lastTs = now;
-    
-    // Normalize to 60fps base (16.667 ms = dt of 1.0)
-    // Cap dt to prevent massive jumps when tab is inactive
+
     const dt = Math.min(elapsed / 16.667, 4);
-    
     this._tick(dt);
     this._render();
   }
 
   _tick(dt) {
-    if (this.settled) return;
+    if (this.settled) {
+      if (this.winning) {
+        this.pulsePhase += 0.08 * dt;
+      }
+      return;
+    }
 
     if (this.spinning && !this.snapping) {
       this.offset    += this.velocity * dt;
-      this.blurAmount = Math.min(this.velocity * 0.6, 18);
+      this.blurAmount = Math.min(this.velocity * 0.55, 18);
+
+      if (this.SYMBOL_H > 0) {
+        const curCell = Math.floor(this.offset / this.SYMBOL_H);
+        if (curCell !== this.lastTickCell) {
+          this.lastTickCell = curCell;
+          if (Math.random() > 0.55) AudioEngine.reelTick();
+        }
+      }
     } else if (this.snapping) {
-      const dist  = this.targetOffset - this.offset;
-      // Normal snap convergence speed at 60fps was: dist * 0.14
-      // Scale with delta time: speed = dist * (1 - (1 - 0.14)^dt)
-      const easingFactor = 1 - Math.pow(1 - 0.14, dt);
+      const dist = this.targetOffset - this.offset;
+      const easingFactor = 1 - Math.pow(1 - 0.16, dt);
       const speed = dist * easingFactor;
       this.offset    += speed;
-      this.blurAmount = Math.abs(speed) * 0.5;
+      this.blurAmount = Math.abs(speed) * 0.45;
 
-      if (Math.abs(dist) < 0.8) {
+      if (Math.abs(dist) < 0.75) {
         this.offset     = this.targetOffset;
         this.velocity   = 0;
         this.blurAmount = 0;
@@ -144,9 +166,8 @@ export class ReelEngine {
       }
     }
 
-    // Wrap offset to prevent float overflow over very long sessions
-    if (this.offset > this.TOTAL_H * 10) {
-      this.offset     -= this.TOTAL_H;
+    if (this.TOTAL_H > 0 && this.offset > this.TOTAL_H * 10) {
+      this.offset       -= this.TOTAL_H;
       this.targetOffset -= this.TOTAL_H;
     }
   }
@@ -155,23 +176,23 @@ export class ReelEngine {
     if (!this.spinning || this.snapping || this.settled) return;
     this._resolveSnap();
     this.snapping = true;
-    this._lastTs = 0; // reset timestamp on snap start to prevent physics jump
+    this._lastTs  = 0;
   }
 
   _render() {
     const ctx = this.ctx;
-    const W   = this.canvas.width;
-    const H   = this.canvas.height;
+    const W   = this.viewW;
+    const H   = this.viewH;
+    if (!W || !H) return;
 
     ctx.clearRect(0, 0, W, H);
 
-    // Simulated motion blur
     if (this.blurAmount > 2) {
       ctx.save();
-      ctx.globalAlpha = 0.35;
+      ctx.globalAlpha = 0.32;
       const blurOffset = this.blurAmount * 0.5;
       this._drawStrip(ctx, W, H, this.offset - blurOffset);
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.18;
       this._drawStrip(ctx, W, H, this.offset - blurOffset * 2);
       ctx.restore();
     }
@@ -181,55 +202,53 @@ export class ReelEngine {
   }
 
   _drawStrip(ctx, W, H, offset) {
-    const symH   = this.SYMBOL_H;
-    const total  = this.TOTAL_H;
+    const symH  = this.SYMBOL_H;
+    const total = this.TOTAL_H;
     if (!total || !symH) return;
 
-    // Normalise offset into [0, total)
     const normOffset = ((offset % total) + total) % total;
-
-    // Figure out which symbol is at the top of the viewport
-    const startIdx = Math.floor(normOffset / symH);
-    const startY   = -(normOffset % symH);
+    const startIdx   = Math.floor(normOffset / symH);
+    const startY     = -(normOffset % symH);
 
     for (let i = 0; i < Math.ceil(H / symH) + 2; i++) {
       const idx = (startIdx + i) % this.strip.length;
       const sym = this.strip[idx];
       const y   = startY + i * symH;
-
       this._drawSymbol(ctx, sym, W, y, symH);
     }
   }
 
   _drawSymbol(ctx, sym, W, y, H) {
     if (!sym) return;
-    // Background cell
     const gradient = ctx.createLinearGradient(0, y, 0, y + H);
     gradient.addColorStop(0,   'rgba(0,0,0,0.0)');
-    gradient.addColorStop(0.5, 'rgba(20,0,0,0.18)');
+    gradient.addColorStop(0.5, this.winning ? 'rgba(55,0,0,0.35)' : 'rgba(20,0,0,0.18)');
     gradient.addColorStop(1,   'rgba(0,0,0,0.0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, y, W, H);
 
-    // Glyph
-    const fontSize = Math.floor(H * 0.55);
-    ctx.font        = `700 ${fontSize}px "Fira Code", monospace`;
-    ctx.textAlign   = 'center';
+    // Subtle cell divider line
+    ctx.fillStyle = 'rgba(255, 51, 51, 0.12)';
+    ctx.fillRect(8, y, W - 16, 1);
+
+    const pulseScale = (this.settled && this.winning) ? (1 + Math.sin(this.pulsePhase) * 0.06) : 1;
+    const fontSize   = Math.floor(H * 0.55 * pulseScale);
+    ctx.font         = `700 ${fontSize}px "Fira Code", monospace`;
+    ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
 
-    // Glow
-    ctx.shadowBlur  = this.settled ? 18 : 6;
+    ctx.shadowBlur  = this.settled ? (this.winning ? 26 : 18) : 6;
     ctx.shadowColor = sym.glow;
 
     ctx.fillStyle = sym.color;
     ctx.fillText(sym.glyph, W / 2, y + H / 2);
 
-    // Reset shadow
     ctx.shadowBlur = 0;
   }
 
   destroy() {
     cancelAnimationFrame(this.rafId);
     window.removeEventListener('resize', this.resizeHandler);
+    window.removeEventListener('orientationchange', this.resizeHandler);
   }
 }

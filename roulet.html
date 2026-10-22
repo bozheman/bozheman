@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title="slots_title">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BOZHEMAN ≡ 777</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
-  <meta name="description" content="BOZHEMAN SLOTS — слот-машина на платформе BOZHEMAN. Играйте и выигрывайте!" />
+  <meta name="description" content="BOZHEMAN SLOTS 777 — киберпанк слот-машина на платформе BOZHEMAN ≡ PROTOCOL." />
   <meta property="og:title" content="BOZHEMAN ≡ 777" />
   <meta property="og:description" content="Слот-машина BOZHEMAN. Спините и выигрывайте!" />
   <meta property="og:type" content="website" />
@@ -43,6 +44,18 @@
         <span class="stat-label" data-i18n="slots_last_bet">LAST BET</span>
         <span class="stat-value" id="last-bet-display">—</span>
       </div>
+      <div class="stat-item">
+        <span class="stat-label" data-i18n="slots_winrate">WIN RATE</span>
+        <span class="stat-value" id="winrate-display">0%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label" data-i18n="slots_max_win">MAX WIN</span>
+        <span class="stat-value" id="maxwin-display">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label" data-i18n="slots_streak">STREAK</span>
+        <span class="stat-value" id="streak-display">0</span>
+      </div>
     </div>
 
     <div class="machine-cabinet">
@@ -53,27 +66,35 @@
         <div class="reel-wrap"><canvas id="reel-canvas-2" aria-label="Slot Reel 3" role="img"></canvas></div>
       </div>
 
-      <div class="pay-table">
-        <div class="pay-row"><span class="pay-symbol">7 7 7</span><span class="pay-mult">x10</span></div>
-        <div class="pay-row"><span class="pay-symbol">★ ★ ★</span><span class="pay-mult">x7</span></div>
-        <div class="pay-row"><span class="pay-symbol">Ω Ω Ω</span><span class="pay-mult">x5</span></div>
-        <div class="pay-row"><span class="pay-symbol">▲ ▲ ▲</span><span class="pay-mult">x3</span></div>
-        <div class="pay-row"><span class="pay-symbol">■ ■ ■</span><span class="pay-mult">x2</span></div>
-        <div class="pay-row"><span class="pay-symbol" data-i18n="slots_any2">ANY 2</span><span class="pay-mult">x1.5</span></div>
+      <div class="pay-table" id="pay-table">
+        <div class="pay-row" data-pay="seven"><span class="pay-symbol">7 7 7</span><span class="pay-mult">x10</span></div>
+        <div class="pay-row" data-pay="star"><span class="pay-symbol">★ ★ ★</span><span class="pay-mult">x7</span></div>
+        <div class="pay-row" data-pay="omega"><span class="pay-symbol">Ω Ω Ω</span><span class="pay-mult">x5</span></div>
+        <div class="pay-row" data-pay="tri"><span class="pay-symbol">▲ ▲ ▲</span><span class="pay-mult">x3</span></div>
+        <div class="pay-row" data-pay="square"><span class="pay-symbol">■ ■ ■</span><span class="pay-mult">x2</span></div>
+        <div class="pay-row" data-pay="pair"><span class="pay-symbol" data-i18n="slots_any2">ANY 2</span><span class="pay-mult">x1.5</span></div>
       </div>
 
       <div class="controls-section">
-        <div class="bet-row" style="display: flex; gap: 0.5rem; align-items: center;">
-          <button class="chip" id="btn-bet-minus" style="flex: 0; min-width: 40px; font-size: 1.2rem;">-</button>
+        <div class="bet-row">
+          <button class="chip" id="btn-bet-minus" style="flex: 0; min-width: 40px; font-size: 1.2rem;" aria-label="Decrease bet">-</button>
           <input type="number" id="bet-input" class="input-field" placeholder="BET" data-i18n-attr="placeholder" data-i18n="slots_bet" min="10" max="99999" value="10" />
-          <button class="chip" id="btn-bet-plus" style="flex: 0; min-width: 40px; font-size: 1.2rem;">+</button>
+          <button class="chip" id="btn-bet-plus" style="flex: 0; min-width: 40px; font-size: 1.2rem;" aria-label="Increase bet">+</button>
         </div>
         
         <div class="chip-row">
-          <button class="chip" data-amount="min" data-i18n="slots_min" aria-label="Минимальная ставка">MIN</button>
-          <button class="chip" data-amount="50" aria-label="Увеличить ставку на 50">+50</button>
-          <button class="chip" data-amount="100" aria-label="Увеличить ставку на 100">+100</button>
-          <button class="chip" data-amount="max" data-i18n="slots_max" aria-label="Максимальная ставка">MAX</button>
+          <button class="chip" data-amount="min" data-i18n="slots_min">MIN</button>
+          <button class="chip" data-amount="half" data-i18n="slots_half">1/2</button>
+          <button class="chip" data-amount="double" data-i18n="slots_double">x2</button>
+          <button class="chip" data-amount="50">+50</button>
+          <button class="chip" data-amount="100">+100</button>
+          <button class="chip" data-amount="max" data-i18n="slots_max">MAX</button>
+        </div>
+
+        <div class="mode-row">
+          <button type="button" id="btn-turbo" class="btn-mode" data-i18n="slots_turbo_off">TURBO: OFF [T]</button>
+          <button type="button" id="btn-auto" class="btn-mode" data-i18n="slots_auto_off">AUTO: OFF [A]</button>
+          <button type="button" id="btn-daily" class="btn-mode btn-daily" data-i18n="slots_daily_btn">⚡ DAILY +500</button>
         </div>
 
         <button id="btn-spin" class="btn-spin" data-text="SPIN (SPACE)" data-i18n="slots_spin_btn">SPIN (SPACE)</button>
@@ -81,25 +102,37 @@
       </div>
     </div>
 
+    <div class="fair-bar">
+      <span data-i18n="slots_fair_seed">PROVABLY FAIR SEED:</span>
+      <span class="fair-seed" id="fair-seed-display">SHA256::8F3A...C901</span>
+    </div>
+
     <div class="history-section">
-      <div class="history-title" data-i18n="slots_history">TRANSACTION HISTORY</div>
+      <div class="history-header">
+        <div class="history-title" data-i18n="slots_history">TRANSACTION HISTORY</div>
+        <button type="button" id="btn-clear-history" class="btn-clear-history" data-i18n="slots_clear_history">CLEAR</button>
+      </div>
       <div id="history-list"></div>
     </div>
 
-    <a href="games.html" class="back-link" data-i18n="slots_back">< BACK TO GAMES</a>
+    <a href="games.html" class="back-link" data-i18n="slots_back">&lt; BACK TO GAMES</a>
   </div>
 
   <canvas id="particle-canvas"></canvas>
 
-  <div id="result-toast">
+  <div id="result-toast" aria-live="polite">
     <div id="toast-label" data-i18n="slots_win_toast">WIN</div>
     <div id="toast-amount">0</div>
     <div id="toast-desc"></div>
   </div>
 
-  <div id="error-bar"></div>
+  <div id="error-bar" role="alert"></div>
 
-  
+  <!-- АУДИО -->
+  <audio id="ambient-audio" loop preload="auto">
+    <source src="assets/audio/omega.m4a" type="audio/mp4" />
+  </audio>
+
   <!-- CRT OVERLAY -->
   <div id="crt-overlay" class="crt-overlay"></div>
 

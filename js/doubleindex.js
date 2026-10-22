@@ -1,18 +1,23 @@
 import { setupMatrix } from './matrix.js';
 import { t, applyTranslations } from './i18n.js';
+import { State } from './state.js';
+import { AudioEngine } from './engine/audio.js';
+import { initHUD, appendLog } from './hud.js';
+
 setupMatrix('matrix-canvas');
+initHUD();
 
-const terminal       = document.getElementById('terminal');
-const fragmentDisplay = document.getElementById('fragment-display');
+const terminal         = document.getElementById('terminal');
+const fragmentDisplay  = document.getElementById('fragment-display');
+const fragmentCounter  = document.getElementById('fragment-counter');
+const fragmentControls = document.getElementById('fragment-controls');
+const btnPrev          = document.getElementById('frag-prev');
+const btnPause         = document.getElementById('frag-pause');
+const btnNext          = document.getElementById('frag-next');
 const progressBarInner = document.getElementById('progress-bar-inner');
-const ambientAudio   = document.getElementById('ambient-audio');
-const skipBtn        = document.getElementById('skip-btn');
+const countdownSec     = document.getElementById('countdown-sec');
+const skipBtn          = document.getElementById('skip-btn');
 
-if (ambientAudio) ambientAudio.volume = 0.5;
-
-// ─── FRAGMENT DATA — keyed for i18n ───────────────────────────
-// Fragments are stored as i18n keys; if a translation exists it's used,
-// otherwise falls back to Russian originals embedded here.
 const FRAGMENT_KEYS = [
   'frag_1', 'frag_2', 'frag_3', 'frag_4', 'frag_5', 'frag_6', 'frag_7'
 ];
@@ -48,7 +53,6 @@ const FRAGMENT_FALLBACK = [
   }
 ];
 
-// Resolve fragment from i18n or fallback
 function getFragment(index) {
   const key = FRAGMENT_KEYS[index];
   const titleKey = `${key}_title`;
@@ -66,10 +70,8 @@ function getFragment(index) {
 
 let currentFragmentIndex = -1;
 let isTyping = false;
-
-function playAudio() {
-  if (ambientAudio) ambientAudio.play().catch(() => {});
-}
+let isPaused = false;
+const seenFragments = new Set();
 
 // ─── TYPEWRITER ────────────────────────────────────────────────
 let typewriterAbort = false;
@@ -95,7 +97,7 @@ function typeWriter(element, title, text, onComplete) {
     if (typewriterAbort) { finishInstant(); return; }
     if (i < title.length) {
       titleSpan.textContent += title.charAt(i++);
-      setTimeout(typeTitle, 22);
+      setTimeout(typeTitle, 20);
     } else {
       i = 0;
       typeMainText();
@@ -106,7 +108,7 @@ function typeWriter(element, title, text, onComplete) {
     if (typewriterAbort) { finishInstant(); return; }
     if (i < text.length) {
       textP.insertBefore(document.createTextNode(text.charAt(i++)), cursor);
-      setTimeout(typeMainText, 12);
+      setTimeout(typeMainText, 11);
     } else {
       cursor.remove();
       if (onComplete) onComplete();
@@ -115,7 +117,7 @@ function typeWriter(element, title, text, onComplete) {
 
   function finishInstant() {
     titleSpan.textContent = title;
-    textP.innerHTML = text;
+    textP.textContent = text;
     cursor.remove();
     if (onComplete) onComplete();
   }
@@ -124,59 +126,127 @@ function typeWriter(element, title, text, onComplete) {
 }
 
 // ─── NAVIGATION ────────────────────────────────────────────────
-function showFragment(index) {
-  typewriterAbort = true; // abort current typing
-  isTyping = true;
-  const fragment = getFragment(index);
-  typeWriter(fragmentDisplay, fragment.title, fragment.text, () => {
-    isTyping = false;
+function updateCounterUI() {
+  if (!fragmentCounter) return;
+  const cur = currentFragmentIndex >= 0 ? currentFragmentIndex + 1 : 0;
+  fragmentCounter.textContent = t('illusion_fragment_of', {
+    cur,
+    total: FRAGMENT_FALLBACK.length
   });
 }
 
-terminal.addEventListener('click', () => {
-  if (ambientAudio && ambientAudio.paused) playAudio();
-  // If currently typing, finish instantly (second click = skip typing)
+function showFragment(index) {
+  typewriterAbort = true;
+  isTyping = true;
+  AudioEngine.click();
+  seenFragments.add(index);
+  updateCounterUI();
+
+  if (seenFragments.size >= FRAGMENT_FALLBACK.length) {
+    State.unlockAchievement('WEAVER_INITIATE');
+    if (!State.read('weaverClaimed')) {
+      const nextBal = State.read('balance') + 500;
+      State.set({ balance: nextBal, weaverClaimed: true });
+      appendLog(`> WEAVER_PROTOCOL COMPLETE: +500 COINS AWARDED`, 'highlight');
+    }
+  }
+
+  const fragment = getFragment(index);
+  setTimeout(() => {
+    typeWriter(fragmentDisplay, fragment.title, fragment.text, () => {
+      isTyping = false;
+    });
+  }, 15);
+}
+
+function stepFragment(delta) {
   if (isTyping) {
     typewriterAbort = true;
     return;
   }
-  currentFragmentIndex = (currentFragmentIndex + 1) % FRAGMENT_FALLBACK.length;
+  const len = FRAGMENT_FALLBACK.length;
+  if (currentFragmentIndex < 0) {
+    currentFragmentIndex = delta >= 0 ? 0 : len - 1;
+  } else {
+    currentFragmentIndex = (currentFragmentIndex + delta + len) % len;
+  }
   showFragment(currentFragmentIndex);
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  AudioEngine.click();
+  if (btnPause) {
+    const key = isPaused ? 'illusion_resume' : 'illusion_pause';
+    btnPause.textContent = t(key);
+    btnPause.setAttribute('data-i18n', key);
+    btnPause.classList.toggle('active', isPaused);
+  }
+}
+
+if (fragmentControls) {
+  fragmentControls.addEventListener('click', (e) => e.stopPropagation());
+}
+if (btnPrev)  btnPrev.addEventListener('click', () => stepFragment(-1));
+if (btnNext)  btnNext.addEventListener('click', () => stepFragment(1));
+if (btnPause) btnPause.addEventListener('click', togglePause);
+
+if (terminal) {
+  terminal.addEventListener('click', () => {
+    stepFragment(1);
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  const tag = document.activeElement ? document.activeElement.tagName : '';
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+
+  if (e.code === 'ArrowRight' || e.code === 'Space') {
+    e.preventDefault();
+    stepFragment(1);
+  } else if (e.code === 'ArrowLeft') {
+    e.preventDefault();
+    stepFragment(-1);
+  } else if (e.code === 'KeyP') {
+    e.preventDefault();
+    togglePause();
+  }
 });
 
-document.body.addEventListener('click', playAudio, { once: true });
-
-// ─── SKIP BUTTON ───────────────────────────────────────────────
+// ─── SKIP BUTTON & COUNTDOWN ───────────────────────────────────
 function doRedirect() {
-  document.body.style.transition = 'opacity 1.5s ease';
+  document.body.style.transition = 'opacity 1.2s ease';
   document.body.style.opacity = '0';
-  setTimeout(() => { window.location.href = 'roulet.html'; }, 1500);
+  setTimeout(() => { window.location.href = 'roulet.html'; }, 1200);
 }
 
 if (skipBtn) {
   skipBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // don't trigger terminal click
+    e.stopPropagation();
     clearInterval(countdownInterval);
     doRedirect();
   });
 }
 
-// ─── COUNTDOWN ─────────────────────────────────────────────────
 let countdown = 60;
 const countdownInterval = setInterval(() => {
+  if (document.hidden || isPaused) return;
   countdown--;
   const percentage = Math.max(0, (countdown / 60) * 100);
   if (progressBarInner) progressBarInner.style.width = `${percentage}%`;
+  if (countdownSec) countdownSec.textContent = `${countdown}s`;
   if (countdown <= 0) {
     clearInterval(countdownInterval);
     doRedirect();
   }
 }, 1000);
 
-// ─── LANGUAGE CHANGE ───────────────────────────────────────────
 document.addEventListener('languagechange', () => {
   applyTranslations();
-  // Re-render current fragment in new language if one is active
+  updateCounterUI();
+  if (btnPause) {
+    btnPause.textContent = t(isPaused ? 'illusion_resume' : 'illusion_pause');
+  }
   if (currentFragmentIndex >= 0 && !isTyping) {
     showFragment(currentFragmentIndex);
   }

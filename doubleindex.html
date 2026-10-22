@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title="illusion_title">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,11 +28,17 @@
 
   <main class="terminal-window" id="terminal">
     <h1 data-text="ILLUSION" data-i18n="illusion_title">ILLUSION</h1>
+    <div id="fragment-counter" class="fragment-meta">FRAGMENT [0/7]</div>
     <div id="fragment-display">
       <p data-i18n="illusion_click">[CLICK TO BEHOLD]</p>
     </div>
+    <div class="fragment-controls" id="fragment-controls">
+      <button type="button" id="frag-prev" class="frag-btn" data-i18n="illusion_prev">← PREV</button>
+      <button type="button" id="frag-pause" class="frag-btn" data-i18n="illusion_pause">⏸ PAUSE</button>
+      <button type="button" id="frag-next" class="frag-btn" data-i18n="illusion_next">NEXT →</button>
+    </div>
     <div id="countdown-timer">
-      <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span>
+      <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span> <strong id="countdown-sec">60s</strong>
       <div id="progress-bar">
         <div id="progress-bar-inner"></div>
       </div>
@@ -46,6 +52,9 @@
   <!-- SKIP BUTTON -->
   <button id="skip-btn" class="hud-btn skip-btn" data-i18n="preloader_skip" aria-label="Skip to roulette">[ SKIP ]</button>
 
+  <!-- CRT OVERLAY -->
+  <div id="crt-overlay" class="crt-overlay"></div>
+
   <!-- HUD CONTROLS -->
   <div id="hud-controls">
     <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
@@ -58,6 +67,7 @@
       <option value="fr">Français</option>
       <option value="es">Español</option>
     </select>
+    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT">CRT: ON</button>
   </div>
 
   <script type="module" src="js/doubleindex.js"></script>

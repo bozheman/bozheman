@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-page-title="manual_full_title">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GROWERSIM ≡ FULL SYSTEM MANUAL</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
-  <meta name="description" content="GrowerSim Full Manual — Полное руководство по игре." />
+  <meta name="description" content="GrowerSim Full Manual — Полное системное руководство и калькулятор биомассы/генетики." />
   <meta property="og:title" content="GrowerSim Full Manual" />
   <meta property="og:description" content="Полное системное руководство по игре GrowerSim." />
   <meta property="og:type" content="website" />
@@ -14,90 +16,144 @@
   <link rel="canonical" href="https://bozheman.com/grower_manual.html" />
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/games.css">
   <link rel="stylesheet" href="css/neon.css">
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
+
   <main class="container manual-page">
     <header class="hub-header">
       <a href="games.html" class="page-title" data-text="← BACK TO GAMES" data-i18n="back_to_games">← BACK TO GAMES</a>
     </header>
+
     <section class="manual-content">
       <h2 data-i18n="manual_full_title">GrowerSim – Full System Manual</h2>
+
       <!-- Overview -->
       <section id="full-tab-overview" class="full-tab">
         <h3 data-i18n="tab_overview">01. PROFILE</h3>
         <ul>
-          <li><strong>100% Кнопковый интерфейс (/start):</strong> Сад, Магазин, Рынок, Селекция, Профиль и Контракты через Inline‑кнопки.</li>
-          <li><strong>Grower ID:</strong> Каждый игрок получает уникальный идентификатор (напр. #GRW-58291).</li>
-          <li><strong>Мультиязычность:</strong> Поддержка RU / EN / UK с мгновенным переключением.</li>
-          <li><strong>Прогрессия:</strong> Повышение уровня за урожай, скрещивание и контракты.</li>
+          <li data-i18n="man_1_1"><strong>100% Кнопковый интерфейс (/start):</strong> Сад, Магазин, Рынок, Селекция, Профиль и Контракты через Inline‑кнопки.</li>
+          <li data-i18n="man_1_2"><strong>Grower ID:</strong> Каждый игрок получает уникальный идентификатор (напр. #GRW-58291).</li>
+          <li data-i18n="man_1_3"><strong>Мультиязычность:</strong> Поддержка RU / EN / UK с мгновенным переключением.</li>
+          <li data-i18n="man_1_4"><strong>Прогрессия:</strong> Повышение уровня за урожай, скрещивание и контракты.</li>
         </ul>
       </section>
+
       <!-- Garden -->
       <section id="full-tab-garden" class="full-tab">
         <h3 data-i18n="tab_garden">02. GARDEN</h3>
         <ul>
-          <li><strong>5 Стадий роста:</strong> Семя → Росток → Вегетация → Цветение → Сбор.</li>
-          <li><strong>Параметры слота:</strong> 💧 Влажность, 🌱 Нутриенты, ❤️ Здоровье, 🌾 Плодородие.</li>
-          <li><strong>Care Window &amp; Streaks:</strong> Пиковый уход дает Крит‑эффекты и накапливает 🔥 Care Streak.</li>
-          <li><strong>Harvest Formula:</strong> Расчет биомассы на основе урожайности, здоровья и баланса ТГК.</li>
+          <li data-i18n="man_2_1"><strong>5 Стадий роста:</strong> Семя → Росток → Вегетация → Цветение → Сбор.</li>
+          <li data-i18n="man_2_2"><strong>Параметры слота:</strong> 💧 Влажность, 🌱 Нутриенты, ❤️ Здоровье, 🌾 Плодородие.</li>
+          <li data-i18n="man_2_3"><strong>Care Window &amp; Streaks:</strong> Пиковый уход дает Крит‑эффекты и накапливает 🔥 Care Streak.</li>
+          <li data-i18n="man_2_4"><strong>Harvest Formula:</strong> Расчет биомассы на основе урожайности, здоровья и баланса ТГК.</li>
         </ul>
       </section>
+
       <!-- Shop -->
       <section id="full-tab-shop" class="full-tab">
         <h3 data-i18n="tab_shop">03. SHOP</h3>
         <ul>
-          <li><strong>💧 Вода и Орошение:</strong> Малая вода (+40%), Полная (+100%), Авто‑полив (+20% HP).</li>
-          <li><strong>🌱 Почва и Удобрения:</strong> Базовое NPK (+35%), Супер‑Органика (+3ч роста), Микориза, Кондиционер.</li>
-          <li><strong>☀️ Свет &amp; Бустеры:</strong> LED Quantum Board 240W (+8ч роста), Ускорители времени x2 / x5.</li>
-          <li><strong>⚡ Энергия &amp; Bman:</strong> Фито‑тоник (+50 Энергии), Расширение сада, Telegram Stars обмен.</li>
+          <li data-i18n="man_3_1"><strong>💧 Вода и Орошение:</strong> Малая вода (+40%), Полная (+100%), Авто‑полив (+20% HP).</li>
+          <li data-i18n="man_3_2"><strong>🌱 Почва и Удобрения:</strong> Базовое NPK (+35%), Супер‑Органика (+3ч роста), Микориза, Кондиционер.</li>
+          <li data-i18n="man_3_3"><strong>☀️ Свет &amp; Бустеры:</strong> LED Quantum Board 240W (+8ч роста), Ускорители времени x2 / x5.</li>
+          <li data-i18n="man_3_4"><strong>⚡ Энергия &amp; Bman:</strong> Фито‑тоник (+50 Энергии), Расширение сада, Telegram Stars обмен.</li>
         </ul>
       </section>
-      <!-- Genetics (extended) -->
+
+      <!-- Genetics -->
       <section id="full-tab-genetics" class="full-tab">
         <h3 data-i18n="tab_genetics">04. GENETICS</h3>
         <ul>
-          <li><strong>Движок Менделя:</strong> Каждое семя содержит фенотипическую комбинацию аллелей (THC, CBD, Урожайность, Время созревания).</li>
-          <li><strong>Гибридизация:</strong> Скрещивание двух уникальных сортов дает 25% вероятность проявления редких доминантных генов.</li>
-          <li><strong>Редкие Мутации:</strong> 5% шанса получить уникальный генотип «Quantum Strain» с повышенным коэффициентом урожайности x3.</li>
+          <li data-i18n="man_4_1"><strong>Движок Менделя:</strong> Каждое семя содержит фенотипическую комбинацию аллелей (THC, CBD, Урожайность, Время созревания).</li>
+          <li data-i18n="man_4_2"><strong>Гибридизация:</strong> Скрещивание двух уникальных сортов дает 25% вероятность проявления редких доминантных генов.</li>
+          <li data-i18n="man_4_3"><strong>Редкие Мутации:</strong> 5% шанса получить уникальный генотип «Quantum Strain» с повышенным коэффициентом урожайности x3.</li>
         </ul>
       </section>
-      <!-- Market (extended) -->
+
+      <!-- Market -->
       <section id="full-tab-market" class="full-tab">
         <h3 data-i18n="tab_market">05. MARKET</h3>
         <ul>
-          <li><strong>P2P Биржа Семян:</strong> Размещение собственных уникальных гибридов на свободном рынке Telegram.</li>
-          <li><strong>Динамическое Ценообразование:</strong> Колебания курса в зависимости от предложения, спроса и вывода редких генов.</li>
-          <li><strong>Безопасные Сделки:</strong> Все транзакции защищены встроенным контрактом бота без риска потери предметов.</li>
+          <li data-i18n="man_5_1"><strong>P2P Биржа Семян:</strong> Размещение собственных уникальных гибридов на свободном рынке Telegram.</li>
+          <li data-i18n="man_5_2"><strong>Динамическое Ценообразование:</strong> Колебания курса в зависимости от предложения, спроса и вывода редких генов.</li>
+          <li data-i18n="man_5_3"><strong>Безопасные Сделки:</strong> Все транзакции защищены встроенным контрактом бота без риска потери предметов.</li>
         </ul>
       </section>
-      <!-- Cup (extended) -->
+
+      <!-- Cup -->
       <section id="full-tab-cup" class="full-tab">
         <h3 data-i18n="tab_cup">06. CANNABIS CUP</h3>
         <ul>
-          <li><strong>Сезонные Турниры:</strong> Еженедельное соревнование на лучший выращенный образец урожая.</li>
-          <li><strong>Оценка Судей:</strong> Автоматический расчет баллов по чистоте ухода, генетике и ароматическому профилю.</li>
-          <li><strong>Призовой Фонд:</strong> Награды в уникальных предметах, статусе Профиля и токенах Bman.</li>
+          <li data-i18n="man_6_1"><strong>Сезонные Турниры:</strong> Еженедельное соревнование на лучший выращенный образец урожая.</li>
+          <li data-i18n="man_6_2"><strong>Оценка Судей:</strong> Автоматический расчет баллов по чистоте ухода, генетике и ароматическому профилю.</li>
+          <li data-i18n="man_6_3"><strong>Призовой Фонд:</strong> Награды в уникальных предметах, статусе Профиля и токенах Bman.</li>
         </ul>
       </section>
+
+      <!-- Interactive Harvest & Genetics Calculator -->
+      <section id="harvest-calc" class="calc-box">
+        <h3>⚙️ HARVEST &amp; MENDEL GENETICS SIMULATOR</h3>
+        <div class="calc-grid">
+          <label class="calc-field">
+            <span>STRAIN GENOTYPE</span>
+            <select id="calc-strain">
+              <option value="1.0">Standard Hybrid (x1.0)</option>
+              <option value="1.35">Dominant Phenotype (x1.35)</option>
+              <option value="1.8">Cyber Kush F2 (x1.8)</option>
+              <option value="3.0">Quantum Strain Mutation (x3.0)</option>
+            </select>
+          </label>
+          <label class="calc-field">
+            <span>PLANT HEALTH (%)</span>
+            <input type="number" id="calc-hp" min="10" max="100" value="95" />
+          </label>
+          <label class="calc-field">
+            <span>CARE STREAK (🔥)</span>
+            <input type="number" id="calc-streak" min="0" max="30" value="7" />
+          </label>
+          <label class="calc-field">
+            <span>LIGHTING MODULE</span>
+            <select id="calc-light">
+              <option value="1.0">Basic Spectrum (x1.0)</option>
+              <option value="1.25">Mycorrhiza + Organic (x1.25)</option>
+              <option value="1.6">LED Quantum Board 240W (x1.6)</option>
+            </select>
+          </label>
+        </div>
+        <div class="calc-result" id="calc-output">
+          ESTIMATED BIOMASS: 185g | THC: 24.8% | CUP SCORE: 912 PTS
+        </div>
+      </section>
     </section>
+
     <footer class="modal-footer">
       <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="btn-glitch btn-tg-sm">⚡ LAUNCH BOT @GrowerSim_bot</a>
       <button class="btn-glitch btn-close-modal" id="close-full-manual" data-i18n="close_manual">CLOSE</button>
     </footer>
   </main>
-  <select id="lang-select" class="lang-select" aria-label="Select language">
-    <option value="en">English</option>
-    <option value="ru">Русский</option>
-    <option value="uk">Українська</option>
-    <option value="be">Беларуская</option>
-    <option value="pl">Polski</option>
-    <option value="de">Deutsch</option>
-    <option value="fr">Français</option>
-    <option value="es">Español</option>
-  </select>
+
+  <div id="crt-overlay" class="crt-overlay"></div>
+
+  <div id="hud-controls">
+    <select id="lang-select" class="lang-select" aria-label="Select language">
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="uk">Українська</option>
+      <option value="be">Беларуская</option>
+      <option value="pl">Polski</option>
+      <option value="de">Deutsch</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+    </select>
+    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT">CRT: ON</button>
+  </div>
+
   <script src="js/manual_full.js" type="module"></script>
 </body>
 </html>

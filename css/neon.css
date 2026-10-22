@@ -49,3 +49,15 @@ body { text-shadow: 0 0 4px rgba(255,51,51,0.4); }
   50%  { text-shadow: -3px 0 #ff3333, 3px 0 #600000; }
   100% { text-shadow: 2px 0 #ff0000, -2px 0 #ff3333; }
 }
+
+/* 8. Cyberpunk Text Selection */
+::selection {
+  background: var(--clr-primary, #ff3333);
+  color: #000000;
+  text-shadow: none;
+}
+
+/* 9. Secondary Neon Accents */
+.neon-gold  { color: var(--clr-gold, #ffd700); text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+.neon-green { color: var(--clr-success, #00ff88); text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
+.neon-pink  { color: var(--clr-pink, #ff00de); text-shadow: 0 0 8px rgba(255, 0, 222, 0.6); }
