@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff3333" />
   <title>BOZHEMAN ≡ PROTOCOL</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
-  <meta name="description" content="BOZHEMAN ≡ PROTOCOL — стример, разработчик игр и контент-мейкер." />
+  <meta name="description" content="BOZHEMAN ≡ PROTOCOL — стример, разработчик игр (@GrowerSim_bot, Slots 777) и контент-мейкер." />
   <meta property="og:title" content="BOZHEMAN ≡ PROTOCOL" />
-  <meta property="og:description" content="Стример, разработчик игр и контент-мейкер." />
+  <meta property="og:description" content="Стример, разработчик игр (@GrowerSim_bot, Slots 777) и контент-мейкер." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bozheman.com/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="BOZHEMAN ≡ PROTOCOL" />
-  <meta name="twitter:description" content="Стример, разработчик игр и контент-мейкер." />
+  <meta name="twitter:description" content="Стример, разработчик игр (@GrowerSim_bot, Slots 777) и контент-мейкер." />
   <meta name="twitter:image" content="assets/images/gg.png" />
   <link rel="canonical" href="https://bozheman.com/" />
   <script type="application/ld+json">
@@ -25,59 +26,66 @@
       "https://www.twitch.tv/Bozhemany",
       "https://www.instagram.com/bozheman",
       "https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw",
-      "https://www.tiktok.com/@bozheman_"
+      "https://www.tiktok.com/@bozheman_",
+      "https://t.me/GrowerSim_bot"
     ]
   }
   </script>
   <link rel="icon" type="image/png" href="assets/images/gg.png" />
+  <link rel="apple-touch-icon" href="assets/images/gg.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/neon.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- PREFETCHING -->
   <link rel="prefetch" href="games.html" />
   <link rel="prefetch" href="roulet.html" />
   <link rel="prefetch" href="refer.html" />
+  <link rel="prefetch" href="grower_manual.html" />
 </head>
 <body>
 
   <!-- ЭКРАН ЗАГРУЗКИ -->
   <div id="preloader">
     <div id="preloader-text"></div>
-    <div class="preloader-skip-hint" data-i18n="preloader_skip">[ Click or press Space to skip ]</div>
+    <div class="preloader-skip-hint" data-i18n="preloader_skip">[ Нажмите клик или Пробел для пропуска ]</div>
   </div>
 
   <!-- ФОНОВАЯ АНИМАЦИЯ (МАТРИЦА) -->
   <canvas id="matrix-canvas" data-i18n-attr="aria-label" data-i18n="canvas_matrix" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
-  
+
+  <!-- ИНТЕРФЕЙС ШАПКИ -->
+  <header id="ui-header">
+    <h1 id="brand-title" data-i18n="title_main">BOZHEMAN ≡ PROTOCOL</h1>
+    <div class="brand-subtitle" data-i18n="brand_subtitle">CYBERPUNK SYSTEM // УЗЕЛ АКТИВЕН</div>
+  </header>
+
   <!-- 3D СЦЕНА -->
   <div id="scene-container">
-    <canvas id="scene-canvas" data-i18n-attr="aria-label" data-i18n="canvas_scene" aria-label="Interactive 3D Object" role="img"></canvas>
+    <canvas id="scene-canvas" tabindex="0" data-i18n-attr="aria-label" data-i18n="canvas_scene" aria-label="Interactive 3D Protocol Core" role="img"></canvas>
+    <div class="core-hint" data-i18n="core_hint">[ Кликните по 3D-ядру 10 раз для дешифровки секретного протокола ]</div>
   </div>
 
-  <!-- ИНТЕРФЕЙС -->
-  <header id="ui-header">
-    <div id="brand-title" data-i18n="title_main">BOZHEMAN</div>
-  </header>
-  
-  <!-- КНОПКИ (ИНТЕРФЕЙС ЧЕЛОВЕКА) -->
-  <nav id="links-container" class="scanlines-effect"></nav>
-  
-  <!-- МОНЕТИЗАЦИЯ -->
+  <!-- КНОПКИ (СИММЕТРИЧНАЯ СЕТКА 8 ЭЛЕМЕНТОВ) -->
+  <nav id="links-container" class="scanlines-effect" aria-label="Main Protocol Navigation"></nav>
+
+  <!-- МОНЕТИЗАЦИЯ И ПАРТНЕРЫ -->
   <section id="monetization-banner">
-    <a href="refer.html" class="btn-glitch" id="partner-link" data-text="PARTNER OFFERS" data-i18n="partner_link">
-      <span class="banner-text">PARTNER OFFERS</span>
+    <a href="refer.html" class="btn-glitch" id="partner-link" data-text="ПАРТНЕРЫ И КРИПТО-ШЛЮЗЫ" data-i18n="partner_link">
+      <span class="banner-text">ПАРТНЕРЫ И КРИПТО-ШЛЮЗЫ</span>
     </a>
   </section>
+
+  <footer class="protocol-footer" data-i18n="footer_status">BOZHEMAN ≡ PROTOCOL v7.0 // ВСЕ СИСТЕМЫ В НОРМЕ</footer>
 
   <!-- АУДИО -->
   <audio id="ambient-audio" loop preload="auto">
     <source src="assets/audio/omega.m4a" type="audio/mp4" />
   </audio>
 
-  <!-- СКРИПТЫ -->
+  <!-- СКРИПТЫ THREE.JS -->
   <script type="importmap">
     {
       "imports": {
@@ -90,14 +98,14 @@
   <!-- ПАНЕЛЬ УПРАВЛЕНИЯ (HUD) -->
   <div id="hud-controls">
     <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
-      <option value="en">English</option>
-      <option value="ru">Русский</option>
-      <option value="uk">Українська</option>
-      <option value="be">Беларуская</option>
-      <option value="pl">Polski</option>
-      <option value="de">Deutsch</option>
-      <option value="fr">Français</option>
-      <option value="es">Español</option>
+      <option value="ru">[RU] Русский</option>
+      <option value="en">[EN] English</option>
+      <option value="uk">[UK] Українська</option>
+      <option value="be">[BE] Беларуская</option>
+      <option value="pl">[PL] Polski</option>
+      <option value="de">[DE] Deutsch</option>
+      <option value="fr">[FR] Français</option>
+      <option value="es">[ES] Español</option>
     </select>
 
     <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT effect">CRT: ON</button>
@@ -111,8 +119,8 @@
     </button>
   </div>
 
-  <!-- ТЕРМИНАЛ (Live Logs) -->
-  <div id="terminal-widget" aria-hidden="true"></div>
+  <!-- ТЕРМИНАЛ (Live Logs & CLI) -->
+  <div id="terminal-widget"></div>
 
   <!-- CRT OVERLAY -->
   <div id="crt-overlay" class="crt-overlay"></div>

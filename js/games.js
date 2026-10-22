@@ -21,15 +21,15 @@ function showToast(msg, type = 'info') {
   toast.id = 'games-toast';
   toast.textContent = msg;
   toast.style.cssText = `
-    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
-    z-index: 9999; padding: 0.8rem 1.6rem;
+    position: fixed; bottom: 4.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    z-index: 9999; padding: 0.75rem 1.4rem;
     background: rgba(0,0,0,0.95); backdrop-filter: blur(12px);
-    border: 1px solid ${type === 'error' ? '#a30000' : '#ff3333'};
-    color: var(--clr-primary, #ff3333);
-    font-family: 'Fira Code', monospace; font-size: 0.85rem;
+    border: 1px solid ${type === 'error' ? '#a30000' : '#00ff88'};
+    color: ${type === 'error' ? '#ff3333' : '#00ff88'};
+    font-family: 'Fira Code', monospace; font-size: 0.8rem;
     white-space: nowrap; max-width: 90vw; text-align: center; overflow: hidden; text-overflow: ellipsis;
     opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
-    box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
   `;
   document.body.appendChild(toast);
   requestAnimationFrame(() => {
@@ -40,8 +40,20 @@ function showToast(msg, type = 'info') {
     toast.style.opacity = '0';
     toast.style.transform = 'translateX(-50%) translateY(20px)';
     setTimeout(() => toast.remove(), 300);
-  }, 4000);
+  }, 3600);
 }
+
+// ─── Live Slots Telemetry on Card #MOD-00 ──────────────────────────────────
+function updateSlotsTelemetry() {
+  const el = document.getElementById('slots-card-telemetry');
+  if (!el) return;
+  const bal = State.read('slotsBalance') ?? 1000;
+  const spins = State.read('slotsTotalSpins') ?? 0;
+  el.textContent = t('game_slots_telemetry', { bal, spins });
+}
+
+updateSlotsTelemetry();
+State.subscribe(updateSlotsTelemetry);
 
 // ─── Countdown ─────────────────────────────────────────────────────────────
 function updateCountdown() {
@@ -53,10 +65,10 @@ function updateCountdown() {
   if (!timerEl) return;
 
   if (diff > 0) {
-    const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs  = Math.floor((diff % (1000 * 60)) / 1000);
+    const days  = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    const hours = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    const mins  = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    const secs  = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
     timerEl.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
   } else {
     timerEl.textContent = t('game_1_timer_soon');
@@ -68,10 +80,11 @@ setInterval(() => {
 }, 1000);
 updateCountdown();
 
-// ─── Filter Bar & Live Search Logic ────────────────────────────────────────
+// ─── Filter Bar, Search & Tag Click Logic ──────────────────────────────────
 const filterBtns  = document.querySelectorAll('.filter-btn');
 const gameCards   = document.querySelectorAll('.game-card');
 const searchInput = document.getElementById('project-search');
+const clearBtn    = document.getElementById('search-clear-btn');
 let activeFilter  = 'all';
 
 function updateFilterCounts() {
@@ -88,6 +101,9 @@ function updateFilterCounts() {
 
 function applyFilterAndSearch() {
   const queryText = (searchInput ? searchInput.value : '').trim().toLowerCase();
+  if (clearBtn) {
+    clearBtn.classList.toggle('visible', queryText.length > 0);
+  }
   gameCards.forEach(card => {
     const matchesCat = activeFilter === 'all' || card.dataset.category === activeFilter;
     const text = card.textContent.toLowerCase();
@@ -113,6 +129,30 @@ if (searchInput) {
   });
 }
 
+if (clearBtn && searchInput) {
+  clearBtn.addEventListener('click', () => {
+    AudioEngine.click();
+    searchInput.value = '';
+    applyFilterAndSearch();
+    searchInput.focus();
+  });
+}
+
+// Interactive tech tags filter search on click
+document.querySelectorAll('.tech-tags .tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    if (!searchInput) return;
+    AudioEngine.click();
+    const val = tag.textContent.trim();
+    if (searchInput.value.trim().toLowerCase() === val.toLowerCase()) {
+      searchInput.value = '';
+    } else {
+      searchInput.value = val;
+    }
+    applyFilterAndSearch();
+  });
+});
+
 updateFilterCounts();
 
 // ─── Modal Manual Logic ──────────────────────────────────────────────────────
@@ -120,6 +160,22 @@ const openManualBtn    = document.getElementById('open-manual-btn');
 const closeManualBtn   = document.getElementById('close-manual-btn');
 const modalCloseFooter = document.getElementById('modal-footer-close');
 const manualModal      = document.getElementById('manual-modal');
+const nextTabBtn       = document.getElementById('modal-next-tab');
+const manualTabs       = Array.from(document.querySelectorAll('.manual-tab'));
+const tabContents      = Array.from(document.querySelectorAll('.tab-content'));
+
+function activateManualTab(index) {
+  if (!manualTabs.length) return;
+  const safeIdx = ((index % manualTabs.length) + manualTabs.length) % manualTabs.length;
+  manualTabs.forEach(tEl => tEl.classList.remove('active'));
+  tabContents.forEach(c => c.classList.remove('active'));
+
+  const tab = manualTabs[safeIdx];
+  tab.classList.add('active');
+  const targetId = tab.dataset.tab;
+  const targetContent = document.getElementById(targetId);
+  if (targetContent) targetContent.classList.add('active');
+}
 
 function openModal() {
   if (manualModal) {
@@ -141,15 +197,16 @@ function closeModal() {
 }
 
 if (openManualBtn) openManualBtn.addEventListener('click', openModal);
-
-const fullManualBtn = document.getElementById('full-manual-btn');
-if (fullManualBtn) {
-  fullManualBtn.addEventListener('click', () => {
-    window.location.href = 'grower_manual.html';
-  });
-}
 if (closeManualBtn) closeManualBtn.addEventListener('click', closeModal);
 if (modalCloseFooter) modalCloseFooter.addEventListener('click', closeModal);
+
+if (nextTabBtn) {
+  nextTabBtn.addEventListener('click', () => {
+    AudioEngine.click();
+    const curIdx = manualTabs.findIndex(tEl => tEl.classList.contains('active'));
+    activateManualTab(curIdx + 1);
+  });
+}
 
 if (manualModal) {
   manualModal.addEventListener('click', (e) => {
@@ -157,27 +214,96 @@ if (manualModal) {
   });
 }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && manualModal && manualModal.classList.contains('active')) {
-    closeModal();
-  }
-});
-
-// ─── Modal Tab Navigation ─────────────────────────────────────────────────────
-const manualTabs  = document.querySelectorAll('.manual-tab');
-const tabContents = document.querySelectorAll('.tab-content');
-
-manualTabs.forEach(tab => {
+manualTabs.forEach((tab, idx) => {
   tab.addEventListener('click', () => {
     AudioEngine.click();
-    manualTabs.forEach(tEl => tEl.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-
-    tab.classList.add('active');
-    const targetId = tab.dataset.tab;
-    const targetContent = document.getElementById(targetId);
-    if (targetContent) targetContent.classList.add('active');
+    activateManualTab(idx);
   });
+});
+
+// ─── @GrowerSim_bot QR Modal Logic ───────────────────────────────────────────
+const openBotQrBtn   = document.getElementById('open-bot-qr-btn');
+const closeBotQrBtn  = document.getElementById('close-bot-qr-btn');
+const botQrModal     = document.getElementById('bot-qr-modal');
+const botQrCanvas    = document.getElementById('bot-qr-canvas');
+const copyBotLinkBtn = document.getElementById('copy-bot-link-btn');
+const BOT_URL        = 'https://t.me/GrowerSim_bot';
+
+function renderBotQr() {
+  if (!botQrCanvas) return;
+  botQrCanvas.innerHTML = '';
+  if (typeof window.QRCode !== 'undefined') {
+    new window.QRCode(botQrCanvas, {
+      text: BOT_URL,
+      width: 190,
+      height: 190,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: window.QRCode.CorrectLevel.H
+    });
+  } else {
+    botQrCanvas.textContent = '@GrowerSim_bot';
+  }
+}
+
+if (openBotQrBtn && botQrModal) {
+  openBotQrBtn.addEventListener('click', () => {
+    AudioEngine.modalOpen();
+    renderBotQr();
+    botQrModal.classList.add('active');
+    botQrModal.setAttribute('aria-hidden', 'false');
+    appendLog('> GROWERSIM_BOT_QR: GENERATED (t.me/GrowerSim_bot)', 'highlight');
+  });
+}
+
+if (closeBotQrBtn && botQrModal) {
+  closeBotQrBtn.addEventListener('click', () => {
+    AudioEngine.modalClose();
+    botQrModal.classList.remove('active');
+    botQrModal.setAttribute('aria-hidden', 'true');
+  });
+}
+
+if (botQrModal) {
+  botQrModal.addEventListener('click', (e) => {
+    if (e.target === botQrModal) {
+      AudioEngine.modalClose();
+      botQrModal.classList.remove('active');
+      botQrModal.setAttribute('aria-hidden', 'true');
+    }
+  });
+}
+
+if (copyBotLinkBtn) {
+  copyBotLinkBtn.addEventListener('click', async () => {
+    AudioEngine.copySuccess();
+    try {
+      await navigator.clipboard.writeText(BOT_URL);
+    } catch { /* fallback */ }
+    showToast(t('qr_bot_copied'), 'info');
+    appendLog(`> COPIED: ${BOT_URL}`, 'highlight');
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (manualModal && manualModal.classList.contains('active')) {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowRight') {
+      AudioEngine.click();
+      const curIdx = manualTabs.findIndex(tEl => tEl.classList.contains('active'));
+      activateManualTab(curIdx + 1);
+    }
+    if (e.key === 'ArrowLeft') {
+      AudioEngine.click();
+      const curIdx = manualTabs.findIndex(tEl => tEl.classList.contains('active'));
+      activateManualTab(curIdx - 1);
+    }
+  }
+  if (botQrModal && botQrModal.classList.contains('active') && e.key === 'Escape') {
+    AudioEngine.modalClose();
+    botQrModal.classList.remove('active');
+    botQrModal.setAttribute('aria-hidden', 'true');
+  }
 });
 
 // ─── Firebase Auth & Email Submission (with Local Protocol Fallback) ──────────
@@ -186,6 +312,7 @@ const notifyBtn = document.getElementById('notify-btn');
 if (notifyBtn) {
   if (State.read('subscribedEmail')) {
     notifyBtn.textContent = t('game_1_btn_subscribed');
+    notifyBtn.setAttribute('data-text', t('game_1_btn_subscribed'));
     notifyBtn.disabled = true;
   }
 
@@ -230,9 +357,9 @@ if (notifyBtn) {
       if (error && error.code === 'auth/popup-closed-by-user') {
         showToast(t('toast_auth_closed'), 'error');
       } else {
-        // Fallback local protocol subscription if popup blocked or offline
         State.set({ subscribedEmail: 'local_node@bozheman.protocol' });
         notifyBtn.textContent = t('game_1_btn_subscribed');
+        notifyBtn.setAttribute('data-text', t('game_1_btn_subscribed'));
         showToast(t('toast_saved', { email: 'LOCAL_NODE' }), 'success');
         appendLog('> TERMINUS_NOTIFY: REGISTERED IN LOCAL NODE', 'highlight');
         success = true;
@@ -249,6 +376,12 @@ if (notifyBtn) {
 document.addEventListener('languagechange', () => {
   applyTranslations();
   updateFilterCounts();
+  updateSlotsTelemetry();
+  updateCountdown();
+  if (notifyBtn && State.read('subscribedEmail')) {
+    notifyBtn.textContent = t('game_1_btn_subscribed');
+    notifyBtn.setAttribute('data-text', t('game_1_btn_subscribed'));
+  }
 });
 
 // --- 3D HOVER EFFECTS (desktop only) ---
@@ -262,9 +395,9 @@ if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
       const y = e.clientY - rect.top;
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -6;
-      const rotateY = ((x - centerX) / centerX) * 6;
-      card.style.transform = `perspective(1000px) scale(1.015) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      const rotateX = ((y - centerY) / centerY) * -4;
+      const rotateY = ((x - centerX) / centerX) * 4;
+      card.style.transform = `perspective(1000px) scale(1.01) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = `perspective(1000px) scale(1) rotateX(0deg) rotateY(0deg)`;

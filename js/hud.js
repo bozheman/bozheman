@@ -1,10 +1,11 @@
 /**
- * BOZHEMAN ≡ PROTOCOL — Unified HUD, Interactive CLI Terminal & Achievement System v3.0
+ * BOZHEMAN ≡ PROTOCOL — Unified HUD, Top Telemetry Bar, Interactive CLI & Achievements v4.0
  * Shared across all 6 pages:
+ *  - Top Protocol Telemetry Bar (Node status, Grower ID, Live Balance, @GrowerSim_bot direct link)
  *  - Persistent CRT toggle (hotkey: C)
  *  - Persistent Sound & Ambient Audio toggle (hotkey: M)
- *  - Interactive Cyberpunk Terminal CLI (hotkey: ` or ~)
- *  - Achievement Toast notifications
+ *  - Interactive Cyberpunk Terminal CLI with Quick-Chips & 100% 8-language i18n (hotkey: ` or ~)
+ *  - Protocol Achievements Modal & Toast notifications
  */
 
 import { State, ACHIEVEMENTS_CATALOG } from './state.js';
@@ -12,9 +13,9 @@ import { t, getCurrentLang, setLanguage } from './i18n.js';
 import { AudioEngine } from './engine/audio.js';
 
 const CLI_COMMANDS = [
-  'help', 'status', 'home', 'games', 'slots', 'support',
-  'manual', 'illusion', 'balance', 'stats', 'achievements',
-  'hack', 'crt', 'sound', 'matrix', 'lang', 'export', 'clear'
+  'help', 'status', 'bot', 'grower', 'home', 'games', 'slots', 'support',
+  'manual', 'illusion', 'balance', 'stats', 'achievements', 'ach',
+  'hack', 'crt', 'sound', 'matrix', 'lang', 'export', 'import', 'reset', 'clear'
 ];
 
 export function appendLog(text, type = 'sys') {
@@ -24,7 +25,10 @@ export function appendLog(text, type = 'sys') {
 }
 
 export function initHUD() {
-  const hud = document.getElementById('hud-controls');
+  if (document.body.dataset.hudInitialized === '1') return;
+  document.body.dataset.hudInitialized = '1';
+
+  // 1. Ensure CRT overlay exists
   let crtOverlay = document.getElementById('crt-overlay');
   if (!crtOverlay) {
     crtOverlay = document.createElement('div');
@@ -33,8 +37,11 @@ export function initHUD() {
     document.body.appendChild(crtOverlay);
   }
 
-  // Ensure HUD container exists on every page
-  let hudContainer = hud;
+  // 2. Ensure Top Protocol Telemetry Bar exists
+  setupTopTelemetryBar();
+
+  // 3. Ensure HUD container exists
+  let hudContainer = document.getElementById('hud-controls');
   if (!hudContainer) {
     hudContainer = document.createElement('div');
     hudContainer.id = 'hud-controls';
@@ -43,13 +50,31 @@ export function initHUD() {
     document.body.appendChild(hudContainer);
   }
 
+  // Upgrade language select labels with protocol codes
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) {
+    const langLabels = {
+      ru: '[RU] Русский',
+      en: '[EN] English',
+      uk: '[UK] Українська',
+      be: '[BE] Беларуская',
+      pl: '[PL] Polski',
+      de: '[DE] Deutsch',
+      fr: '[FR] Français',
+      es: '[ES] Español'
+    };
+    Array.from(langSelect.options).forEach(opt => {
+      if (langLabels[opt.value]) opt.textContent = langLabels[opt.value];
+    });
+    langSelect.addEventListener('change', () => AudioEngine.click());
+  }
+
   // Ensure CRT toggle button exists
   let crtToggle = document.getElementById('crt-toggle');
   if (!crtToggle) {
     crtToggle = document.createElement('button');
     crtToggle.id = 'crt-toggle';
     crtToggle.className = 'hud-btn';
-    crtToggle.setAttribute('aria-label', 'Toggle CRT');
     hudContainer.appendChild(crtToggle);
   }
 
@@ -59,7 +84,6 @@ export function initHUD() {
     soundToggle = document.createElement('button');
     soundToggle.id = 'sound-toggle';
     soundToggle.className = 'hud-btn sound-toggle';
-    soundToggle.setAttribute('aria-label', 'Toggle sound');
     soundToggle.innerHTML = `
       <span data-i18n="sound_off">SOUND: OFF</span>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="sound-icon" aria-hidden="true">
@@ -70,6 +94,15 @@ export function initHUD() {
     hudContainer.appendChild(soundToggle);
   }
 
+  // Ensure Achievements HUD button exists
+  let achToggle = document.getElementById('ach-toggle');
+  if (!achToggle) {
+    achToggle = document.createElement('button');
+    achToggle.id = 'ach-toggle';
+    achToggle.className = 'hud-btn ach-toggle-btn';
+    hudContainer.appendChild(achToggle);
+  }
+
   // Ensure Terminal toggle button exists in HUD
   let termToggle = document.getElementById('term-toggle');
   if (!termToggle) {
@@ -77,7 +110,6 @@ export function initHUD() {
     termToggle.id = 'term-toggle';
     termToggle.className = 'hud-btn term-toggle-btn';
     termToggle.setAttribute('data-i18n', 'term_toggle');
-    termToggle.setAttribute('aria-label', 'Toggle Interactive Terminal');
     termToggle.textContent = t('term_toggle');
     hudContainer.appendChild(termToggle);
   }
@@ -92,6 +124,7 @@ export function initHUD() {
       const key = enabled ? 'crt_on' : 'crt_off';
       crtToggle.textContent = t(key);
       crtToggle.setAttribute('data-i18n', key);
+      crtToggle.setAttribute('aria-pressed', String(enabled));
       crtToggle.classList.toggle('active-hud', enabled);
     }
   }
@@ -102,6 +135,7 @@ export function initHUD() {
     if (soundToggle) {
       soundToggle.classList.toggle('muted', muted);
       soundToggle.classList.toggle('active-hud', !muted);
+      soundToggle.setAttribute('aria-pressed', String(!muted));
     }
     if (labelSpan) {
       const key = muted ? 'sound_off' : 'sound_on';
@@ -118,6 +152,13 @@ export function initHUD() {
     }
   }
 
+  function syncAchButton() {
+    if (!achToggle) return;
+    const unlockedCount = (State.read('achievements') || []).length;
+    const totalCount = Object.keys(ACHIEVEMENTS_CATALOG).length;
+    achToggle.textContent = `${t('ach_btn_label')} [${unlockedCount}/${totalCount}]`;
+  }
+
   function toggleCRT() {
     const next = !(State.read('crtEnabled') !== false);
     State.set({ crtEnabled: next });
@@ -132,7 +173,6 @@ export function initHUD() {
     if (!nextMuted) AudioEngine.click();
   }
 
-  // Remove duplicate inline listeners by cloning if needed, or bind once
   if (!crtToggle.dataset.hudBound) {
     crtToggle.dataset.hudBound = '1';
     crtToggle.addEventListener('click', toggleCRT);
@@ -140,6 +180,13 @@ export function initHUD() {
   if (!soundToggle.dataset.hudBound) {
     soundToggle.dataset.hudBound = '1';
     soundToggle.addEventListener('click', toggleSound);
+  }
+  if (!achToggle.dataset.hudBound) {
+    achToggle.dataset.hudBound = '1';
+    achToggle.addEventListener('click', () => {
+      AudioEngine.modalOpen();
+      openAchievementsModal();
+    });
   }
 
   document.addEventListener('visibilitychange', () => {
@@ -155,7 +202,6 @@ export function initHUD() {
     }
   });
 
-  // Auto-resume ambient audio on first user interaction if sound is unmuted
   document.addEventListener('pointerdown', () => {
     if (!State.read('audioMuted') && ambientAudio && ambientAudio.paused) {
       ambientAudio.volume = 0.45;
@@ -168,28 +214,121 @@ export function initHUD() {
 
   // Setup Achievement Toast Listener
   window.addEventListener('bzp:achievement', (e) => {
+    syncAchButton();
     if (e.detail) showAchievementToast(e.detail);
   });
 
-  // Sync on language or state change
   document.addEventListener('languagechange', () => {
     syncCRT();
     syncSound(false);
+    syncAchButton();
+    syncTopTelemetryBar();
     if (termToggle) termToggle.textContent = t('term_toggle');
   });
 
   window.addEventListener('bzp:statechange', () => {
     syncCRT();
     syncSound(false);
+    syncAchButton();
+    syncTopTelemetryBar();
   });
 
   syncCRT();
   syncSound(false);
+  syncAchButton();
+  syncTopTelemetryBar();
 
-  // Unlock FIRST_CONTACT achievement on first session
   setTimeout(() => {
     State.unlockAchievement('FIRST_CONTACT');
-  }, 1200);
+  }, 1000);
+}
+
+function setupTopTelemetryBar() {
+  if (document.getElementById('protocol-top-bar')) return;
+  const bar = document.createElement('div');
+  bar.id = 'protocol-top-bar';
+  bar.className = 'protocol-top-bar';
+  bar.innerHTML = `
+    <div class="top-bar-inner">
+      <div class="top-bar-left">
+        <span class="top-dot"></span>
+        <span class="top-node-text" data-i18n="top_node_online">${t('top_node_online')}</span>
+        <span class="top-sep">|</span>
+        <span class="top-id-text" id="top-grower-id">${State.read('growerId')}</span>
+      </div>
+      <div class="top-bar-right">
+        <a href="roulet.html" class="top-bal-chip" id="top-bal-link">
+          <span data-i18n="top_balance">${t('top_balance')}</span>:
+          <strong id="top-bal-val">${State.read('balance')} ₿</strong>
+        </a>
+        <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="top-bot-chip">
+          <span class="live-pulse"></span>
+          <span data-i18n="top_bot_link">🌱 @GrowerSim_bot</span>
+        </a>
+      </div>
+    </div>
+  `;
+  document.body.prepend(bar);
+}
+
+function syncTopTelemetryBar() {
+  const idEl  = document.getElementById('top-grower-id');
+  const balEl = document.getElementById('top-bal-val');
+  if (idEl)  idEl.textContent  = State.read('growerId');
+  if (balEl) balEl.textContent = `${State.read('balance')} ₿`;
+}
+
+function openAchievementsModal() {
+  let modal = document.getElementById('bzp-ach-modal');
+  if (modal) modal.remove();
+
+  const unlocked = State.read('achievements') || [];
+  const total = Object.keys(ACHIEVEMENTS_CATALOG).length;
+
+  modal = document.createElement('div');
+  modal.id = 'bzp-ach-modal';
+  modal.className = 'modal-overlay active';
+  modal.style.opacity = '1';
+  modal.style.pointerEvents = 'all';
+
+  const itemsHtml = Object.values(ACHIEVEMENTS_CATALOG).map(ach => {
+    const done = unlocked.includes(ach.id);
+    return `
+      <div class="ach-card-item ${done ? 'ach-done' : 'ach-locked'}">
+        <div class="ach-card-icon">${ach.icon}</div>
+        <div class="ach-card-info">
+          <div class="ach-card-title">${t(ach.titleKey)} ${done ? '<span class="ach-check">✓</span>' : ''}</div>
+          <div class="ach-card-desc">${t(ach.descKey)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="ach-modal-box">
+      <div class="ach-modal-header">
+        <span>🏆 ${t('ach_modal_title')} [${unlocked.length}/${total}]</span>
+        <button type="button" class="ach-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="ach-modal-grid">${itemsHtml}</div>
+      <div class="ach-modal-footer">
+        <button type="button" class="btn-glitch ach-close-btn">${t('close_manual')}</button>
+      </div>
+    </div>
+  `;
+
+  const closeFn = () => {
+    AudioEngine.modalClose();
+    modal.remove();
+  };
+
+  modal.querySelector('.ach-modal-close').addEventListener('click', closeFn);
+  modal.querySelector('.ach-close-btn').addEventListener('click', closeFn);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeFn();
+  });
+
+  document.body.appendChild(modal);
 }
 
 function showAchievementToast(ach) {
@@ -250,47 +389,61 @@ function setupInteractiveTerminal(termToggleBtn, controls) {
     <div class="cyber-term-header" id="cyber-term-header">
       <span class="cyber-term-title">BOZHEMAN ≡ CLI v7.0</span>
       <div class="cyber-term-actions">
-        <span class="cyber-term-ping" id="cyber-term-ping">12ms</span>
+        <span class="cyber-term-ping" id="cyber-term-ping">60 FPS • 11ms</span>
         <button type="button" class="cyber-term-expand" id="cyber-term-close" aria-label="Toggle console">[×]</button>
       </div>
     </div>
     <div class="cyber-term-logs" id="cyber-term-logs"></div>
+    <div class="cyber-term-chips" id="cyber-term-chips">
+      <button type="button" class="term-chip" data-cmd="help">help</button>
+      <button type="button" class="term-chip" data-cmd="status">status</button>
+      <button type="button" class="term-chip" data-cmd="bot">@GrowerSim_bot</button>
+      <button type="button" class="term-chip" data-cmd="hack">hack +250</button>
+      <button type="button" class="term-chip" data-cmd="slots">slots 777</button>
+      <button type="button" class="term-chip" data-cmd="ach">ach</button>
+      <button type="button" class="term-chip" data-cmd="clear">clear</button>
+    </div>
     <form class="cyber-term-form" id="cyber-term-form" autocomplete="off">
       <span class="cyber-term-prompt">&gt;_</span>
-      <input type="text" id="cyber-term-input" class="cyber-term-input" placeholder="${t('term_placeholder')}" aria-label="Protocol CLI command input" />
+      <input type="text" id="cyber-term-input" class="cyber-term-input" data-i18n-attr="placeholder" data-i18n="term_placeholder" placeholder="${t('term_placeholder')}" aria-label="Protocol CLI command input" />
     </form>
+    <div class="cyber-term-hint" data-i18n="term_hotkeys_hint">${t('term_hotkeys_hint')}</div>
   `;
 
-  const logsEl  = document.getElementById('cyber-term-logs');
-  const formEl  = document.getElementById('cyber-term-form');
-  const inputEl = document.getElementById('cyber-term-input');
-  const closeEl = document.getElementById('cyber-term-close');
+  const logsEl   = document.getElementById('cyber-term-logs');
+  const formEl   = document.getElementById('cyber-term-form');
+  const inputEl  = document.getElementById('cyber-term-input');
+  const closeEl  = document.getElementById('cyber-term-close');
   const headerEl = document.getElementById('cyber-term-header');
-  const pingEl  = document.getElementById('cyber-term-ping');
+  const pingEl   = document.getElementById('cyber-term-ping');
+  const chipsEl  = document.getElementById('cyber-term-chips');
 
   const cmdHistory = [];
   let historyIdx = -1;
   let isExpanded = false;
 
-  function appendLog(text, type = 'sys') {
+  function localAppendLog(text, type = 'sys') {
     if (!logsEl) return;
     const line = document.createElement('div');
     line.className = `cyber-log-line log-${type}`;
     line.textContent = text;
     logsEl.appendChild(line);
-    const maxLines = isExpanded ? 60 : 6;
+    const maxLines = isExpanded ? 60 : 5;
     while (logsEl.children.length > maxLines) {
       logsEl.removeChild(logsEl.firstChild);
     }
     logsEl.scrollTop = logsEl.scrollHeight;
   }
 
-  window.bzpTerminalLog = appendLog;
+  window.bzpTerminalLog = localAppendLog;
 
   function setExpanded(next) {
     isExpanded = Boolean(next);
     widget.classList.toggle('expanded', isExpanded);
-    if (termToggleBtn) termToggleBtn.classList.toggle('active-hud', isExpanded);
+    if (termToggleBtn) {
+      termToggleBtn.classList.toggle('active-hud', isExpanded);
+      termToggleBtn.setAttribute('aria-pressed', String(isExpanded));
+    }
     AudioEngine.click();
     if (isExpanded && inputEl) {
       setTimeout(() => inputEl.focus(), 50);
@@ -312,25 +465,36 @@ function setupInteractiveTerminal(termToggleBtn, controls) {
     });
   }
 
-  // Ambient live telemetry logs when idle
+  if (chipsEl) {
+    chipsEl.querySelectorAll('.term-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const cmd = chip.getAttribute('data-cmd');
+        if (!cmd) return;
+        AudioEngine.click();
+        localAppendLog(`>_ ${cmd}`, 'cmd');
+        executeCommand(cmd, localAppendLog, controls);
+      });
+    });
+  }
+
   const AMBIENT_LOGS = [
-    () => `> INIT_CONNECTION... [OK]`,
-    () => `> NODE_BALANCE: ${State.read('balance')} COINS`,
-    () => `> BYPASSING_ICE... [SECURE]`,
-    () => `> SLOTS_SPINS: ${State.get().rouletteStats.spins} | WINRATE: ${State.getWinRate()}%`,
-    () => `> PROTOCOL_BOZHEMAN: v7.0 ACTIVE`,
-    () => `> TYPE 'help' OR PRESS [~] FOR CLI`,
+    () => t('amb_log_1'),
+    () => t('amb_log_2', { bal: State.read('balance') }),
+    () => t('amb_log_3'),
+    () => t('amb_log_4', { spins: State.get().rouletteStats.spins, winrate: State.getWinRate() }),
+    () => t('amb_log_5'),
+    () => t('amb_log_6'),
   ];
   let ambIdx = 0;
-  appendLog('> BOZHEMAN ≡ PROTOCOL CLI READY. Type "help".', 'highlight');
+  localAppendLog(t('term_ready'), 'highlight');
 
   setInterval(() => {
     if (document.hidden || isExpanded) return;
     const fn = AMBIENT_LOGS[ambIdx % AMBIENT_LOGS.length];
-    appendLog(fn(), 'sys');
-    if (pingEl) pingEl.textContent = `${8 + Math.floor(Math.random() * 14)}ms`;
+    localAppendLog(fn(), 'sys');
+    if (pingEl) pingEl.textContent = `60 FPS • ${8 + Math.floor(Math.random() * 11)}ms`;
     ambIdx++;
-  }, 3200);
+  }, 3400);
 
   if (formEl && inputEl) {
     inputEl.addEventListener('keydown', (e) => {
@@ -368,12 +532,12 @@ function setupInteractiveTerminal(termToggleBtn, controls) {
       inputEl.value = '';
       cmdHistory.push(raw);
       historyIdx = -1;
-      appendLog(`>_ ${raw}`, 'cmd');
-      executeCommand(raw, appendLog, controls);
+      localAppendLog(`>_ ${raw}`, 'cmd');
+      executeCommand(raw, localAppendLog, controls);
     });
   }
 
-  // Global keyboard shortcuts (when not focused in an input)
+  // Global keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     const tag = document.activeElement ? document.activeElement.tagName : '';
     const inInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
@@ -399,54 +563,63 @@ function setupInteractiveTerminal(termToggleBtn, controls) {
 function executeCommand(raw, log, controls) {
   const parts = raw.trim().split(/\s+/);
   const cmd   = parts[0].toLowerCase();
-  const arg   = (parts[1] || '').toLowerCase();
+  const arg   = (parts[1] || '');
 
   switch (cmd) {
     case 'help':
     case '?':
-      log('=== BOZHEMAN ≡ CLI COMMANDS ===', 'highlight');
-      log('  status       - System & player telemetry', 'info');
-      log('  home / games - Navigate to Main / Games Hub', 'info');
-      log('  slots        - Launch BOZHEMAN SLOTS 777', 'info');
-      log('  support      - Open Crypto & Partner Gateways', 'info');
-      log('  manual       - Open GrowerSim Full Manual', 'info');
-      log('  illusion     - Enter Secret Weaver Protocol', 'info');
-      log('  stats        - Detailed Slots 777 analytics', 'info');
-      log('  achievements - List protocol achievements', 'info');
-      log('  hack         - Breach ICE firewall (+250 coins)', 'info');
-      log('  matrix <spd> - Set rain speed: slow|normal|fast', 'info');
-      log('  crt / sound  - Toggle CRT filter or Audio', 'info');
-      log('  export       - Export profile state token', 'info');
-      log('  clear        - Clear terminal output', 'info');
+      log(t('cli_help_header'), 'highlight');
+      log(t('cli_help_status'), 'info');
+      log(t('cli_help_bot'), 'info');
+      log(t('cli_help_nav'), 'info');
+      log(t('cli_help_slots'), 'info');
+      log(t('cli_help_support'), 'info');
+      log(t('cli_help_manual'), 'info');
+      log(t('cli_help_illusion'), 'info');
+      log(t('cli_help_stats'), 'info');
+      log(t('cli_help_ach'), 'info');
+      log(t('cli_help_hack'), 'info');
+      log(t('cli_help_matrix'), 'info');
+      log(t('cli_help_crt'), 'info');
+      log(t('cli_help_export'), 'info');
+      log(t('cli_help_clear'), 'info');
       break;
 
     case 'status': {
       const s = State.get();
-      log(`> PROTOCOL: v7.0 ONLINE | LANG: ${getCurrentLang().toUpperCase()}`, 'highlight');
-      log(`> BALANCE: ${s.balance} COINS | ACHIEVEMENTS: ${s.achievements.length}/${Object.keys(ACHIEVEMENTS_CATALOG).length}`, 'info');
-      log(`> SPINS: ${s.rouletteStats.spins} | WINRATE: ${State.getWinRate()}% | PROFIT: ${State.getNetProfit()}`, 'info');
-      log(`> CRT: ${s.crtEnabled ? 'ON' : 'OFF'} | AUDIO: ${s.audioMuted ? 'MUTED' : 'ACTIVE'} | MATRIX: ${s.matrixSpeed.toUpperCase()}`, 'info');
+      log(`> PROTOCOL: v7.0 | ID: ${s.growerId} | LANG: ${getCurrentLang().toUpperCase()}`, 'highlight');
+      log(`> ${t('top_balance')}: ${s.balance} ₿ | ${t('ach_btn_label')}: ${s.achievements.length}/${Object.keys(ACHIEVEMENTS_CATALOG).length}`, 'info');
+      log(`> SLOTS: ${s.rouletteStats.spins} | WINRATE: ${State.getWinRate()}% | PROFIT: ${State.getNetProfit()}`, 'info');
+      log(`> TG BOT: @GrowerSim_bot (https://t.me/GrowerSim_bot) [ONLINE]`, 'info');
       break;
     }
 
+    case 'bot':
+    case 'grower':
+    case 'growersim':
+    case 'tg':
+      log(t('cli_bot_opening'), 'highlight');
+      window.open('https://t.me/GrowerSim_bot', '_blank', 'noopener,noreferrer');
+      break;
+
     case 'balance':
-      log(`> CURRENT BALANCE: ${State.read('balance')} COINS`, 'highlight');
+      log(`> ${t('top_balance')}: ${State.read('balance')} ₿`, 'highlight');
       break;
 
     case 'stats': {
       const st = State.get().rouletteStats;
       log('=== SLOTS 777 TELEMETRY ===', 'highlight');
-      log(`  Total Spins  : ${st.spins} (Wins: ${st.wins} | ${State.getWinRate()}%)`, 'info');
-      log(`  Total Wagered: ${st.totalWagered} | Total Won: ${st.totalWon}`, 'info');
-      log(`  Net Profit   : ${State.getNetProfit()} | Max Win: ${st.maxWin}`, 'info');
-      log(`  Current Strk : ${st.currentStreak} | Best Streak: ${st.bestStreak}`, 'info');
+      log(`  Spins  : ${st.spins} (Wins: ${st.wins} | ${State.getWinRate()}%)`, 'info');
+      log(`  Wagered: ${st.totalWagered} | Won: ${st.totalWon}`, 'info');
+      log(`  Profit : ${State.getNetProfit()} | Max Win: ${st.maxWin}`, 'info');
+      log(`  Streak : ${st.currentStreak} | Best: ${st.bestStreak}`, 'info');
       break;
     }
 
     case 'achievements':
     case 'ach': {
       const unlocked = State.get().achievements;
-      log(`=== ACHIEVEMENTS (${unlocked.length}/${Object.keys(ACHIEVEMENTS_CATALOG).length}) ===`, 'highlight');
+      log(`=== ${t('ach_modal_title')} (${unlocked.length}/${Object.keys(ACHIEVEMENTS_CATALOG).length}) ===`, 'highlight');
       Object.values(ACHIEVEMENTS_CATALOG).forEach(a => {
         const done = unlocked.includes(a.id);
         log(`  ${done ? '[✓]' : '[ ]'} ${a.icon} ${t(a.titleKey)} — ${t(a.descKey)}`, done ? 'highlight' : 'sys');
@@ -456,91 +629,97 @@ function executeCommand(raw, log, controls) {
 
     case 'hack': {
       if (State.read('hackClaimed')) {
-        log('> ICE_FIREWALL: Already breached in this profile.', 'err');
+        log(t('cli_hack_done'), 'err');
         AudioEngine.error();
         break;
       }
-      log('> INJECTING PAYLOAD INTO SECTOR_0ZERO...', 'info');
+      log(t('cli_hack_start'), 'info');
       AudioEngine.glitch();
       setTimeout(() => log('> BYPASSING QUANTUM HASH [██████████] 100%', 'info'), 350);
       setTimeout(() => {
         const nextBal = State.read('balance') + 250;
         State.set({ balance: nextBal, hackClaimed: true });
         State.unlockAchievement('ICE_HACKER');
-        log(`> ACCESS GRANTED! +250 COINS TRANSFERRED (BALANCE: ${nextBal})`, 'highlight');
+        log(t('cli_hack_granted', { bal: nextBal }), 'highlight');
       }, 750);
       break;
     }
 
     case 'home':
     case 'index':
-      log('> NAVIGATING TO MAIN PROTOCOL...', 'highlight');
-      setTimeout(() => { window.location.href = 'index.html'; }, 250);
+      window.location.href = 'index.html';
       break;
 
     case 'games':
-      log('> NAVIGATING TO GAMES HUB...', 'highlight');
-      setTimeout(() => { window.location.href = 'games.html'; }, 250);
+      window.location.href = 'games.html';
       break;
 
     case 'slots':
     case '777':
     case 'roulette':
-      log('> LAUNCHING BOZHEMAN SLOTS 777...', 'highlight');
-      setTimeout(() => { window.location.href = 'roulet.html'; }, 250);
+      window.location.href = 'roulet.html';
       break;
 
     case 'support':
     case 'refer':
     case 'crypto':
-      log('> OPENING CRYPTO & PARTNER GATEWAYS...', 'highlight');
-      setTimeout(() => { window.location.href = 'refer.html'; }, 250);
+      window.location.href = 'refer.html';
       break;
 
     case 'manual':
-      log('> OPENING GROWERSIM SYSTEM MANUAL...', 'highlight');
-      setTimeout(() => { window.location.href = 'grower_manual.html'; }, 250);
+      window.location.href = 'grower_manual.html';
       break;
 
     case 'illusion':
     case 'secret':
       State.set({ secretUnlocked: true });
       State.unlockAchievement('CORE_BREAKER');
-      log('> ENTERING SECRET WEAVER PROTOCOL...', 'highlight');
-      setTimeout(() => { window.location.href = 'doubleindex.html'; }, 250);
+      window.location.href = 'doubleindex.html';
       break;
 
     case 'crt':
       controls.toggleCRT();
-      log(`> CRT OVERLAY: ${State.read('crtEnabled') ? 'ENABLED' : 'DISABLED'}`, 'info');
       break;
 
     case 'sound':
     case 'audio':
       controls.toggleSound();
-      log(`> AUDIO ENGINE: ${State.read('audioMuted') ? 'MUTED' : 'ACTIVE'}`, 'info');
       break;
 
-    case 'matrix':
-      if (['slow', 'normal', 'fast'].includes(arg)) {
-        State.set({ matrixSpeed: arg });
-        log(`> MATRIX SPEED SET TO: ${arg.toUpperCase()}`, 'highlight');
+    case 'matrix': {
+      const mArg = arg.toLowerCase();
+      if (['slow', 'normal', 'fast'].includes(mArg)) {
+        State.set({ matrixSpeed: mArg });
+        log(`> MATRIX SPEED: ${mArg.toUpperCase()}`, 'highlight');
       } else {
         log('> Usage: matrix slow | normal | fast', 'err');
       }
       break;
+    }
 
     case 'lang':
       if (arg) {
-        setLanguage(arg);
-        log(`> LANGUAGE UPDATED: ${arg.toUpperCase()}`, 'highlight');
+        setLanguage(arg.toLowerCase());
       } else {
         log('> Usage: lang ru|en|uk|be|pl|de|fr|es', 'info');
       }
       break;
 
     case 'export':
-      log(`> PROFILE TOKEN: ${State.exportData()}`, 'highlight');
+      log(`> TOKEN: ${State.exportData()}`, 'highlight');
+      break;
+
+    case 'import':
+      if (arg && State.importData(arg)) {
+        log(t('cli_import_ok'), 'highlight');
+      } else {
+        log(t('cli_import_err'), 'err');
+      }
+      break;
+
+    case 'reset':
+      State.reset();
+      log(t('cli_reset_ok'), 'highlight');
       break;
 
     case 'clear':
@@ -551,7 +730,7 @@ function executeCommand(raw, log, controls) {
     }
 
     default:
-      log(`> UNKNOWN COMMAND: "${cmd}". Type "help" for available commands.`, 'err');
+      log(t('cli_unknown', { cmd }), 'err');
       AudioEngine.error();
       break;
   }

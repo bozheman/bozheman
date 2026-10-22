@@ -6,7 +6,7 @@
   "background_color": "#000000",
   "theme_color": "#ff3333",
   "orientation": "any",
-  "description": "BOZHEMAN ≡ PROTOCOL v7.0 — Cyberpunk Hub, Slots 777, GrowerSim & Game Dev.",
+  "description": "BOZHEMAN ≡ PROTOCOL v8.0 — Cyberpunk Hub, Slots 777, @GrowerSim_bot & Game Dev.",
   "icons": [
     {
       "src": "assets/images/gg.png",
@@ -24,10 +24,17 @@
       "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
     },
     {
-      "name": "GAMES HUB",
+      "name": "GAMES HUB & @GrowerSim_bot",
       "short_name": "Games Hub",
-      "description": "Explore BOZHEMAN Games & Telegram Bots",
+      "description": "Explore BOZHEMAN Games & @GrowerSim_bot",
       "url": "./games.html",
+      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "GROWERSIM LAB MANUAL",
+      "short_name": "GrowerSim Lab",
+      "description": "GrowerSim Full Manual & Mendel Genetics Calculator",
+      "url": "./grower_manual.html",
       "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
     },
     {

@@ -28,32 +28,33 @@
   <!-- Фоновая матрица -->
   <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
 
-  <div class="machine-wrapper">
-    <h1 class="page-title" data-text="BOZHEMAN SLOTS" data-i18n="slots_title">BOZHEMAN SLOTS</h1>
+  <main class="machine-wrapper">
+    <h1 class="page-title" data-text="BOZHEMAN SLOTS 777" data-i18n="slots_title">BOZHEMAN SLOTS 777</h1>
 
+    <!-- 6-CELL SYMMETRIC STATS BAR -->
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_balance">BALANCE</span>
+        <span class="stat-label" data-i18n="slots_balance">БАЛАНС</span>
         <span class="stat-value" id="balance-display">1000</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_spins">SPINS</span>
+        <span class="stat-label" data-i18n="slots_spins">СПИНОВ</span>
         <span class="stat-value" id="spins-display">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_last_bet">LAST BET</span>
+        <span class="stat-label" data-i18n="slots_last_bet">ПОСЛ. СТАВКА</span>
         <span class="stat-value" id="last-bet-display">—</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_winrate">WIN RATE</span>
+        <span class="stat-label" data-i18n="slots_winrate">ВИНРЕЙТ</span>
         <span class="stat-value" id="winrate-display">0%</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_max_win">MAX WIN</span>
+        <span class="stat-label" data-i18n="slots_max_win">МАКС. КУШ</span>
         <span class="stat-value" id="maxwin-display">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label" data-i18n="slots_streak">STREAK</span>
+        <span class="stat-label" data-i18n="slots_streak">СЕРИЯ</span>
         <span class="stat-value" id="streak-display">0</span>
       </div>
     </div>
@@ -72,56 +73,59 @@
         <div class="pay-row" data-pay="omega"><span class="pay-symbol">Ω Ω Ω</span><span class="pay-mult">x5</span></div>
         <div class="pay-row" data-pay="tri"><span class="pay-symbol">▲ ▲ ▲</span><span class="pay-mult">x3</span></div>
         <div class="pay-row" data-pay="square"><span class="pay-symbol">■ ■ ■</span><span class="pay-mult">x2</span></div>
-        <div class="pay-row" data-pay="pair"><span class="pay-symbol" data-i18n="slots_any2">ANY 2</span><span class="pay-mult">x1.5</span></div>
+        <div class="pay-row" data-pay="pair"><span class="pay-symbol" data-i18n="slots_any2">ЛЮБЫЕ 2</span><span class="pay-mult">x1.5</span></div>
       </div>
 
       <div class="controls-section">
         <div class="bet-row">
-          <button class="chip" id="btn-bet-minus" style="flex: 0; min-width: 40px; font-size: 1.2rem;" aria-label="Decrease bet">-</button>
-          <input type="number" id="bet-input" class="input-field" placeholder="BET" data-i18n-attr="placeholder" data-i18n="slots_bet" min="10" max="99999" value="10" />
-          <button class="chip" id="btn-bet-plus" style="flex: 0; min-width: 40px; font-size: 1.2rem;" aria-label="Increase bet">+</button>
+          <button type="button" class="chip" id="btn-bet-minus" style="font-size: 1.15rem;" aria-label="Decrease bet">-</button>
+          <input type="number" id="bet-input" class="input-field" placeholder="СТАВКА" data-i18n-attr="placeholder" data-i18n="slots_bet" min="10" max="99999" value="10" />
+          <button type="button" class="chip" id="btn-bet-plus" style="font-size: 1.15rem;" aria-label="Increase bet">+</button>
         </div>
         
         <div class="chip-row">
-          <button class="chip" data-amount="min" data-i18n="slots_min">MIN</button>
-          <button class="chip" data-amount="half" data-i18n="slots_half">1/2</button>
-          <button class="chip" data-amount="double" data-i18n="slots_double">x2</button>
-          <button class="chip" data-amount="50">+50</button>
-          <button class="chip" data-amount="100">+100</button>
-          <button class="chip" data-amount="max" data-i18n="slots_max">MAX</button>
+          <button type="button" class="chip" data-amount="min" data-i18n="slots_min">MIN</button>
+          <button type="button" class="chip" data-amount="half" data-i18n="slots_half">1/2</button>
+          <button type="button" class="chip" data-amount="double" data-i18n="slots_double">x2</button>
+          <button type="button" class="chip" data-amount="50">+50</button>
+          <button type="button" class="chip" data-amount="100">+100</button>
+          <button type="button" class="chip" data-amount="max" data-i18n="slots_max">MAX</button>
         </div>
 
         <div class="mode-row">
-          <button type="button" id="btn-turbo" class="btn-mode" data-i18n="slots_turbo_off">TURBO: OFF [T]</button>
-          <button type="button" id="btn-auto" class="btn-mode" data-i18n="slots_auto_off">AUTO: OFF [A]</button>
-          <button type="button" id="btn-daily" class="btn-mode btn-daily" data-i18n="slots_daily_btn">⚡ DAILY +500</button>
+          <button type="button" id="btn-turbo" class="btn-mode" data-i18n="slots_turbo_off">TURBO: ВЫКЛ [T]</button>
+          <button type="button" id="btn-auto" class="btn-mode" data-i18n="slots_auto_off">АВТО: ВЫКЛ [A]</button>
+          <button type="button" id="btn-daily" class="btn-mode btn-daily" data-i18n="slots_daily_btn">⚡ БОНУС +500</button>
         </div>
 
-        <button id="btn-spin" class="btn-spin" data-text="SPIN (SPACE)" data-i18n="slots_spin_btn">SPIN (SPACE)</button>
-        <button id="btn-refill" class="btn-refill" style="display:none;" data-text="+ GET 1000 COINS" data-i18n="slots_refill_btn">+ GET 1000 COINS</button>
+        <button type="button" id="btn-spin" class="btn-spin" data-text="КРУТИТЬ (ПРОБЕЛ)" data-i18n="slots_spin_btn">КРУТИТЬ (ПРОБЕЛ)</button>
+        <button type="button" id="btn-refill" class="btn-refill" style="display:none;" data-text="+ ПОЛУЧИТЬ 1000 МОНЕТ" data-i18n="slots_refill_btn">+ ПОЛУЧИТЬ 1000 МОНЕТ</button>
       </div>
     </div>
 
-    <div class="fair-bar">
-      <span data-i18n="slots_fair_seed">PROVABLY FAIR SEED:</span>
+    <div class="fair-bar" id="fair-bar" role="button" tabindex="0" aria-label="Copy Provably Fair Seed">
+      <span data-i18n="slots_fair_seed">PROVABLY FAIR ХЕШ:</span>
       <span class="fair-seed" id="fair-seed-display">SHA256::8F3A...C901</span>
     </div>
 
     <div class="history-section">
       <div class="history-header">
-        <div class="history-title" data-i18n="slots_history">TRANSACTION HISTORY</div>
-        <button type="button" id="btn-clear-history" class="btn-clear-history" data-i18n="slots_clear_history">CLEAR</button>
+        <div class="history-title" data-i18n="slots_history">ИСТОРИЯ ТРАНЗАКЦИЙ</div>
+        <button type="button" id="btn-clear-history" class="btn-clear-history" data-i18n="slots_clear_history">ОЧИСТИТЬ</button>
       </div>
       <div id="history-list"></div>
     </div>
 
-    <a href="games.html" class="back-link" data-i18n="slots_back">&lt; BACK TO GAMES</a>
-  </div>
+    <div class="slots-bottom-nav">
+      <a href="games.html" class="back-link" data-i18n="slots_back">&lt; К ПРОЕКТАМ</a>
+      <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="back-link bot-link" data-i18n="slots_bot_link">🌱 БОТ @GrowerSim_bot</a>
+    </div>
+  </main>
 
   <canvas id="particle-canvas"></canvas>
 
   <div id="result-toast" aria-live="polite">
-    <div id="toast-label" data-i18n="slots_win_toast">WIN</div>
+    <div id="toast-label" data-i18n="slots_win_toast">ВЫИГРЫШ</div>
     <div id="toast-amount">0</div>
     <div id="toast-desc"></div>
   </div>

@@ -9,20 +9,22 @@ import { initHUD, appendLog } from './hud.js';
 
 // --- НАСТРОЙКИ ---
 const PRELOADER_LINES = [
-  { key: 'preloader_1', delay: 70 },
-  { key: 'preloader_2', delay: 45 },
-  { key: 'preloader_3', delay: 70 },
-  { key: 'preloader_4', delay: 45 }
+  { key: 'preloader_1', delay: 65 },
+  { key: 'preloader_2', delay: 40 },
+  { key: 'preloader_3', delay: 65 },
+  { key: 'preloader_4', delay: 40 }
 ];
 
+// Symmetric 8-button grid (4x2 on desktop, 2x4 on tablet, 1x8 on mobile)
 const LINKS = [
-  { name: 'Twitch',       url: 'https://www.twitch.tv/Bozhemany' },
-  { name: 'Instagram',    url: 'https://www.instagram.com/bozheman' },
-  { name: 'YouTube',      url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw' },
-  { name: 'TikTok',       url: 'https://www.tiktok.com/@bozheman_' },
-  { name: 'nav_games',    url: 'games.html' },
-  { name: 'nav_slots',    url: 'roulet.html', showBalance: true },
-  { name: 'nav_donation', url: 'https://donatello.to/bozheman', isSpecial: true },
+  { name: 'Twitch',        url: 'https://www.twitch.tv/Bozhemany', isRaw: true },
+  { name: 'Instagram',     url: 'https://www.instagram.com/bozheman', isRaw: true },
+  { name: 'YouTube',       url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw', isRaw: true },
+  { name: 'TikTok',        url: 'https://www.tiktok.com/@bozheman_', isRaw: true },
+  { name: 'nav_growersim', url: 'https://t.me/GrowerSim_bot', isBot: true },
+  { name: 'nav_games',     url: 'games.html' },
+  { name: 'nav_slots',     url: 'roulet.html', showBalance: true },
+  { name: 'nav_donation',  url: 'https://donatello.to/bozheman', isSpecial: true },
 ];
 
 const SECRET_CLICK_COUNT = 10;
@@ -50,7 +52,7 @@ function skipPreloader() {
   if (currentTypingInterval) clearInterval(currentTypingInterval);
   if (preloader) {
     preloader.classList.add('hidden');
-    setTimeout(() => { preloader.style.display = 'none'; }, 900);
+    setTimeout(() => { preloader.style.display = 'none'; }, 850);
   }
   document.removeEventListener('click', skipPreloader);
   document.removeEventListener('keydown', handlePreloaderKeyDown);
@@ -74,7 +76,7 @@ async function runPreloader() {
 
   for (const line of PRELOADER_LINES) {
     if (preloaderSkipped) break;
-    await typeLine(t(line.key), 42);
+    await typeLine(t(line.key), 38);
     if (preloaderSkipped) break;
     await new Promise(resolve => {
       const timer = setTimeout(resolve, line.delay);
@@ -106,7 +108,7 @@ function typeLine(text, speed) {
   });
 }
 
-// --- 3D СЦЕНА ---
+// --- 3D СЦЕНА И НАВИГАЦИЯ ---
 function init() {
   initHUD();
   createLinkButtons();
@@ -155,6 +157,12 @@ function init() {
   sceneCanvas.addEventListener('pointerup', (e) => {
     const dist = Math.hypot(e.clientX - pointerStart.x, e.clientY - pointerStart.y);
     if (dist < 6) onCanvasClick();
+  });
+  sceneCanvas.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter' || e.code === 'Space') {
+      e.preventDefault();
+      onCanvasClick();
+    }
   });
 }
 
@@ -214,14 +222,17 @@ function createLinkButtons() {
     const a = document.createElement('a');
     a.href      = link.url;
     a.className = 'btn-glitch';
-    const label = t(link.name);
-    a.setAttribute('data-text', label);
+    const label = link.isRaw ? link.name : t(link.name);
 
     if (link.showBalance) {
-      a.innerHTML = `<span data-i18n="${link.name}">${label}</span> <span class="nav-badge" id="nav-slots-balance">${bal} ₿</span>`;
+      const fullText = `${label} [${bal} ₿]`;
+      a.id = 'nav-slots-btn';
+      a.setAttribute('data-text', fullText);
+      a.innerHTML = `<span>${label}</span> <span class="nav-badge" id="nav-slots-balance">${bal} ₿</span>`;
     } else {
       a.textContent = label;
-      a.setAttribute('data-i18n', link.name);
+      a.setAttribute('data-text', label);
+      if (!link.isRaw) a.setAttribute('data-i18n', link.name);
     }
 
     if (link.url.startsWith('http')) {
@@ -229,6 +240,7 @@ function createLinkButtons() {
       a.rel    = 'noopener noreferrer';
     }
     if (link.isSpecial) a.classList.add('special');
+    if (link.isBot)     a.classList.add('bot-accent');
     a.addEventListener('mouseenter', () => AudioEngine.hover());
     linksContainer.appendChild(a);
   });
@@ -240,8 +252,11 @@ document.addEventListener('languagechange', () => {
 });
 
 window.addEventListener('bzp:statechange', () => {
+  const bal = State.read('balance');
   const badge = document.getElementById('nav-slots-balance');
-  if (badge) badge.textContent = `${State.read('balance')} ₿`;
+  const btn   = document.getElementById('nav-slots-btn');
+  if (badge) badge.textContent = `${bal} ₿`;
+  if (btn)   btn.setAttribute('data-text', `${t('nav_slots')} [${bal} ₿]`);
 });
 
 function animate() {
@@ -274,7 +289,7 @@ function onCanvasClick() {
 
   const filled = Math.min(10, secretClickCounter);
   const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
-  appendLog(`> CORE_DECRYPTION: [${bar}] ${filled * 10}%`, filled >= 10 ? 'highlight' : 'info');
+  appendLog(t('core_decrypt_log', { bar, pct: filled * 10 }), filled >= 10 ? 'highlight' : 'info');
 
   const pulse = (obj, intensity) => {
     if (!obj) return;

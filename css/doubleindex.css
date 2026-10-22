@@ -4,11 +4,13 @@
 
 body {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
   min-height: 100dvh;
-  overflow: hidden;
+  padding: 2.8rem 0 5.5rem 0;
+  overflow-x: hidden;
   background: #000000;
 }
 
@@ -22,25 +24,25 @@ body {
 /* ─── TERMINAL WINDOW ─────────────────────────────────────── */
 .terminal-window {
   width: calc(100% - 2rem);
-  max-width: clamp(300px, 90vw, 800px);
-  padding: clamp(1rem, 4vw, 2rem);
-  border: 2px solid rgba(255,51,51,0.4);
-  background: rgba(8,0,0,0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  max-width: 780px;
+  padding: 1.75rem;
+  border: 2px solid var(--clr-border-bright);
+  background: rgba(8,0,0,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  justify-content: space-between;
+  gap: 0.9rem;
   z-index: 5;
   cursor: pointer;
   position: relative;
   margin: 0 auto;
   opacity: 0;
-  transform: scale(0.95);
-  animation: boot-up 1s forwards ease-out, flicker 8s 1s linear infinite;
+  transform: scale(0.96);
+  animation: boot-up 0.8s forwards ease-out, flicker 8s 1s linear infinite;
 }
 
 .terminal-window::after {
@@ -48,8 +50,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
-    linear-gradient(90deg, rgba(255,0,0,0.08), rgba(0,0,0,0.02), rgba(255,0,0,0.08));
+    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.22) 50%),
+    linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,0,0,0.02), rgba(255,0,0,0.06));
   background-size: 100% 4px, 6px 100%;
   pointer-events: none;
   animation: scanline 15s linear infinite;
@@ -60,8 +62,8 @@ body {
 }
 
 @keyframes flicker {
-  0%, 100% { box-shadow: 0 0 20px rgba(255,51,51,0.2); }
-  50%       { box-shadow: 0 0 25px rgba(255,51,51,0.4); }
+  0%, 100% { box-shadow: 0 0 22px rgba(255,51,51,0.22); }
+  50%       { box-shadow: 0 0 30px rgba(255,51,51,0.42); }
 }
 
 @keyframes scanline {
@@ -71,36 +73,109 @@ body {
 
 /* ─── CONTENT ────────────────────────────────────────────── */
 h1 {
-  font-size: clamp(1.4rem, 6vw, 2.5rem);
-  margin-bottom: 0.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.3rem);
+  margin: 0;
   color: var(--clr-primary, #ff3333);
   text-shadow: 0 0 10px var(--clr-glow, #ff0000);
   text-align: center;
 }
 
+.fragment-meta {
+  font-size: var(--fs-xs);
+  color: var(--clr-gold);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 7 Interactive Fragment Dots */
+.fragment-dots {
+  display: grid;
+  grid-template-columns: repeat(7, 32px);
+  gap: 0.4rem;
+  justify-content: center;
+  z-index: 10;
+}
+
+.frag-dot {
+  width: 32px;
+  height: 28px;
+  background: rgba(255, 51, 51, 0.08);
+  border: 1px solid rgba(255, 51, 51, 0.35);
+  color: var(--clr-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.frag-dot:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+
+.frag-dot.seen {
+  border-color: rgba(255, 215, 0, 0.55);
+  color: var(--clr-gold);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.frag-dot.current {
+  border-color: var(--clr-success);
+  color: var(--clr-success);
+  background: rgba(0, 255, 136, 0.16);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+
+.weaver-bonus-badge {
+  display: none;
+  font-size: 0.72rem;
+  color: var(--clr-success);
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--clr-success);
+  padding: 0.3rem 0.75rem;
+  font-weight: 700;
+}
+
+.weaver-bonus-badge.visible {
+  display: inline-block;
+}
+
+/* Fixed-Height Fragment Display Box (Zero Jump) */
 #fragment-display {
-  min-height: clamp(160px, 30vh, 250px);
-  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
-  line-height: 1.7;
-  padding: 0.5rem;
+  height: 210px;
+  overflow-y: auto;
+  font-size: clamp(0.82rem, 2.2vw, 1.02rem);
+  line-height: 1.68;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 51, 51, 0.25);
   color: var(--clr-primary, #ff3333);
   text-align: center;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .fragment-title {
-  font-weight: bold;
-  color: var(--clr-primary, #ff3333);
+  font-weight: 700;
+  color: var(--clr-gold);
   display: block;
-  margin-bottom: 0.75rem;
-  text-shadow: 0 0 8px rgba(255,51,51,0.6);
-  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  margin-bottom: 0.65rem;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  font-size: clamp(0.88rem, 2.4vw, 1.05rem);
 }
 
 .typing-cursor {
   display: inline-block;
-  width: 10px;
-  height: 1.1em;
+  width: 9px;
+  height: 1.05em;
   background: var(--clr-primary, #ff3333);
   animation: blink 1s step-end infinite;
   vertical-align: text-bottom;
@@ -108,74 +183,13 @@ h1 {
 
 @keyframes blink { 50% { opacity: 0; } }
 
-#countdown-timer {
-  font-size: clamp(0.7rem, 2vw, 1rem);
-  color: rgba(255,51,51,0.8);
-  text-align: center;
-  width: 100%;
-}
-
-#progress-bar {
-  width: 100%;
-  height: 2px;
-  background: rgba(255,51,51,0.3);
-  margin-top: 0.5rem;
-}
-
-#progress-bar-inner {
-  width: 100%;
-  height: 100%;
-  background: var(--clr-primary, #ff3333);
-  transition: width 1s linear;
-  box-shadow: 0 0 6px var(--clr-primary, #ff3333);
-}
-
-/* ─── SKIP BUTTON ────────────────────────────────────────── */
-.skip-btn {
-  position: fixed;
-  bottom: clamp(5.5rem, 14vh, 8rem);
-  right: clamp(0.75rem, 2vw, 1.5rem);
-  z-index: 200;
-  opacity: 0.7;
-  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
-  white-space: nowrap;
-}
-
-.skip-btn:hover { opacity: 1; }
-
-/* ─── RESPONSIVE ──────────────────────────────────────────── */
-
-/* Feature phones */
-@media (max-width: 359px) {
-  .terminal-window { max-width: 96vw; padding: 0.75rem; }
-  h1 { font-size: 1.2rem; }
-  #fragment-display { font-size: 0.75rem; min-height: 130px; }
-  .skip-btn { font-size: 0.55rem; }
-}
-
-/* 4K */
-@media (min-width: 2560px) {
-  .terminal-window { max-width: 1100px; padding: 3rem; }
-  h1 { font-size: 3.5rem; }
-  #fragment-display { font-size: 1.4rem; min-height: 320px; }
-  .fragment-title { font-size: 1.3rem; }
-}
-
-/* ─── v3.0 FRAGMENT PROGRESS & NAVIGATION CONTROLS ────────── */
-.fragment-meta {
-  font-size: var(--fs-xs);
-  color: var(--clr-gold);
-  letter-spacing: 0.12em;
-  font-weight: 700;
-}
-
+/* Symmetric 3-Button Fragment Controls */
 .fragment-controls {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 440px;
   z-index: 10;
 }
 
@@ -185,8 +199,13 @@ h1 {
   color: var(--clr-primary);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
-  padding: 0.4rem 0.85rem;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 0.4rem 0.6rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
 }
 
@@ -198,4 +217,79 @@ h1 {
 .frag-btn.active {
   border-color: var(--clr-gold);
   color: var(--clr-gold);
+  background: rgba(255, 215, 0, 0.12);
+}
+
+#countdown-timer {
+  font-size: 0.78rem;
+  color: rgba(255,51,51,0.85);
+  text-align: center;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,51,51,0.25);
+  margin-top: 0.45rem;
+}
+
+#progress-bar-inner {
+  width: 100%;
+  height: 100%;
+  background: var(--clr-primary, #ff3333);
+  transition: width 1s linear;
+  box-shadow: 0 0 6px var(--clr-primary, #ff3333);
+}
+
+/* Bottom Navigation Bar */
+.illusion-bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(255, 51, 51, 0.25);
+  z-index: 10;
+}
+
+.illusion-bottom-nav .btn-glitch {
+  min-height: 38px;
+  font-size: 0.7rem;
+  padding: 0.35rem 0.5rem;
+}
+
+/* ─── SKIP BUTTON ────────────────────────────────────────── */
+.skip-btn {
+  position: fixed;
+  bottom: 4.5rem;
+  right: 1rem;
+  z-index: 200;
+  opacity: 0.8;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.skip-btn:hover { opacity: 1; }
+
+/* ─── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .terminal-window {
+    padding: 1.1rem;
+  }
+  .fragment-dots {
+    grid-template-columns: repeat(7, 28px);
+    gap: 0.25rem;
+  }
+  .frag-dot {
+    width: 28px;
+    height: 26px;
+  }
+  #fragment-display {
+    height: 230px;
+  }
+  .illusion-bottom-nav {
+    grid-template-columns: 1fr;
+  }
 }

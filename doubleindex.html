@@ -27,21 +27,43 @@
   <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
 
   <main class="terminal-window" id="terminal">
-    <h1 data-text="ILLUSION" data-i18n="illusion_title">ILLUSION</h1>
-    <div id="fragment-counter" class="fragment-meta">FRAGMENT [0/7]</div>
+    <h1 data-text="ИЛЛЮЗИЯ" data-i18n="illusion_title">ИЛЛЮЗИЯ</h1>
+    <div id="fragment-counter" class="fragment-meta">ФРАГМЕНТ [0/7]</div>
+
+    <!-- 7 INTERACTIVE FRAGMENT DOTS -->
+    <div class="fragment-dots" id="fragment-dots" aria-label="Fragment selector">
+      <button type="button" class="frag-dot" data-frag-idx="0">1</button>
+      <button type="button" class="frag-dot" data-frag-idx="1">2</button>
+      <button type="button" class="frag-dot" data-frag-idx="2">3</button>
+      <button type="button" class="frag-dot" data-frag-idx="3">4</button>
+      <button type="button" class="frag-dot" data-frag-idx="4">5</button>
+      <button type="button" class="frag-dot" data-frag-idx="5">6</button>
+      <button type="button" class="frag-dot" data-frag-idx="6">7</button>
+    </div>
+
+    <div id="weaver-bonus-badge" class="weaver-bonus-badge" data-i18n="illusion_weaver_bonus">🕸️ ПОСВЯЩЕНИЕ ТКАЧА: +500 МОНЕТ НАЧИСЛЕНО</div>
+
     <div id="fragment-display">
-      <p data-i18n="illusion_click">[CLICK TO BEHOLD]</p>
+      <p data-i18n="illusion_click">[НАЖМИТЕ, ЧТОБЫ УЗРЕТЬ]</p>
     </div>
+
     <div class="fragment-controls" id="fragment-controls">
-      <button type="button" id="frag-prev" class="frag-btn" data-i18n="illusion_prev">← PREV</button>
-      <button type="button" id="frag-pause" class="frag-btn" data-i18n="illusion_pause">⏸ PAUSE</button>
-      <button type="button" id="frag-next" class="frag-btn" data-i18n="illusion_next">NEXT →</button>
+      <button type="button" id="frag-prev" class="frag-btn" data-i18n="illusion_prev">← НАЗАД</button>
+      <button type="button" id="frag-pause" class="frag-btn" data-i18n="illusion_pause">⏸ ПАУЗА</button>
+      <button type="button" id="frag-next" class="frag-btn" data-i18n="illusion_next">ДАЛЕЕ →</button>
     </div>
+
     <div id="countdown-timer">
-      <span data-i18n="illusion_redirect">REDIRECTING PROTOCOL...</span> <strong id="countdown-sec">60s</strong>
+      <span data-i18n="illusion_redirect">ПЕРЕНАПРАВЛЕНИЕ ПРОТОКОЛА...</span> <strong id="countdown-sec">60s</strong>
       <div id="progress-bar">
         <div id="progress-bar-inner"></div>
       </div>
+    </div>
+
+    <div class="illusion-bottom-nav" id="illusion-bottom-nav">
+      <a href="index.html" class="btn-glitch" data-i18n="illusion_home_btn">← В ПРОТОКОЛ</a>
+      <a href="roulet.html" class="btn-glitch" data-i18n="illusion_slots_btn">🎰 В SLOTS 777</a>
+      <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="btn-glitch" data-i18n="slots_bot_link">🌱 БОТ @GrowerSim_bot</a>
     </div>
   </main>
 

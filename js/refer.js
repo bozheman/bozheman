@@ -27,17 +27,18 @@ async function writeTextWithFallback(text) {
 
 function copyAddress(address, feedbackEl) {
   if (!address) return;
+  const isBtn = feedbackEl && feedbackEl.tagName === 'BUTTON';
   const originalText = feedbackEl ? feedbackEl.textContent : '';
   writeTextWithFallback(address).then(() => {
     AudioEngine.copy();
     State.unlockAchievement('CRYPTO_PATRON');
-    appendLog(`> WALLET_COPIED: ${address.slice(0, 10)}...`, 'highlight');
+    appendLog(`> COPIED: ${address.slice(0, 14)}...`, 'highlight');
     if (feedbackEl) {
       feedbackEl.classList.add('copy-feedback');
       feedbackEl.textContent = t('copied');
       setTimeout(() => {
         feedbackEl.classList.remove('copy-feedback');
-        feedbackEl.textContent = originalText;
+        feedbackEl.textContent = isBtn ? t('copy_btn') : originalText;
       }, 1500);
     }
   }).catch(() => {
@@ -78,7 +79,7 @@ function showQR(address, netLabel = 'CRYPTO GATEWAY') {
       qrInstance = new QRious({
         element: qrCanvas,
         value: address,
-        size: 256,
+        size: 240,
         background: 'black',
         foreground: '#ff3333'
       });
@@ -86,14 +87,14 @@ function showQR(address, netLabel = 'CRYPTO GATEWAY') {
   } else if (qrCanvas) {
     const ctx = qrCanvas.getContext('2d');
     if (ctx) {
-      qrCanvas.width = 256;
-      qrCanvas.height = 256;
+      qrCanvas.width = 240;
+      qrCanvas.height = 240;
       ctx.fillStyle = '#080000';
-      ctx.fillRect(0, 0, 256, 256);
+      ctx.fillRect(0, 0, 240, 240);
       ctx.fillStyle = '#ff3333';
       ctx.font = '14px "Fira Code", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('[ QR ENGINE OFFLINE ]', 128, 128);
+      ctx.fillText('[ QR ENGINE OFFLINE ]', 120, 120);
     }
   }
 
@@ -146,10 +147,39 @@ if (qrDownloadBtn) {
   qrDownloadBtn.addEventListener('click', () => {
     if (!qrCanvas) return;
     AudioEngine.click();
+    // Create branded PNG canvas with BOZHEMAN header & network label
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width  = 320;
+    exportCanvas.height = 380;
+    const ctx = exportCanvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#050000';
+      ctx.fillRect(0, 0, 320, 380);
+      ctx.strokeStyle = '#ff3333';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(4, 4, 312, 372);
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 14px "Fira Code", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`BOZHEMAN ≡ ${currentQrNet}`, 160, 32);
+
+      ctx.drawImage(qrCanvas, 40, 50, 240, 240);
+
+      ctx.fillStyle = '#ff3333';
+      ctx.font = '10px "Fira Code", monospace';
+      const shortAddr = currentQrAddress.length > 34
+        ? `${currentQrAddress.slice(0, 18)}...${currentQrAddress.slice(-14)}`
+        : currentQrAddress;
+      ctx.fillText(shortAddr, 160, 320);
+      ctx.fillStyle = '#00ff88';
+      ctx.fillText('BOZHEMAN.COM • @GrowerSim_bot', 160, 350);
+    }
+
     const link = document.createElement('a');
     const safeName = currentQrNet.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     link.download = `bozheman_${safeName}_qr.png`;
-    link.href = qrCanvas.toDataURL('image/png');
+    link.href = (ctx ? exportCanvas : qrCanvas).toDataURL('image/png');
     link.click();
   });
 }
@@ -178,7 +208,7 @@ if (mainQrCanvas && typeof QRious !== 'undefined') {
   new QRious({
     element: mainQrCanvas,
     value: 'https://bozheman.com',
-    size: 150,
+    size: 140,
     background: 'black',
     foreground: '#ff3333'
   });

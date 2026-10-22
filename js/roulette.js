@@ -1,11 +1,11 @@
 /**
- * BOZHEMAN ≡ 777  —  Slot Machine Engine v3.0
+ * BOZHEMAN ≡ 777  —  Slot Machine Engine v4.0
  * ============================================
  * Architecture:
  *  - State Machine  : IDLE → SPINNING → EVALUATING → REWARDING → IDLE
- *  - Canvas Reels   : Managed by ReelEngine (with Turbo & HiDPI support)
+ *  - Canvas Reels   : Managed by ReelEngine (with Turbo, HiDPI & per-reel win highlight)
  *  - Particle System: Managed by ParticleSystem (with Cyber Glyphs)
- *  - Audio          : Managed by AudioEngine (with Master Compressor)
+ *  - Audio          : Managed by AudioEngine (with Master Compressor & Near-Miss tension)
  *  - State          : Persistent via state.js (with History, Streaks & Achievements)
  */
 
@@ -55,15 +55,17 @@ class SlotMachine {
       btnAuto:         document.getElementById('btn-auto'),
       btnDaily:        document.getElementById('btn-daily'),
       refillBtn:       document.getElementById('btn-refill'),
+      fairBar:         document.getElementById('fair-bar'),
       fairSeedDisplay: document.getElementById('fair-seed-display'),
     };
 
-    this.state    = GameState.IDLE;
-    this.balance  = 0;
-    this.stats    = {};
-    this.turbo    = Boolean(State.read('turboSpin'));
-    this.autoSpin = false;
+    this.state      = GameState.IDLE;
+    this.balance    = 0;
+    this.stats      = {};
+    this.turbo      = Boolean(State.read('turboSpin'));
+    this.autoSpin   = false;
     this._autoTimer = null;
+    this._fullSeed  = '';
 
     this.reels = [];
     document.fonts.ready.then(() => this._initReels());
@@ -83,9 +85,11 @@ class SlotMachine {
   }
 
   _rotateFairSeed() {
-    if (!this.dom.fairSeedDisplay) return;
-    const hex = Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16).toUpperCase()).join('');
-    this.dom.fairSeedDisplay.textContent = `SHA256::${hex.slice(0, 6)}...${hex.slice(-4)}`;
+    const hex = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16).toUpperCase()).join('');
+    this._fullSeed = `SHA256::${hex}`;
+    if (this.dom.fairSeedDisplay) {
+      this.dom.fairSeedDisplay.textContent = `SHA256::${hex.slice(0, 8)}...${hex.slice(-6)}`;
+    }
   }
 
   _loadState() {
@@ -100,6 +104,21 @@ class SlotMachine {
 
   _saveBalance() {
     State.set({ balance: this.balance });
+  }
+
+  _animateBalance(fromVal, toVal) {
+    if (!this.dom.balanceDisplay) return;
+    const formatter = new Intl.NumberFormat(document.documentElement.lang || 'ru', { style: 'decimal', maximumFractionDigits: 0 });
+    const start = performance.now();
+    const dur = 380;
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / dur);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const cur = Math.round(fromVal + (toVal - fromVal) * ease);
+      this.dom.balanceDisplay.textContent = formatter.format(cur);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
 
   _refreshUI() {
@@ -132,7 +151,7 @@ class SlotMachine {
   _bindEvents() {
     this.dom.spinButton.addEventListener('click', () => this._handleSpin());
 
-    // Keyboard shortcuts
+    // Keyboard shortcuts (Space/Enter = Spin, T = Turbo, A = Auto, Up/Down = Bet, 1-6 = Chips)
     document.addEventListener('keydown', (e) => {
       const activeTag = document.activeElement ? document.activeElement.tagName : '';
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(activeTag)) return;
@@ -152,6 +171,10 @@ class SlotMachine {
       } else if (e.code === 'ArrowDown') {
         e.preventDefault();
         this._adjustBet(-10);
+      } else if (/^Digit[1-6]$/.test(e.code) && !e.ctrlKey && !e.metaKey) {
+        const idx = parseInt(e.code.replace('Digit', ''), 10) - 1;
+        const chips = this.dom.chipRow ? this.dom.chipRow.querySelectorAll('[data-amount]') : [];
+        if (chips[idx]) chips[idx].click();
       }
     });
 
@@ -175,7 +198,18 @@ class SlotMachine {
       this.dom.clearHistoryBtn.addEventListener('click', () => {
         AudioEngine.click();
         State.clearHistory();
-        if (this.dom.historyList) this.dom.historyList.innerHTML = '';
+        this._renderSavedHistory();
+      });
+    }
+
+    // Copy Provably Fair seed on click
+    if (this.dom.fairBar) {
+      this.dom.fairBar.addEventListener('click', async () => {
+        AudioEngine.copySuccess();
+        try {
+          await navigator.clipboard.writeText(this._fullSeed);
+        } catch { /* fallback */ }
+        this._showError(t('slots_seed_copied'));
       });
     }
 
@@ -224,9 +258,11 @@ class SlotMachine {
       this.dom.refillBtn.addEventListener('click', () => {
         if (this.state !== GameState.IDLE) return;
         AudioEngine.win();
+        const prev = this.balance;
         this.balance += 1000;
         this._saveBalance();
         this._refreshUI();
+        this._animateBalance(prev, this.balance);
         this.dom.refillBtn.textContent = t('slots_refill_success');
         setTimeout(() => {
           this.dom.refillBtn.textContent = t('slots_refill_btn');
@@ -237,6 +273,7 @@ class SlotMachine {
     document.addEventListener('languagechange', () => {
       this._syncModeButtons();
       this._refreshUI();
+      this._renderSavedHistory();
     });
 
     window.addEventListener('bzp:statechange', () => {
@@ -281,8 +318,10 @@ class SlotMachine {
     const res = State.claimDailyBonus(500);
     if (res.ok) {
       AudioEngine.win();
+      const prev = this.balance;
       this.balance = res.balance;
       this._refreshUI();
+      this._animateBalance(prev, this.balance);
       this._flashBalance(true);
       this._showError(t('slots_daily_claimed'));
       appendLog(`> DAILY_BONUS: +500 COINS CLAIMED`, 'highlight');
@@ -372,12 +411,16 @@ class SlotMachine {
       new Promise(resolve => {
         this.reels[i].spin(sym, () => {
           AudioEngine.snap();
+          // Near-miss tension chime when Reel 0 and Reel 1 match!
+          if (i === 1 && results[0].id === results[1].id && results[0].id !== 'dash') {
+            AudioEngine.winSmall();
+          }
           resolve();
         }, this.turbo);
       })
     );
 
-    const COAST_MS     = this.turbo ? 520 : 1650;
+    const COAST_MS     = this.turbo ? 500 : 1600;
     const SNAP_STAGGER = this.turbo ? 90  : 210;
     for (let i = 0; i < this.reels.length; i++) {
       setTimeout(() => this.reels[i].snapNow(), COAST_MS + i * SNAP_STAGGER);
@@ -414,12 +457,24 @@ class SlotMachine {
         resultType = multiplier === PAY_TABLE.seven ? 'jackpot' : 'win';
         label      = multiplier === PAY_TABLE.seven ? t('slots_jackpot') : t('slots_win');
         if (a.id === 'seven') State.unlockAchievement('JACKPOT_777');
+        this.reels.forEach(r => r.setWinning(true));
       }
     } else if (twoPairs) {
       multiplier = PAIR_MULT;
       payKey     = 'pair';
       resultType = 'win';
       label      = t('slots_pair');
+      // Highlight only the two matching reels
+      if (a.id === b.id) {
+        this.reels[0].setWinning(true);
+        this.reels[1].setWinning(true);
+      } else if (b.id === c.id) {
+        this.reels[1].setWinning(true);
+        this.reels[2].setWinning(true);
+      } else if (a.id === c.id) {
+        this.reels[0].setWinning(true);
+        this.reels[2].setWinning(true);
+      }
     }
 
     const winnings = Math.floor(bet * multiplier);
@@ -427,10 +482,10 @@ class SlotMachine {
     if (multiplier > 0) {
       this.dom.winLine.classList.add('active');
       this._highlightPaytableRow(payKey);
-      this.reels.forEach(r => r.setWinning(true));
       setTimeout(() => this.dom.winLine.classList.remove('active'), 1500);
     }
 
+    const prevBal = this.balance;
     if (winnings > 0) {
       this.balance += winnings;
       this._saveBalance();
@@ -443,11 +498,14 @@ class SlotMachine {
     appendLog(`> SPIN [${glyphs}] BET:${bet} -> ${winnings > 0 ? '+' + winnings : -bet}`, winnings > 0 ? 'highlight' : 'sys');
 
     this._refreshUI();
+    if (winnings > 0) {
+      this._animateBalance(prevBal, this.balance);
+    }
     this._flashBalance(winnings > 0);
 
     await this._showResult(resultType, label, winnings, desc, bet);
 
-    this._prependHistoryDOM(glyphs, bet, winnings);
+    this._prependHistoryDOM(glyphs, bet, winnings, Date.now());
 
     this._transition(GameState.IDLE);
     this._setControlsDisabled(false);
@@ -496,8 +554,8 @@ class SlotMachine {
 
       toast.classList.add('visible');
 
-      const baseDuration = type === 'jackpot' ? 2800 : 1650;
-      const duration = this.turbo ? Math.min(950, baseDuration) : baseDuration;
+      const baseDuration = type === 'jackpot' ? 2600 : 1550;
+      const duration = this.turbo ? Math.min(900, baseDuration) : baseDuration;
       setTimeout(() => {
         toast.classList.remove('visible');
         resolve();
@@ -510,31 +568,53 @@ class SlotMachine {
     if (!list) return;
     list.innerHTML = '';
     const history = State.get().history || [];
+    if (!history.length) {
+      const empty = document.createElement('div');
+      empty.className = 'history-empty';
+      empty.textContent = t('slots_history_empty');
+      list.appendChild(empty);
+      return;
+    }
     history.slice(0, 12).forEach(item => {
-      const entry = this._createHistoryElement(item.glyphs, item.wagered, item.won);
+      const entry = this._createHistoryElement(item.glyphs, item.wagered, item.won, item.ts);
       list.appendChild(entry);
     });
   }
 
-  _createHistoryElement(glyphs, bet, winnings) {
+  _createHistoryElement(glyphs, bet, winnings, ts) {
     const entry = document.createElement('div');
     entry.className = `history-entry ${winnings > 0 ? 'win-entry' : 'loss-entry'}`;
     const formatter = new Intl.NumberFormat(document.documentElement.lang || 'ru', { style: 'decimal', maximumFractionDigits: 0, signDisplay: 'always' });
     const net = winnings > 0 ? formatter.format(winnings) : formatter.format(-bet);
 
+    const d = ts ? new Date(ts) : new Date();
+    const timeStr = d.toTimeString().slice(0, 8);
+
+    const spanTime = document.createElement('span');
+    spanTime.className = 'history-time';
+    spanTime.textContent = timeStr;
+
     const spanGlyphs = document.createElement('span');
+    spanGlyphs.className = 'history-glyphs';
     spanGlyphs.textContent = glyphs;
+
     const spanNet = document.createElement('span');
+    spanNet.className = 'history-net';
     spanNet.textContent = net;
+
+    entry.appendChild(spanTime);
     entry.appendChild(spanGlyphs);
     entry.appendChild(spanNet);
     return entry;
   }
 
-  _prependHistoryDOM(glyphs, bet, winnings) {
+  _prependHistoryDOM(glyphs, bet, winnings, ts) {
     const list = this.dom.historyList;
     if (!list) return;
-    const entry = this._createHistoryElement(glyphs, bet, winnings);
+    const emptyEl = list.querySelector('.history-empty');
+    if (emptyEl) emptyEl.remove();
+
+    const entry = this._createHistoryElement(glyphs, bet, winnings, ts);
     list.insertBefore(entry, list.firstChild);
     while (list.children.length > 12) {
       list.removeChild(list.lastChild);
@@ -570,8 +650,8 @@ class SlotMachine {
   _checkRefill() {
     if (!this.dom.refillBtn) return;
     const show = this.balance < 10;
-    this.dom.refillBtn.style.display = show ? 'block' : 'none';
-    this.dom.spinButton.style.display = show ? 'none' : 'block';
+    this.dom.refillBtn.style.display = show ? 'inline-flex' : 'none';
+    this.dom.spinButton.style.display = show ? 'none' : 'inline-flex';
   }
 }
 

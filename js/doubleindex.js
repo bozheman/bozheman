@@ -7,16 +7,19 @@ import { initHUD, appendLog } from './hud.js';
 setupMatrix('matrix-canvas');
 initHUD();
 
-const terminal         = document.getElementById('terminal');
-const fragmentDisplay  = document.getElementById('fragment-display');
-const fragmentCounter  = document.getElementById('fragment-counter');
-const fragmentControls = document.getElementById('fragment-controls');
-const btnPrev          = document.getElementById('frag-prev');
-const btnPause         = document.getElementById('frag-pause');
-const btnNext          = document.getElementById('frag-next');
-const progressBarInner = document.getElementById('progress-bar-inner');
-const countdownSec     = document.getElementById('countdown-sec');
-const skipBtn          = document.getElementById('skip-btn');
+const terminal          = document.getElementById('terminal');
+const fragmentDisplay   = document.getElementById('fragment-display');
+const fragmentCounter   = document.getElementById('fragment-counter');
+const fragmentDotsWrap  = document.getElementById('fragment-dots');
+const weaverBonusBadge  = document.getElementById('weaver-bonus-badge');
+const fragmentControls  = document.getElementById('fragment-controls');
+const bottomNav         = document.getElementById('illusion-bottom-nav');
+const btnPrev           = document.getElementById('frag-prev');
+const btnPause          = document.getElementById('frag-pause');
+const btnNext           = document.getElementById('frag-next');
+const progressBarInner  = document.getElementById('progress-bar-inner');
+const countdownSec      = document.getElementById('countdown-sec');
+const skipBtn           = document.getElementById('skip-btn');
 
 const FRAGMENT_KEYS = [
   'frag_1', 'frag_2', 'frag_3', 'frag_4', 'frag_5', 'frag_6', 'frag_7'
@@ -71,7 +74,8 @@ function getFragment(index) {
 let currentFragmentIndex = -1;
 let isTyping = false;
 let isPaused = false;
-const seenFragments = new Set();
+const savedRead = Array.isArray(State.read('weaverRead')) ? State.read('weaverRead') : [];
+const seenFragments = new Set(savedRead);
 
 // ─── TYPEWRITER ────────────────────────────────────────────────
 let typewriterAbort = false;
@@ -97,7 +101,7 @@ function typeWriter(element, title, text, onComplete) {
     if (typewriterAbort) { finishInstant(); return; }
     if (i < title.length) {
       titleSpan.textContent += title.charAt(i++);
-      setTimeout(typeTitle, 20);
+      setTimeout(typeTitle, 18);
     } else {
       i = 0;
       typeMainText();
@@ -108,7 +112,7 @@ function typeWriter(element, title, text, onComplete) {
     if (typewriterAbort) { finishInstant(); return; }
     if (i < text.length) {
       textP.insertBefore(document.createTextNode(text.charAt(i++)), cursor);
-      setTimeout(typeMainText, 11);
+      setTimeout(typeMainText, 10);
     } else {
       cursor.remove();
       if (onComplete) onComplete();
@@ -125,31 +129,46 @@ function typeWriter(element, title, text, onComplete) {
   typeTitle();
 }
 
-// ─── NAVIGATION ────────────────────────────────────────────────
-function updateCounterUI() {
-  if (!fragmentCounter) return;
-  const cur = currentFragmentIndex >= 0 ? currentFragmentIndex + 1 : 0;
-  fragmentCounter.textContent = t('illusion_fragment_of', {
-    cur,
-    total: FRAGMENT_FALLBACK.length
-  });
+// ─── NAVIGATION & DOTS UI ──────────────────────────────────────
+function updateCounterAndDotsUI() {
+  if (fragmentCounter) {
+    const cur = currentFragmentIndex >= 0 ? currentFragmentIndex + 1 : 0;
+    fragmentCounter.textContent = t('illusion_fragment_of', {
+      cur,
+      total: FRAGMENT_FALLBACK.length
+    });
+  }
+  if (fragmentDotsWrap) {
+    fragmentDotsWrap.querySelectorAll('.frag-dot').forEach(dot => {
+      const idx = parseInt(dot.dataset.fragIdx, 10);
+      dot.classList.toggle('seen', seenFragments.has(idx));
+      dot.classList.toggle('current', idx === currentFragmentIndex);
+    });
+  }
+  if (weaverBonusBadge) {
+    weaverBonusBadge.classList.toggle('visible', Boolean(State.read('weaverClaimed')));
+  }
 }
 
 function showFragment(index) {
   typewriterAbort = true;
   isTyping = true;
   AudioEngine.click();
+  currentFragmentIndex = index;
   seenFragments.add(index);
-  updateCounterUI();
+  State.set({ weaverRead: Array.from(seenFragments) });
 
   if (seenFragments.size >= FRAGMENT_FALLBACK.length) {
     State.unlockAchievement('WEAVER_INITIATE');
     if (!State.read('weaverClaimed')) {
-      const nextBal = State.read('balance') + 500;
-      State.set({ balance: nextBal, weaverClaimed: true });
-      appendLog(`> WEAVER_PROTOCOL COMPLETE: +500 COINS AWARDED`, 'highlight');
+      const nextBal = State.adjustBalance(500);
+      State.set({ weaverClaimed: true });
+      AudioEngine.win();
+      appendLog(`> WEAVER_PROTOCOL COMPLETE: +500 COINS AWARDED (BAL: ${nextBal})`, 'highlight');
     }
   }
+
+  updateCounterAndDotsUI();
 
   const fragment = getFragment(index);
   setTimeout(() => {
@@ -187,6 +206,19 @@ function togglePause() {
 if (fragmentControls) {
   fragmentControls.addEventListener('click', (e) => e.stopPropagation());
 }
+if (bottomNav) {
+  bottomNav.addEventListener('click', (e) => e.stopPropagation());
+}
+if (fragmentDotsWrap) {
+  fragmentDotsWrap.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dot = e.target.closest('.frag-dot');
+    if (!dot) return;
+    const idx = parseInt(dot.dataset.fragIdx, 10);
+    if (!isNaN(idx)) showFragment(idx);
+  });
+}
+
 if (btnPrev)  btnPrev.addEventListener('click', () => stepFragment(-1));
 if (btnNext)  btnNext.addEventListener('click', () => stepFragment(1));
 if (btnPause) btnPause.addEventListener('click', togglePause);
@@ -210,6 +242,9 @@ document.addEventListener('keydown', (e) => {
   } else if (e.code === 'KeyP') {
     e.preventDefault();
     togglePause();
+  } else if (/^Digit[1-7]$/.test(e.code)) {
+    const idx = parseInt(e.code.replace('Digit', ''), 10) - 1;
+    showFragment(idx);
   }
 });
 
@@ -241,9 +276,11 @@ const countdownInterval = setInterval(() => {
   }
 }, 1000);
 
+updateCounterAndDotsUI();
+
 document.addEventListener('languagechange', () => {
   applyTranslations();
-  updateCounterUI();
+  updateCounterAndDotsUI();
   if (btnPause) {
     btnPause.textContent = t(isPaused ? 'illusion_resume' : 'illusion_pause');
   }

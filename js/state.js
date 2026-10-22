@@ -1,9 +1,9 @@
 /**
  * BOZHEMAN ≡ PROTOCOL
- * State Management Module v3.0
+ * State Management Module v4.0
  *
  * Single source of truth for all cross-page persistent state.
- * Uses localStorage with JSON serialization, strict schema validation,
+ * Uses localStorage with in-memory fallback, strict schema validation,
  * cross-tab storage synchronization, and event broadcasting.
  */
 
@@ -18,9 +18,16 @@ export const ACHIEVEMENTS_CATALOG = Object.freeze({
   JACKPOT_777:     { id: 'JACKPOT_777',     icon: '🎰', titleKey: 'ach_jackpot_title', descKey: 'ach_jackpot_desc' },
   ICE_HACKER:      { id: 'ICE_HACKER',      icon: '💻', titleKey: 'ach_hacker_title',  descKey: 'ach_hacker_desc' },
   CRYPTO_PATRON:   { id: 'CRYPTO_PATRON',   icon: '🪙', titleKey: 'ach_patron_title',  descKey: 'ach_patron_desc' },
+  GROWER_SCHOLAR:  { id: 'GROWER_SCHOLAR',  icon: '🌱', titleKey: 'ach_scholar_title', descKey: 'ach_scholar_desc' },
 });
 
+function generateGrowerId() {
+  const num = 10000 + Math.floor(Math.random() * 89999);
+  return `#GRW-${num}`;
+}
+
 const DEFAULTS = {
+  growerId: '#GRW-58291',
   balance: 1000,
   audioMuted: true,
   crtEnabled: true,
@@ -31,7 +38,15 @@ const DEFAULTS = {
   lastDailyBonus: 0,
   hackClaimed: false,
   weaverClaimed: false,
+  scholarClaimed: false,
   subscribedEmail: '',
+  weaverRead: [],
+  calcSettings: {
+    strain: '1.0',
+    hp: 95,
+    streak: 7,
+    light: '1.0',
+  },
   rouletteStats: {
     spins: 0,
     wins: 0,
@@ -47,6 +62,8 @@ const DEFAULTS = {
   lastSeed: null,
 };
 
+let memoryFallbackState = null;
+
 function clampInt(val, fallback = 0, min = 0, max = MAX_SAFE) {
   const num = typeof val === 'string' ? parseInt(val, 10) : val;
   if (typeof num === 'number' && Number.isFinite(num) && num >= min) {
@@ -55,10 +72,20 @@ function clampInt(val, fallback = 0, min = 0, max = MAX_SAFE) {
   return fallback;
 }
 
+function structuredCloneFallback(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 function validateState(state) {
   if (!state || typeof state !== 'object') return structuredCloneFallback(DEFAULTS);
 
   const validated = structuredCloneFallback(DEFAULTS);
+
+  if (typeof state.growerId === 'string' && /^#GRW-\d{5}$/.test(state.growerId)) {
+    validated.growerId = state.growerId;
+  } else {
+    validated.growerId = generateGrowerId();
+  }
 
   validated.balance = clampInt(state.balance, DEFAULTS.balance, 0, MAX_SAFE);
   if (typeof state.audioMuted === 'boolean') validated.audioMuted = state.audioMuted;
@@ -71,7 +98,23 @@ function validateState(state) {
   validated.lastDailyBonus = clampInt(state.lastDailyBonus, 0, 0, Number.MAX_SAFE_INTEGER);
   if (typeof state.hackClaimed === 'boolean') validated.hackClaimed = state.hackClaimed;
   if (typeof state.weaverClaimed === 'boolean') validated.weaverClaimed = state.weaverClaimed;
+  if (typeof state.scholarClaimed === 'boolean') validated.scholarClaimed = state.scholarClaimed;
   if (typeof state.subscribedEmail === 'string') validated.subscribedEmail = state.subscribedEmail.slice(0, 120);
+
+  if (Array.isArray(state.weaverRead)) {
+    validated.weaverRead = Array.from(
+      new Set(state.weaverRead.filter(idx => Number.isInteger(idx) && idx >= 0 && idx < 7))
+    );
+  }
+
+  if (state.calcSettings && typeof state.calcSettings === 'object') {
+    validated.calcSettings = {
+      strain: String(state.calcSettings.strain || '1.0'),
+      hp:     clampInt(state.calcSettings.hp, 95, 10, 100),
+      streak: clampInt(state.calcSettings.streak, 7, 0, 30),
+      light:  String(state.calcSettings.light || '1.0'),
+    };
+  }
 
   if (state.rouletteStats && typeof state.rouletteStats === 'object') {
     const s = state.rouletteStats;
@@ -90,13 +133,17 @@ function validateState(state) {
     validated.history = state.history
       .filter(h => h && typeof h === 'object' && typeof h.glyphs === 'string')
       .slice(0, 20)
-      .map(h => ({
-        glyphs: String(h.glyphs).slice(0, 16),
-        bet:    clampInt(h.bet, 10),
-        won:    clampInt(h.won, 0),
-        mult:   typeof h.mult === 'number' && Number.isFinite(h.mult) ? h.mult : 0,
-        time:   typeof h.time === 'string' ? h.time.slice(0, 16) : '',
-      }));
+      .map(h => {
+        const betVal = clampInt(h.bet !== undefined ? h.bet : h.wagered, 10);
+        return {
+          glyphs:  String(h.glyphs).slice(0, 16),
+          bet:     betVal,
+          wagered: betVal,
+          won:     clampInt(h.won, 0),
+          mult:    typeof h.mult === 'number' && Number.isFinite(h.mult) ? h.mult : 0,
+          time:    typeof h.time === 'string' ? h.time.slice(0, 16) : '',
+        };
+      });
   }
 
   if (Array.isArray(state.achievements)) {
@@ -116,30 +163,33 @@ function validateState(state) {
   return validated;
 }
 
-function structuredCloneFallback(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
 function load() {
   try {
     const raw = localStorage.getItem(STATE_KEY);
-    if (!raw) return structuredCloneFallback(DEFAULTS);
+    if (!raw) {
+      if (memoryFallbackState) return structuredCloneFallback(memoryFallbackState);
+      const init = validateState({});
+      localStorage.setItem(STATE_KEY, JSON.stringify(init));
+      return init;
+    }
     const parsed = JSON.parse(raw);
     return validateState(parsed);
   } catch {
-    return structuredCloneFallback(DEFAULTS);
+    if (!memoryFallbackState) memoryFallbackState = validateState({});
+    return structuredCloneFallback(memoryFallbackState);
   }
 }
 
 function save(state) {
   const validated = validateState(state);
+  memoryFallbackState = structuredCloneFallback(validated);
   try {
     localStorage.setItem(STATE_KEY, JSON.stringify(validated));
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('bzp:statechange', { detail: validated }));
-    }
   } catch (e) {
-    console.warn('[State] localStorage write failed:', e);
+    console.warn('[State] localStorage write fallback to memory:', e);
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('bzp:statechange', { detail: validated }));
   }
   return validated;
 }
@@ -178,7 +228,8 @@ export const State = {
   },
 
   reset() {
-    return save(structuredCloneFallback(DEFAULTS));
+    const fresh = validateState({});
+    return save(fresh);
   },
 
   recordRound({ wagered, won, glyphs = '', mult = 0 }) {
@@ -193,10 +244,10 @@ export const State = {
 
     const now = new Date();
     const timeStr = now.toTimeString().slice(0, 8);
-    const entry = { glyphs, bet: wagered, won, mult, time: timeStr };
+    const entry = { glyphs, bet: wagered, wagered, won, mult, time: timeStr };
     const history = [entry, ...(current.history || [])].slice(0, 20);
 
-    return this.set({
+    const updated = this.set({
       rouletteStats: {
         spins:         stats.spins + 1,
         wins:          stats.wins + (isWin ? 1 : 0),
@@ -208,6 +259,12 @@ export const State = {
       },
       history,
     });
+
+    if (wagered >= 1000) {
+      this.unlockAchievement('HIGH_ROLLER');
+    }
+
+    return updated;
   },
 
   clearHistory() {
@@ -246,8 +303,15 @@ export const State = {
     return (Date.now() - last) >= 24 * 60 * 60 * 1000;
   },
 
+  getDailyBonusRemainingMs() {
+    const last = load().lastDailyBonus || 0;
+    return Math.max(0, 24 * 60 * 60 * 1000 - (Date.now() - last));
+  },
+
   claimDailyBonus(amount = 500) {
-    if (!this.canClaimDailyBonus()) return { ok: false, remainingMs: 24 * 60 * 60 * 1000 - (Date.now() - load().lastDailyBonus) };
+    if (!this.canClaimDailyBonus()) {
+      return { ok: false, remainingMs: this.getDailyBonusRemainingMs() };
+    }
     const current = load();
     const nextBalance = current.balance + amount;
     this.set({ balance: nextBalance, lastDailyBonus: Date.now() });

@@ -1,6 +1,6 @@
-/* BOZHEMAN ≡ PROTOCOL - Service Worker v3.0 */
+/* BOZHEMAN ≡ PROTOCOL - Service Worker v4.0 */
 
-const CACHE_NAME = 'bozheman-cache-v3';
+const CACHE_NAME = 'bozheman-cache-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
