@@ -1,32 +1,102 @@
-# Rules for AI Agents (BOZHEMAN ≡ PROTOCOL)
+# Rules and Architecture Directives for AI Agents (BOZHEMAN ≡ PROTOCOL)
 
-This file contains specific instructions and rules for AI agents working on the **BOZHEMAN ≡ PROTOCOL** project.
+> **КРИТИЧЕСКОЕ ПРАВИЛО:** Этот документ является постоянным архитектурным манифестом и набором правил для AI-агентов Antigravity. Перед внесением любых изменений в проект агент обязан строго следовать описанным архитектурным слоям, дизайн-системе и принципам умеренности.
 
-## 1. Technology Stack
-- **Frontend:** Vanilla HTML5, CSS3, JavaScript (ES6 Modules).
-- **Libraries:** Three.js (via CDN and `importmap`), TWEEN.js.
-- **Build tools:** Not used. The project runs without Webpack, Vite, or other bundlers (direct inclusion of scripts as `type="module"`). Do not add build tools unless explicitly instructed.
+---
 
-## 2. Design and Aesthetics
-- **Style:** Cyberpunk, Hacker, Matrix, Terminal. The project should evoke the feeling of a "hack" or a futuristic interface.
-- **Colors (from `main.css`):** 
-  - Main background: black (`#000000`).
-  - Primary accent: red (`#ff3333`, `#a30000`).
-  - Secondary colors for glows and glitches: pink (`#ff00de`), neon green (`#00ff88`), gold (`#ffd700`).
-- **Fonts:** Exclusively monospace. The main font is `'Fira Code'`, with fallbacks to `'Courier New', monospace`.
-- **Effects:** Heavy use of glitch effects, scanlines, glows, and typewriter animations.
+## 1. Концепция и Позиционирование Проекта
+* **Суть портала:** BOZHEMAN ≡ PROTOCOL — это официальный цифровой хаб стримера, разработчика игр и медиа-автора BOZHEMAN.
+* **Главная страница (`index.html`):** Презентационный портал экосистемы (медиа-ресурсы, игровой хаб, системные руководства, интерактивное 3D-ядро).
+* **Политика относительно казино и бота (CRITICAL):**
+  * Главная страница **НЕ ДОЛЖНА** выглядеть как лендинг онлайн-казино или спам-шлюз бота.
+  * Мини-игра «Слоты» (`roulet.html`) и бот `@GrowerSim_bot` — это равноправные внутренние модули, доступные через игровой хаб (`games.html`) или сдержанные пункты меню.
+  * **ЗАПРЕЩЕНО:** Выделять казино-слоты мигающими бейджами баланса `[500 ₿]`, выводить кричащие зеленые рамки, мигающие неоновые пульсары (`live-pulse`) или агрессивные рекламные баннеры на первой странице.
+  * Все элементы основной навигационной сетки (8 кнопок) должны иметь **одинаковый визуальный вес**, гармоничную сетку и строгую типографику.
 
-## 3. Writing Code (CSS)
-- Do not use TailwindCSS or other CSS frameworks.
-- Follow the existing system of CSS variables (Custom Properties) defined in `css/main.css` (e.g., `var(--clr-primary)`, `var(--fs-base)`).
-- Separate styles into different files for different pages (e.g., `games.css`, `roulet.css`), but always include global styles (fonts, variables, base resets).
+---
 
-## 4. Writing Code (JavaScript)
-- Use a modular approach (`import` / `export`).
-- Keep logic related to 3D (Three.js), glitch effects, or audio in separate or appropriate modules.
-- Animations and transitions are often driven via `requestAnimationFrame` or TWEEN.js.
+## 2. Архитектурная Декомпозиция (Architecture & System Design)
 
-## 5. Language and Content
-- **Localization:** The main interface language is Russian (for descriptions, button texts, content).
-- **Text styling:** System messages, "protocol" logs, and terminal statuses are often written in English (e.g., `> INIT_CONNECTION...`, `SOUND: OFF`, `ACCESS GRANTED`) to maintain the hacker atmosphere.
-- Preserve existing audio effects (e.g., `ambient-audio`, `glitch-audio`) to support user immersion.
+Проект построен по модульному принципу **Vanilla ES6 Modules (Buildless)** без Webpack, Vite и внешних фреймворков.
+
+```
+/
+├── css/                     # Слой стилизации (Vanilla CSS3)
+│   ├── main.css             # Глобальные токены, сброс, HUD, терминал, кнопки
+│   ├── neon.css             # Тонкая кибер-текстура, сканлайны, скроллбар
+│   ├── games.css            # Игровой хаб (поиск, фильтры, 2x2 карточки)
+│   ├── roulet.css           # Модуль слот-машины (барабаны, кабинет)
+│   ├── refer.css            # Партнерские шлюзы и крипто-кошельки
+│   └── doubleindex.css      # Секретный протокол дешифровки (Иллюзия)
+├── js/
+│   ├── state.js             # [CORE DATA] Единственный источник правды (Single Source of Truth)
+│   ├── i18n.js              # [I18N BUS] Движок интернационализации (8 языков, 300+ ключей)
+│   ├── hud.js               # [UI TELEMETRY] Верхняя панель, HUD-кнопки, CLI, ачивки
+│   ├── matrix.js            # [CANVAS BG] Фоновый матричный дождь
+│   ├── index.js             # [PAGE CONTROLLER] Главная страница + Three.js 3D-сцена
+│   ├── games.js             # [PAGE CONTROLLER] Логика игрового хаба
+│   ├── roulette.js          # [PAGE CONTROLLER] Логика слот-машины
+│   └── engine/
+│       ├── audio.js         # Синтез звуков (Web Audio API) + звуковые эффекты
+│       ├── particles.js     # Canvas-система частиц и кибер-искр
+│       ├── reel.js          # Физика и математика барабанов
+│       └── constants.js     # Глобальные неизменяемые константы
+└── locales/                 # Словари локализации (*.json)
+```
+
+---
+
+## 3. Слой Данных и Состояния (Database & State Management)
+* **Модуль `js/state.js`:**
+  * Хранит глобальное состояние (`balance`, `growerId`, `achievements`, `stats`, `crtEnabled`, `audioMuted`, `matrixSpeed`).
+  * Все чтения: `State.read(key)` или `State.get()`.
+  * Все записи: `State.set({ key: value })`.
+  * Реактивность: При любом изменении стейта генерируется событие:
+    ```javascript
+    window.dispatchEvent(new CustomEvent('bzp:statechange', { detail: nextState }));
+    ```
+  * Персистентность: Автоматическая синхронизация с `localStorage` с валидацией схемы и дефолтными значениями (защита от порчи данных).
+
+---
+
+## 4. Дизайн-Система и Эстетика (Clean Concise Cyberpunk)
+* **Стиль:** Строгий, лаконичный, милитари-терминал / темный киберпанк.
+* **Главный фон:** Глубокий черный (`#000000`) и угольный полупрозрачный (`rgba(10, 4, 4, 0.65)`).
+* **Основной акцент:** Сдержанный багрово-красный (`#ff3333`, `--clr-primary`).
+* **Токены телеметрии:**
+  * Золото (кредиты): `#e5b842` (приглушенное благородное золото, без ядовито-желтого).
+  * Зеленый (статус онлайн/успех): `#00e575` (четкий терминальный изумруд, без кислоты).
+  * Текст: Четкий контрастный белый (`#ffffff`) или приглушенный серебристо-красный (`var(--clr-text-muted)`).
+* **ЗАПРЕТЫ ДИЗАЙНА:**
+  * **НЕТ** глобальному `text-shadow` на `body` (текст обязан быть кристально четким).
+  * **НЕТ** ядовито-розовому (`#ff00de`) и кислотному конфетти в 3D-сцене или матрице.
+  * **НЕТ** клоунским анимациям разрывания текста (`liquid-wave`, `skewX`) на кнопках.
+  * **НЕТ** слепящему bloom-свечению более 14px.
+  * **НЕТ** хроматическим радужным аберрациям на сканлайнах.
+
+---
+
+## 5. Правила Написания Кода (Code Review & Clean Code)
+1. **HTML:** Семантические теги (`<header>`, `<nav>`, `<main>`, `<section>`, `<footer>`). Обязательные атрибуты доступности (`aria-label`, `role`).
+2. **CSS:**
+   * Не подключать Tailwind, Bootstrap и сборщики.
+   * Использовать CSS Custom Properties из `main.css`.
+   * Избегать `!important` кроме системных переопределений доступности (`prefers-reduced-motion`).
+   * Кнопки `.btn-glitch`: единообразные, сдержанные, с легким подъемом на 1px и тонкой верхней акцентной гранью.
+3. **JavaScript:**
+   * Строгий `import`/`export`.
+   * Никаких глобальных переменных без инкапсуляции.
+   * Очистка таймеров и `cancelAnimationFrame` при скрытии страницы (`document.hidden`).
+   * Обработка ошибок в `try/catch` при работе с `localStorage`, `AudioContext`, `navigator.clipboard`.
+4. **Интернационализация (i18n):**
+   * Каждый новый текст в интерфейсе обязан добавляться во все 8 языковых файлов (`ru`, `en`, `uk`, `be`, `pl`, `de`, `fr`, `es`).
+   * В HTML использовать разметку `data-i18n="key"` или `t('key')` в JS.
+
+---
+
+## 6. Тестирование и QA (TDD & Quality Assurance)
+* Перед коммитом проверять:
+  1. Синтаксис JS через `node -c <file>`.
+  2. Валидность JSON всех 8 локалей.
+  3. Отсутствие ошибок в консоли браузера при переключении языков, CRT, звука и кликов по 3D-ядру.
+  4. Адаптивность: 320px (мобильные), 768px (планшеты), 1440px (десктоп), 2560px+ (4K).

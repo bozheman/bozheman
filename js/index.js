@@ -21,10 +21,10 @@ const LINKS = [
   { name: 'Instagram',     url: 'https://www.instagram.com/bozheman', isRaw: true },
   { name: 'YouTube',       url: 'https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw', isRaw: true },
   { name: 'TikTok',        url: 'https://www.tiktok.com/@bozheman_', isRaw: true },
-  { name: 'nav_growersim', url: 'https://t.me/GrowerSim_bot', isBot: true },
+  { name: 'nav_growersim', url: 'https://t.me/GrowerSim_bot' },
   { name: 'nav_games',     url: 'games.html' },
-  { name: 'nav_slots',     url: 'roulet.html', showBalance: true },
-  { name: 'nav_donation',  url: 'https://donatello.to/bozheman', isSpecial: true },
+  { name: 'nav_slots',     url: 'roulet.html' },
+  { name: 'nav_donation',  url: 'https://donatello.to/bozheman' },
 ];
 
 const SECRET_CLICK_COUNT = 10;
@@ -216,7 +216,6 @@ function createMainObject() {
 function createLinkButtons() {
   if (!linksContainer) return;
   linksContainer.innerHTML = '';
-  const bal = State.read('balance');
 
   LINKS.forEach(link => {
     const a = document.createElement('a');
@@ -224,23 +223,14 @@ function createLinkButtons() {
     a.className = 'btn-glitch';
     const label = link.isRaw ? link.name : t(link.name);
 
-    if (link.showBalance) {
-      const fullText = `${label} [${bal} ₿]`;
-      a.id = 'nav-slots-btn';
-      a.setAttribute('data-text', fullText);
-      a.innerHTML = `<span>${label}</span> <span class="nav-badge" id="nav-slots-balance">${bal} ₿</span>`;
-    } else {
-      a.textContent = label;
-      a.setAttribute('data-text', label);
-      if (!link.isRaw) a.setAttribute('data-i18n', link.name);
-    }
+    a.textContent = label;
+    a.setAttribute('data-text', label);
+    if (!link.isRaw) a.setAttribute('data-i18n', link.name);
 
     if (link.url.startsWith('http')) {
       a.target = '_blank';
       a.rel    = 'noopener noreferrer';
     }
-    if (link.isSpecial) a.classList.add('special');
-    if (link.isBot)     a.classList.add('bot-accent');
     a.addEventListener('mouseenter', () => AudioEngine.hover());
     linksContainer.appendChild(a);
   });
@@ -252,11 +242,7 @@ document.addEventListener('languagechange', () => {
 });
 
 window.addEventListener('bzp:statechange', () => {
-  const bal = State.read('balance');
-  const badge = document.getElementById('nav-slots-balance');
-  const btn   = document.getElementById('nav-slots-btn');
-  if (badge) badge.textContent = `${bal} ₿`;
-  if (btn)   btn.setAttribute('data-text', `${t('nav_slots')} [${bal} ₿]`);
+  // State change hook reserved for future reactive UI updates
 });
 
 function animate() {

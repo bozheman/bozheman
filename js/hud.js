@@ -262,7 +262,6 @@ function setupTopTelemetryBar() {
           <strong id="top-bal-val">${State.read('balance')} ₿</strong>
         </a>
         <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="top-bot-chip">
-          <span class="live-pulse"></span>
           <span data-i18n="top_bot_link">🌱 @GrowerSim_bot</span>
         </a>
       </div>
