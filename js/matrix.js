@@ -4,7 +4,7 @@
  * - Zero CPU usage when tab is hidden (document.hidden check)
  * - Smooth column preservation on window resize
  * - Dynamic speed control via State.get().matrixSpeed ('slow' | 'normal' | 'fast')
- * - Occasional cyber-neon lead glyphs (#ff00de, #00ff88, #ffd700)
+ * - Cohesive cyber-terminal rain palette (disciplined crimson with rare highlights)
  */
 
 import { State } from './state.js';
@@ -69,14 +69,14 @@ export function setupMatrix(canvasId = 'matrix-canvas') {
     for (let i = 0; i < drops.length; i++) {
       const text = chars[Math.floor(Math.random() * chars.length)];
       const r = Math.random();
-      if (r > 0.992) {
-        ctx.fillStyle = '#00ff88';
+      if (r > 0.994) {
+        ctx.fillStyle = '#ffffff';
       } else if (r > 0.985) {
-        ctx.fillStyle = '#ff00de';
-      } else if (r > 0.975) {
-        ctx.fillStyle = '#ffd700';
+        ctx.fillStyle = '#ff5555';
+      } else if (r > 0.976) {
+        ctx.fillStyle = '#e5b842';
       } else {
-        ctx.fillStyle = '#ff3333';
+        ctx.fillStyle = 'rgba(165, 20, 20, 0.65)';
       }
 
       ctx.fillText(text, i * FONT_SIZE, drops[i] * FONT_SIZE);

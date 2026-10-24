@@ -124,14 +124,14 @@ function init() {
   renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-  const redLight = new THREE.PointLight(0xff0000, 160, 100);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const redLight = new THREE.PointLight(0xff3333, 35, 40);
   redLight.position.set(2, 2, 3);
   scene.add(redLight);
 
-  const pinkLight = new THREE.PointLight(0xff00de, 75, 80);
-  pinkLight.position.set(-3, -2, 2);
-  scene.add(pinkLight);
+  const fillLight = new THREE.PointLight(0x881818, 20, 30);
+  fillLight.position.set(-3, -2, 2);
+  scene.add(fillLight);
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping   = true;
@@ -168,30 +168,30 @@ function init() {
 
 function createMainObject() {
   const mat = new THREE.MeshStandardMaterial({
-    color: 0xff3333, emissive: 0xcc0000, emissiveIntensity: 0.85,
-    metalness: 0.8, roughness: 0.2, wireframe: true
+    color: 0xaa1818, emissive: 0x4a0808, emissiveIntensity: 0.5,
+    metalness: 0.85, roughness: 0.3, wireframe: true
   });
   mainObject = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), mat);
   scene.add(mainObject);
 
   const innerMat = new THREE.MeshStandardMaterial({
-    color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 1.25,
-    metalness: 1.0, roughness: 0.1, wireframe: true
+    color: 0xd43838, emissive: 0x6a1010, emissiveIntensity: 0.55,
+    metalness: 0.9, roughness: 0.25, wireframe: true
   });
   innerObject = new THREE.Mesh(new THREE.OctahedronGeometry(0.7, 0), innerMat);
   mainObject.add(innerObject);
 
   // Orbital Cyber Ring
   const ringMat = new THREE.MeshStandardMaterial({
-    color: 0xff00de, emissive: 0xff00de, emissiveIntensity: 0.9,
-    metalness: 0.9, roughness: 0.15, wireframe: true
+    color: 0x881111, emissive: 0x330808, emissiveIntensity: 0.4,
+    metalness: 0.9, roughness: 0.2, wireframe: true
   });
-  outerRing = new THREE.Mesh(new THREE.TorusGeometry(1.75, 0.02, 8, 60), ringMat);
+  outerRing = new THREE.Mesh(new THREE.TorusGeometry(1.75, 0.015, 8, 60), ringMat);
   outerRing.rotation.x = Math.PI / 3;
   scene.add(outerRing);
 
   // 3D Floating Cyber Particle Cloud
-  const particleCount = 160;
+  const particleCount = 140;
   const positions = new Float32Array(particleCount * 3);
   for (let i = 0; i < particleCount; i++) {
     const r = 1.9 + Math.random() * 1.4;
@@ -204,10 +204,10 @@ function createMainObject() {
   const pGeo = new THREE.BufferGeometry();
   pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const pMat = new THREE.PointsMaterial({
-    color: 0xff3333,
-    size: 0.035,
+    color: 0xcc2929,
+    size: 0.024,
     transparent: true,
-    opacity: 0.75
+    opacity: 0.55
   });
   particleCloud = new THREE.Points(pGeo, pMat);
   scene.add(particleCloud);

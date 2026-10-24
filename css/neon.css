@@ -1,53 +1,51 @@
 /* =============================================
-   BOZHEMAN ≡ PROTOCOL  ‖  Neon Effects v3.0
-   Global neon polish — imported AFTER main.css
+   BOZHEMAN ≡ PROTOCOL  ‖  Refined Visuals v4.0
+   Clean, concise, restrained cyberpunk styling
    ============================================= */
 
 /* 1. Cyberpunk Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #080000; border-left: 1px solid rgba(255,51,51,0.2); }
-::-webkit-scrollbar-thumb { background: var(--clr-primary-dim, #a30000); border-radius: 2px; box-shadow: 0 0 8px var(--clr-primary, #ff3333); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #060608; border-left: 1px solid rgba(255, 51, 51, 0.14); }
+::-webkit-scrollbar-thumb { background: #4a0808; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--clr-primary, #ff3333); }
-* { scrollbar-width: thin; scrollbar-color: var(--clr-primary-dim, #a30000) #080000; }
+* { scrollbar-width: thin; scrollbar-color: #4a0808 #060608; }
 
-/* 2. Glowing Headings */
+/* 2. Crisp, Legible Headings — disciplined terminal glow, no blurry bloom */
 h1, h2, h3, h4, h5, h6, .page-title, #brand-title, .game-title {
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--clr-primary, #ff3333);
-  text-shadow:
-    0 0 5px var(--clr-primary, #ff3333),
-    0 0 15px rgba(255,51,51,0.6),
-    0 0 30px rgba(255,0,0,0.4);
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.35);
 }
 
-/* 3. Button Neon Polish */
-.btn-glitch { box-shadow: 0 0 10px rgba(255,51,51,0.2); will-change: transform, box-shadow; }
+/* 3. Button Polish — clean transitions without garish bloom */
+.btn-glitch { will-change: transform, border-color, background-color, box-shadow; }
 
-/* 4. Icon filter */
-svg, .sound-icon { filter: drop-shadow(0 0 4px var(--clr-primary, #ff3333)); }
+/* 4. Icon filter — clean, crisp rendering without blurry halos */
+svg, .sound-icon { filter: none; }
 
-/* 5. Scanlines intensity tweak */
+/* 5. Scanlines intensity — subtle, non-intrusive CRT texture */
 .scanlines-effect::after {
-  background:
-    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.35) 50%),
-    linear-gradient(90deg, rgba(255,0,0,0.08), rgba(0,0,0,0.02), rgba(255,0,0,0.08));
-  background-size: 100% 3px, 5px 100%;
-  animation: scanline 8s linear infinite !important;
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
+  background-size: 100% 4px;
+  animation: scanline 25s linear infinite !important;
+  opacity: 0.3;
 }
 
-/* 6. Body subtle glow */
-body { text-shadow: 0 0 4px rgba(255,51,51,0.4); }
+/* 6. Body text — crisp and sharp typography, NO global blurry text-shadow */
+body {
+  text-shadow: none !important;
+}
 
-/* 7. Glitch-intense animation class */
+/* 7. Glitch effect — tasteful micro-glitch, not eye-tearing spasm */
 .glitch-intense {
-  animation: glitch-anim 0.3s infinite alternate;
-  filter: contrast(1.5);
+  animation: glitch-subtle 2.5s ease-in-out infinite;
+  filter: none;
 }
 
-@keyframes glitch-anim {
-  0%   { text-shadow: 2px 0 #ff0000, -2px 0 #a30000; }
-  50%  { text-shadow: -3px 0 #ff3333, 3px 0 #600000; }
-  100% { text-shadow: 2px 0 #ff0000, -2px 0 #ff3333; }
+@keyframes glitch-subtle {
+  0%, 93%, 100% { transform: translate(0, 0); text-shadow: none; }
+  94% { transform: translate(-1px, 0); text-shadow: 1px 0 rgba(255, 51, 51, 0.5); }
+  96% { transform: translate(1px, 0); text-shadow: -1px 0 rgba(255, 51, 51, 0.5); }
 }
 
 /* 8. Cyberpunk Text Selection */
@@ -57,7 +55,7 @@ body { text-shadow: 0 0 4px rgba(255,51,51,0.4); }
   text-shadow: none;
 }
 
-/* 9. Secondary Neon Accents */
-.neon-gold  { color: var(--clr-gold, #ffd700); text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
-.neon-green { color: var(--clr-success, #00ff88); text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
-.neon-pink  { color: var(--clr-pink, #ff00de); text-shadow: 0 0 8px rgba(255, 0, 222, 0.6); }
+/* 9. Secondary Accents — refined, technical telemetry colors */
+.neon-gold  { color: var(--clr-gold, #e5b842); text-shadow: none; }
+.neon-green { color: var(--clr-success, #00e575); text-shadow: none; }
+.neon-pink  { color: var(--clr-pink, #d946ef); text-shadow: none; }

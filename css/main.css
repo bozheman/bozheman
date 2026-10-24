@@ -10,19 +10,19 @@
 :root {
   /* Palette */
   --clr-bg:            #000000;
-  --clr-surface:       rgba(8, 0, 0, 0.58);
-  --clr-surface-heavy: rgba(8, 0, 0, 0.88);
-  --clr-border:        rgba(255, 51, 51, 0.32);
-  --clr-border-bright: rgba(255, 51, 51, 0.72);
+  --clr-surface:       rgba(10, 4, 4, 0.65);
+  --clr-surface-heavy: rgba(12, 6, 6, 0.92);
+  --clr-border:        rgba(255, 51, 51, 0.22);
+  --clr-border-bright: rgba(255, 51, 51, 0.48);
   --clr-primary:       #ff3333;
-  --clr-primary-dim:   #a30000;
+  --clr-primary-dim:   #7a0000;
   --clr-white:         #ffffff;
-  --clr-success:       #00ff88;
-  --clr-pink:          #ff00de;
-  --clr-glow:          #ff0000;
-  --clr-gold:          #ffd700;
-  --clr-matrix:        #a30000;
-  --clr-text-muted:    rgba(255, 75, 75, 0.76);
+  --clr-success:       #00e575;
+  --clr-pink:          #d946ef;
+  --clr-glow:          rgba(255, 51, 51, 0.35);
+  --clr-gold:          #e5b842;
+  --clr-matrix:        #4a0808;
+  --clr-text-muted:    rgba(255, 110, 110, 0.7);
 
   /* Typography — fluid scale */
   --font-mono:  'Fira Code', 'Courier New', monospace;
@@ -46,9 +46,9 @@
   --sp-12: 3rem;
 
   /* Shadows / Glows */
-  --shadow-primary: 0 0 8px var(--clr-primary), 0 0 22px rgba(255,51,51,0.35);
-  --shadow-glow:    0 0 12px var(--clr-glow),   0 0 30px rgba(255,0,0,0.4);
-  --shadow-white:   0 0 8px var(--clr-primary),  0 0 20px rgba(255,51,51,0.5);
+  --shadow-primary: 0 0 8px rgba(255, 51, 51, 0.3);
+  --shadow-glow:    0 0 14px rgba(255, 51, 51, 0.25);
+  --shadow-white:   0 0 8px rgba(255, 255, 255, 0.25);
 
   /* Transitions */
   --t-fast: 0.18s ease;
@@ -174,8 +174,8 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
   height: 7px;
   border-radius: 50%;
   background: var(--clr-primary);
-  box-shadow: 0 0 8px var(--clr-primary);
-  animation: blink 1.6s infinite;
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.45);
+  animation: pulse-soft 3s infinite ease-in-out;
 }
 
 .top-sep {
@@ -193,8 +193,8 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
   align-items: center;
   gap: 0.35rem;
   padding: 0.15rem 0.55rem;
-  border: 1px solid rgba(255, 51, 51, 0.38);
-  background: rgba(255, 51, 51, 0.08);
+  border: 1px solid rgba(255, 51, 51, 0.28);
+  background: rgba(255, 51, 51, 0.06);
   border-radius: 2px;
   transition: all var(--t-fast);
   font-size: var(--fs-xs);
@@ -206,19 +206,19 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
 
 .top-bal-chip:hover {
   border-color: var(--clr-gold);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.35);
+  box-shadow: 0 0 8px rgba(229, 184, 66, 0.25);
 }
 
 .top-bot-chip {
-  border-color: rgba(0, 255, 136, 0.45);
+  border-color: rgba(0, 229, 117, 0.35);
   color: var(--clr-success);
-  background: rgba(0, 255, 136, 0.08);
+  background: rgba(0, 229, 117, 0.06);
   font-weight: 700;
 }
 
 .top-bot-chip:hover {
   border-color: var(--clr-success);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.45);
+  box-shadow: 0 0 8px rgba(0, 229, 117, 0.25);
 }
 
 .live-pulse {
@@ -226,8 +226,13 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
   height: 6px;
   border-radius: 50%;
   background: var(--clr-success);
-  box-shadow: 0 0 8px var(--clr-success);
-  animation: blink 1.2s infinite;
+  box-shadow: 0 0 6px rgba(0, 229, 117, 0.4);
+  animation: pulse-soft 2.4s infinite ease-in-out;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1; }
 }
 
 /* ──────────────────────────────────────────────
@@ -507,21 +512,14 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.22) 50%),
-    linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.015), rgba(0,0,255,0.05));
-  background-size: 100% 4px, 6px 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.16) 50%);
+  background-size: 100% 4px;
   pointer-events: none;
-  animation: scanline 15s linear infinite;
-}
-
-@keyframes scanline {
-  from { background-position: 0 0; }
-  to   { background-position: 0 -100vh; }
+  opacity: 0.35;
 }
 
 /* ──────────────────────────────────────────────
-   9.  BTN-GLITCH (Aligned Universal Neon Button)
+   9.  BTN-GLITCH (Concise Cyberpunk Button)
    ────────────────────────────────────────────── */
 .btn-glitch {
   position: relative;
@@ -549,54 +547,51 @@ select, input { font-family: var(--font-mono); font-variant-numeric: tabular-num
   user-select: none;
 }
 
+.btn-glitch::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--clr-primary);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
 .btn-glitch:hover:not(:disabled) {
   border-color: var(--clr-primary);
-  text-shadow: var(--shadow-primary), var(--shadow-glow);
-  box-shadow: 0 0 18px rgba(255,51,51,0.55), 0 0 30px rgba(255,0,222,0.25);
+  background: rgba(28, 8, 8, 0.95);
+  box-shadow: 0 0 12px rgba(255, 51, 51, 0.28);
   transform: translateY(-1px);
+}
+
+.btn-glitch:hover:not(:disabled)::before {
+  opacity: 1;
 }
 
 .btn-glitch:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-.btn-glitch::before, .btn-glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  padding: 0.75rem 1rem;
-  background: rgba(12, 0, 0, 0.92);
-  color: var(--clr-white);
-  opacity: 0;
-  transition: opacity var(--t-med);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.btn-glitch:hover:not(:disabled)::before,
-.btn-glitch:hover:not(:disabled)::after { opacity: 1; }
-.btn-glitch:hover:not(:disabled)::before { clip-path: polygon(0 0,100% 0,100% 50%,0 50%); animation: liquid-wave-top 2s ease-in-out infinite; }
-.btn-glitch:hover:not(:disabled)::after  { clip-path: polygon(0 50%,100% 50%,100% 100%,0 100%); animation: liquid-wave-bottom 2s ease-in-out infinite; }
-
-@keyframes liquid-wave-top    { 0%,100%{transform:translateX(0) skewX(0deg)} 50%{transform:translateX(-4px) skewX(2deg)} }
-@keyframes liquid-wave-bottom { 0%,100%{transform:translateX(0) skewX(0deg)} 50%{transform:translateX(4px) skewX(-2deg)} }
-
 .btn-glitch.special {
-  background: linear-gradient(135deg, rgba(110, 0, 0, 0.85), rgba(8, 0, 0, 0.95));
+  background: linear-gradient(135deg, rgba(80, 0, 0, 0.75), rgba(8, 0, 0, 0.95));
   border-color: var(--clr-primary);
 }
 
 .btn-glitch.bot-accent {
-  border-color: rgba(0, 255, 136, 0.6);
+  border-color: rgba(0, 229, 117, 0.4);
   color: var(--clr-success);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.18);
+}
+
+.btn-glitch.bot-accent::before {
+  background: var(--clr-success);
 }
 
 .btn-glitch.bot-accent:hover:not(:disabled) {
   border-color: var(--clr-success);
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.45);
+  background: rgba(0, 26, 13, 0.9);
+  box-shadow: 0 0 12px rgba(0, 229, 117, 0.25);
 }
 
 .btn-glitch:disabled { cursor: not-allowed; opacity: 0.45; }
@@ -626,12 +621,10 @@ body.glitch-out::after {
   inset: 0;
   pointer-events: none;
   z-index: 9998;
-  background:
-    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.22) 50%),
-    linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.015), rgba(0,0,255,0.05));
-  background-size: 100% 2px, 3px 100%;
-  box-shadow: inset 0 0 110px rgba(0,0,0,0.82);
-  opacity: 0.72;
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.16) 50%);
+  background-size: 100% 3px;
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.72);
+  opacity: 0.3;
 }
 
 /* ──────────────────────────────────────────────

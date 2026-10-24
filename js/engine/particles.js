@@ -41,8 +41,8 @@ class Particle {
     this.life = 1.0;
     this.decay = Math.random() * 0.015 + 0.010;
     const palette = jackpot
-      ? ['#ff3333', '#ffd700', '#ff00de', '#00ff88', '#ff4d4d']
-      : ['#ff3333', '#a30000', '#ff4d4d', '#00ff88'];
+      ? ['#ff3333', '#e5b842', '#ffffff', '#ff6666', '#a30000']
+      : ['#ff3333', '#a30000', '#ff6666', '#ffffff'];
     this.color = palette[Math.floor(Math.random() * palette.length)];
     const r = Math.random();
     this.shape = jackpot && r > 0.72 ? 'glyph' : (r > 0.35 ? 'rect' : 'circle');

@@ -18,16 +18,9 @@ body::before {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background:
-    linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.18) 50%),
-    linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,0,0,0.01), rgba(255,0,0,0.04));
-  background-size: 100% 4px, 6px 100%;
-  animation: scanline-reel 20s linear infinite;
-}
-
-@keyframes scanline-reel {
-  from { background-position: 0 0; }
-  to   { background-position: 0 -200vh; }
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.14) 50%);
+  background-size: 100% 4px;
+  opacity: 0.35;
 }
 
 /* ─── MACHINE WRAPPER ─────────────────────────────────────── */
@@ -50,14 +43,8 @@ body::before {
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--clr-primary, #ff3333);
-  text-shadow: 0 0 6px var(--clr-primary), 0 0 18px var(--clr-glow, #ff0000);
-  animation: title-pulse 4s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.35);
   margin: 0;
-}
-
-@keyframes title-pulse {
-  0%, 100% { text-shadow: 0 0 6px var(--clr-primary), 0 0 18px var(--clr-glow); }
-  50%       { text-shadow: 0 0 12px var(--clr-primary), 0 0 35px var(--clr-glow), 0 0 60px var(--clr-glow); }
 }
 
 /* ─── SYMMETRIC 6-CELL STATS BAR ────────────────────────────── */

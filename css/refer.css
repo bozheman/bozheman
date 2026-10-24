@@ -30,13 +30,13 @@ body {
   font-weight: 700;
   text-align: center;
   color: var(--clr-primary, #ff3333);
-  text-shadow: 0 0 10px rgba(255,51,51,0.5);
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.35);
   text-decoration: none;
   transition: all var(--t-med, 0.3s ease);
 }
 
 .page-title:hover {
-  text-shadow: 0 0 8px #ff3333, 0 0 20px rgba(255,51,51,0.8);
+  text-shadow: 0 0 12px rgba(255, 51, 51, 0.5);
 }
 
 /* ─── SUPPORT BLOCKS ─────────────────────────────────────────── */
@@ -52,17 +52,17 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 0 20px rgba(255, 51, 51, 0.15);
+  box-shadow: 0 0 14px rgba(255, 51, 51, 0.12);
 }
 
 .support-block h2 {
   font-size: clamp(1rem, 3vw, 1.35rem);
   margin: 0;
-  border-bottom: 1px dashed rgba(255,51,51,0.45);
+  border-bottom: 1px dashed rgba(255, 51, 51, 0.3);
   padding-bottom: 0.6rem;
   color: var(--clr-primary, #ff3333);
   width: 100%;
-  text-shadow: 0 0 8px rgba(255,51,51,0.4);
+  text-shadow: 0 0 6px rgba(255, 51, 51, 0.3);
 }
 
 .crypto-warning {
