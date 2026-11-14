@@ -6,12 +6,12 @@ import (
 )
 
 func TestNewManagerAndStatus(t *testing.T) {
-	mgr := NewManager("../..", false, 2*time.Minute)
+	mgr := NewManager("../..", false, 20*time.Second)
 	st := mgr.GetStatus()
 	if st.AutoPullEnabled {
 		t.Fatal("expected AutoPullEnabled=false")
 	}
-	if st.Interval != (2 * time.Minute).String() {
+	if st.Interval != (20 * time.Second).String() {
 		t.Fatalf("unexpected interval %q", st.Interval)
 	}
 	if st.LastResult != "initialized" {

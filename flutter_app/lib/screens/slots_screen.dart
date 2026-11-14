@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 import '../l10n/i18n.dart';
 import '../services/api_service.dart';
@@ -10,29 +11,32 @@ import '../widgets/slot_reels_painter.dart';
 
 class SlotsScreen extends StatefulWidget {
   final ProtocolState state;
-  final ValueChanged<String> onNavigate;
+  final ValueChanged<String>? onNavigate;
 
   const SlotsScreen({
     super.key,
     required this.state,
-    required this.onNavigate,
+    this.onNavigate,
   });
 
   @override
   State<SlotsScreen> createState() => _SlotsScreenState();
 }
 
-class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStateMixin {
+class _SlotsScreenState extends State<SlotsScreen> with TickerProviderStateMixin {
   late final TextEditingController _betCtrl;
   late final AnimationController _spinAnim;
+  late final AnimationController _winFxAnim;
 
   final List<SlotSymbol> _reels = [slotSymbols[0], slotSymbols[0], slotSymbols[0]];
   List<bool> _reelSpinning = [false, false, false];
   bool _isSpinning = false;
   bool _autoSpin = false;
+  bool _showDetails = false;
   String? _statusMsg;
   Color _statusColor = ProtocolColors.emerald;
   String _winId = '';
+  bool _isJackpotWin = false;
   Timer? _autoTimer;
 
   @override
@@ -45,12 +49,19 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
     )..addListener(() {
         if (mounted) setState(() {});
       });
+    _winFxAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1100),
+    )..addListener(() {
+        if (mounted) setState(() {});
+      });
   }
 
   @override
   void dispose() {
     _autoTimer?.cancel();
     _spinAnim.dispose();
+    _winFxAnim.dispose();
     _betCtrl.dispose();
     super.dispose();
   }
@@ -87,6 +98,7 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
       _reelSpinning = [true, true, true];
       _statusMsg = null;
       _winId = '';
+      _isJackpotWin = false;
     });
 
     widget.state.adjustBalance(-bet);
@@ -97,7 +109,7 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
     if (!mounted) return;
 
     final turbo = widget.state.turboSpin;
-    final stepMs = turbo ? 120 : 340;
+    final stepMs = turbo ? 120 : 320;
 
     await Future.delayed(Duration(milliseconds: stepMs));
     if (!mounted) return;
@@ -127,7 +139,9 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
 
     if (outcome.win > 0) {
       widget.state.adjustBalance(outcome.win);
-      if (outcome.outcome == 'jackpot') {
+      _isJackpotWin = outcome.outcome == 'jackpot';
+      _winFxAnim.forward(from: 0.0);
+      if (_isJackpotWin) {
         AudioService.jackpot();
         _statusColor = ProtocolColors.gold;
         _statusMsg = '${I18n.t('slots_jackpot')} +${outcome.win} ₿ (x${outcome.multiplier})';
@@ -155,7 +169,7 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
 
     if (_autoSpin && mounted) {
       _autoTimer?.cancel();
-      _autoTimer = Timer(Duration(milliseconds: turbo ? 350 : 900), () {
+      _autoTimer = Timer(Duration(milliseconds: turbo ? 360 : 880), () {
         if (mounted && _autoSpin) _spin();
       });
     }
@@ -180,266 +194,69 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
 
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 940),
+        constraints: const BoxConstraints(maxWidth: 920),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 36),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Zero-Money Free-To-Play Banner
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: ProtocolColors.gold.withAlpha(20),
-                  border: Border.all(color: ProtocolColors.gold.withAlpha(110)),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Row(
+              // ── TOP WALLET & TELEMETRY STRIP ──
+              BentoCard(
+                accentColor: ProtocolColors.gold,
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+                borderRadius: 22,
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 16,
+                  runSpacing: 12,
                   children: [
-                    const Icon(Icons.verified_user_outlined, color: ProtocolColors.gold, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        I18n.t('slots_free_badge'),
-                        style: ProtocolTheme.mono(
-                          size: 11,
-                          weight: FontWeight.w700,
-                          color: ProtocolColors.gold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              // 6-Cell Symmetric Telemetry Stats Bar
-              LayoutBuilder(
-                builder: (_, c) {
-                  final cols = c.maxWidth >= 680 ? 6 : (c.maxWidth >= 380 ? 3 : 2);
-                  const gap = 8.0;
-                  final cellW = (c.maxWidth - gap * (cols - 1)) / cols;
-                  final items = [
-                    (I18n.t('slots_balance'), '${s.balance} ₿', ProtocolColors.gold),
-                    (I18n.t('slots_spins'), '${s.spins}', ProtocolColors.textPrimary),
-                    (I18n.t('slots_last_bet'), s.lastBet, ProtocolColors.textPrimary),
-                    (I18n.t('slots_winrate'), '${s.winrate.toStringAsFixed(1)}%', ProtocolColors.emerald),
-                    (I18n.t('slots_max_win'), '${s.maxWin}', ProtocolColors.gold),
-                    (I18n.t('slots_streak'), '${s.currentStreak}', ProtocolColors.crimson),
-                  ];
-                  return Wrap(
-                    spacing: gap,
-                    runSpacing: gap,
-                    children: items
-                        .map(
-                          (it) => SizedBox(
-                            width: cellW,
-                            child: CyberPanel(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    it.$1,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: ProtocolTheme.mono(size: 10, color: ProtocolColors.textDim),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    it.$2,
-                                    style: ProtocolTheme.mono(
-                                      size: 14,
-                                      weight: FontWeight.w700,
-                                      color: it.$3,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  );
-                },
-              ),
-              const SizedBox(height: 14),
-
-              // Machine Cabinet: Reels + Pay Table + Controls
-              CyberPanel(
-                borderColor: ProtocolColors.borderBright,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (var i = 0; i < 3; i++) ...[
-                          Expanded(
-                            child: SlotReelWidget(
-                              targetSymbol: _reels[i],
-                              spinning: _reelSpinning[i],
-                              reelIndex: i,
-                              spinTick: _spinAnim.value,
-                              highlighted: _winId.isNotEmpty && !_isSpinning,
-                            ),
-                          ),
-                          if (i < 2) const SizedBox(width: 10),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Outcome Status Banner
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: ProtocolColors.bgPure,
-                        border: Border.all(
-                          color: _statusMsg != null
-                              ? _statusColor.withAlpha(140)
-                              : ProtocolColors.borderSubtle,
-                        ),
-                      ),
-                      child: Text(
-                        _statusMsg ?? I18n.t('slots_title'),
-                        textAlign: TextAlign.center,
-                        style: ProtocolTheme.mono(
-                          size: 13,
-                          weight: FontWeight.w700,
-                          color: _statusMsg != null ? _statusColor : ProtocolColors.textMuted,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Pay Table Strip
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        _payChip('seven', '7 7 7', 'x10'),
-                        _payChip('star', '★ ★ ★', 'x7'),
-                        _payChip('omega', 'Ω Ω Ω', 'x5'),
-                        _payChip('triangle', '▲ ▲ ▲', 'x3'),
-                        _payChip('square', '■ ■ ■', 'x2'),
-                        _payChip('pair', I18n.t('slots_any2'), 'x1.5'),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Bet Input + Chips
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CyberButton(
-                          label: '-',
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() - 10),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 150,
-                          child: TextField(
-                            controller: _betCtrl,
-                            enabled: !_isSpinning,
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            style: ProtocolTheme.mono(
-                              size: 15,
-                              weight: FontWeight.w700,
-                              color: ProtocolColors.gold,
-                            ),
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                              border: const OutlineInputBorder(
-                                borderSide: BorderSide(color: ProtocolColors.borderBright),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: ProtocolColors.gold),
-                              ),
-                            ),
+                        Text(
+                          I18n.t('slots_free_badge'),
+                          style: ProtocolTheme.mono(
+                            size: 10.5,
+                            weight: FontWeight.w700,
+                            color: ProtocolColors.textSecondary,
+                            letterSpacing: 0.7,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        CyberButton(
-                          label: '+',
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() + 10),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              '${s.balance}',
+                              style: ProtocolTheme.display(
+                                size: 32,
+                                color: ProtocolColors.gold,
+                                letterSpacing: -0.6,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '₿',
+                              style: ProtocolTheme.mono(
+                                size: 18,
+                                weight: FontWeight.w700,
+                                color: ProtocolColors.gold,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        CyberButton(
-                          label: I18n.t('slots_min'),
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(10),
-                        ),
-                        CyberButton(
-                          label: I18n.t('slots_half'),
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet((_parsedBet() ~/ 2)),
-                        ),
-                        CyberButton(
-                          label: I18n.t('slots_double'),
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() * 2),
-                        ),
-                        CyberButton(
-                          label: '+50',
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() + 50),
-                        ),
-                        CyberButton(
-                          label: '+100',
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() + 100),
-                        ),
-                        CyberButton(
-                          label: I18n.t('slots_max'),
-                          compact: true,
-                          onPressed: _isSpinning ? null : () => _setBet(s.balance),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Mode Row
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        CyberButton(
-                          label: s.turboSpin ? I18n.t('slots_turbo_on') : I18n.t('slots_turbo_off'),
-                          compact: true,
-                          filled: s.turboSpin,
-                          accentColor: s.turboSpin ? ProtocolColors.gold : ProtocolColors.textDim,
-                          onPressed: s.toggleTurbo,
-                        ),
-                        CyberButton(
-                          label: _autoSpin ? I18n.t('slots_auto_on') : I18n.t('slots_auto_off'),
-                          compact: true,
-                          filled: _autoSpin,
-                          accentColor: _autoSpin ? ProtocolColors.emerald : ProtocolColors.textDim,
-                          onPressed: () {
-                            AudioService.click();
-                            setState(() => _autoSpin = !_autoSpin);
-                            if (!_autoSpin) {
-                              _autoTimer?.cancel();
-                            } else if (!_isSpinning) {
-                              _spin();
-                            }
-                          },
-                        ),
+                        _StatChip(label: I18n.t('slots_winrate'), value: '${s.winrate.toStringAsFixed(1)}%', accent: ProtocolColors.emerald),
+                        _StatChip(label: I18n.t('slots_max_win'), value: '${s.maxWin} ₿', accent: ProtocolColors.gold),
                         CyberButton(
                           label: dailyLabel,
                           compact: true,
@@ -456,15 +273,206 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
                         ),
                       ],
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ── ARCADE MACHINE CABINET ──
+              BentoCard(
+                accentColor: _winId.isNotEmpty ? ProtocolColors.gold : ProtocolColors.crimson,
+                highlightBorder: _winId.isNotEmpty,
+                padding: const EdgeInsets.all(24),
+                borderRadius: 24,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 3 Cylindrical Reels + Win Particle Overlay
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: ProtocolColors.bgVoid,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: ProtocolColors.borderSubtle),
+                          ),
+                          child: Row(
+                            children: [
+                              for (var i = 0; i < 3; i++) ...[
+                                Expanded(
+                                  child: SlotReelWidget(
+                                    targetSymbol: _reels[i],
+                                    spinning: _reelSpinning[i],
+                                    reelIndex: i,
+                                    spinTick: _spinAnim.value,
+                                    highlighted: _winId.isNotEmpty && !_isSpinning,
+                                  ),
+                                ),
+                                if (i < 2) const SizedBox(width: 12),
+                              ],
+                            ],
+                          ),
+                        ),
+                        if (_winFxAnim.isAnimating)
+                          Positioned.fill(
+                            child: IgnorePointer(
+                              child: CustomPaint(
+                                painter: _WinParticlesPainter(
+                                  progress: _winFxAnim.value,
+                                  isJackpot: _isJackpotWin,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 14),
 
-                    // SPIN & Free Refill CTA
+                    // Dynamic Result Pill
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: _statusMsg != null
+                            ? _statusColor.withAlpha(22)
+                            : ProtocolColors.bgVoid.withAlpha(180),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: _statusMsg != null
+                              ? _statusColor.withAlpha(120)
+                              : ProtocolColors.borderSubtle,
+                        ),
+                      ),
+                      child: Text(
+                        _statusMsg ?? I18n.t('slots_title'),
+                        textAlign: TextAlign.center,
+                        style: ProtocolTheme.sans(
+                          size: 14,
+                          weight: FontWeight.w700,
+                          color: _statusMsg != null ? _statusColor : ProtocolColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Bet Stepper + Input
+                    LayoutBuilder(
+                      builder: (_, c) {
+                        return Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            CyberButton(
+                              label: '−',
+                              compact: true,
+                              onPressed: _isSpinning ? null : () => _setBet(_parsedBet() - 10),
+                            ),
+                            SizedBox(
+                              width: min(170, c.maxWidth * 0.55),
+                              child: TextField(
+                                controller: _betCtrl,
+                                enabled: !_isSpinning,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                style: ProtocolTheme.mono(
+                                  size: 16,
+                                  weight: FontWeight.w700,
+                                  color: ProtocolColors.gold,
+                                ),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: ProtocolColors.bgVoid,
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(999),
+                                    borderSide: const BorderSide(color: ProtocolColors.borderBright),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(999),
+                                    borderSide: const BorderSide(color: ProtocolColors.borderBright),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(999),
+                                    borderSide: const BorderSide(color: ProtocolColors.gold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            CyberButton(
+                              label: '+',
+                              compact: true,
+                              onPressed: _isSpinning ? null : () => _setBet(_parsedBet() + 10),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Quick Bet Multipliers + Mode Toggles
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        CyberButton(
+                          label: I18n.t('slots_min'),
+                          compact: true,
+                          onPressed: _isSpinning ? null : () => _setBet(10),
+                        ),
+                        CyberButton(
+                          label: '1/2',
+                          compact: true,
+                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() ~/ 2),
+                        ),
+                        CyberButton(
+                          label: 'x2',
+                          compact: true,
+                          onPressed: _isSpinning ? null : () => _setBet(_parsedBet() * 2),
+                        ),
+                        CyberButton(
+                          label: I18n.t('slots_max'),
+                          compact: true,
+                          onPressed: _isSpinning ? null : () => _setBet(s.balance),
+                        ),
+                        CyberButton(
+                          label: '⚡ TURBO',
+                          compact: true,
+                          filled: s.turboSpin,
+                          accentColor: s.turboSpin ? ProtocolColors.gold : ProtocolColors.textSecondary,
+                          onPressed: s.toggleTurbo,
+                        ),
+                        CyberButton(
+                          label: _autoSpin ? '🔄 AUTO: ON' : '🔄 AUTO',
+                          compact: true,
+                          filled: _autoSpin,
+                          accentColor: _autoSpin ? ProtocolColors.emerald : ProtocolColors.textSecondary,
+                          onPressed: () {
+                            AudioService.click();
+                            setState(() => _autoSpin = !_autoSpin);
+                            if (!_autoSpin) {
+                              _autoTimer?.cancel();
+                            } else if (!_isSpinning) {
+                              _spin();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Giant Tactile Primary CTA
                     if (s.balance < 10 && !_isSpinning)
                       CyberButton(
                         label: I18n.t('slots_refill_btn'),
                         filled: true,
                         accentColor: ProtocolColors.emerald,
-                        icon: Icons.add_circle_outline,
+                        icon: Icons.add_circle_outline_rounded,
                         onPressed: () {
                           s.refillFreeCoins();
                           setState(() {
@@ -478,111 +486,139 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
                         label: _isSpinning ? '...' : I18n.t('slots_spin_btn'),
                         filled: true,
                         accentColor: ProtocolColors.crimson,
-                        icon: Icons.play_arrow,
+                        icon: Icons.play_arrow_rounded,
                         onPressed: _isSpinning ? null : _spin,
                       ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // Provably Fair SHA-256 Bar
-              InkWell(
-                onTap: () {
-                  final seed = s.lastSeed ?? 'SHA256::GENESIS';
-                  WebBridge.copyText(seed);
-                  AudioService.copy();
-                  setState(() {
-                    _statusColor = ProtocolColors.emerald;
-                    _statusMsg = I18n.t('slots_seed_copied');
-                  });
-                },
-                child: CyberPanel(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.verified_outlined, color: ProtocolColors.emerald, size: 15),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${I18n.t('slots_fair_seed')} ${s.lastSeed ?? "SHA256::READY"}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: ProtocolTheme.mono(size: 11, color: ProtocolColors.textSecondary),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        I18n.t('copy_btn'),
-                        style: ProtocolTheme.mono(size: 10, color: ProtocolColors.gold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Transaction History
+              // ── PROVABLY FAIR HASH + COLLAPSIBLE DETAILS TOGGLE ──
               CyberPanel(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      runSpacing: 8,
                       children: [
-                        Text(
-                          I18n.t('slots_history'),
-                          style: ProtocolTheme.mono(
-                            size: 12,
-                            weight: FontWeight.w700,
-                            color: ProtocolColors.crimson,
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_outlined, color: ProtocolColors.emerald, size: 17),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: InkWell(
+                                onTap: () {
+                                  final seed = s.lastSeed ?? 'SHA256::GENESIS';
+                                  WebBridge.copyText(seed);
+                                  AudioService.copy();
+                                  setState(() {
+                                    _statusColor = ProtocolColors.emerald;
+                                    _statusMsg = I18n.t('slots_seed_copied');
+                                  });
+                                },
+                                child: Text(
+                                  'SHA-256: ${s.lastSeed ?? "READY"}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: ProtocolTheme.mono(size: 11.5, color: ProtocolColors.textSecondary),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const Spacer(),
-                        if (s.history.isNotEmpty)
-                          CyberButton(
-                            label: I18n.t('slots_clear_history'),
-                            compact: true,
-                            onPressed: s.clearHistory,
-                          ),
+                        CyberButton(
+                          label: _showDetails
+                              ? (I18n.currentLang == 'ru' ? 'Скрыть выплаты ▲' : 'Hide Info ▲')
+                              : (I18n.currentLang == 'ru' ? 'Выплаты и история ▼' : 'Payouts & History ▼'),
+                          compact: true,
+                          accentColor: ProtocolColors.textSecondary,
+                          onPressed: () {
+                            AudioService.click();
+                            setState(() => _showDetails = !_showDetails);
+                          },
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    if (s.history.isEmpty)
-                      Text(
-                        I18n.t('slots_history_empty'),
-                        style: ProtocolTheme.mono(size: 12, color: ProtocolColors.textDim),
-                      )
-                    else
-                      for (final item in s.history.take(8))
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Row(
-                            children: [
-                              Text(
-                                item.time,
-                                style: ProtocolTheme.mono(size: 11, color: ProtocolColors.textDim),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                '[${item.glyphs}]',
-                                style: ProtocolTheme.mono(
-                                  size: 12,
-                                  weight: FontWeight.w700,
-                                  color: item.won > 0 ? ProtocolColors.gold : ProtocolColors.textSecondary,
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                item.won > 0 ? '+${item.won} ₿ (x${item.mult})' : '-${item.bet} ₿',
-                                style: ProtocolTheme.mono(
-                                  size: 12,
-                                  weight: FontWeight.w700,
-                                  color: item.won > 0 ? ProtocolColors.emerald : ProtocolColors.crimson,
-                                ),
-                              ),
-                            ],
+                    if (_showDetails) ...[
+                      const SizedBox(height: 14),
+                      const Divider(color: ProtocolColors.borderSubtle, height: 1),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _payChip('seven', '7 7 7', 'x10'),
+                          _payChip('star', '★ ★ ★', 'x7'),
+                          _payChip('omega', 'Ω Ω Ω', 'x5'),
+                          _payChip('triangle', '▲ ▲ ▲', 'x3'),
+                          _payChip('square', '■ ■ ■', 'x2'),
+                          _payChip('pair', I18n.t('slots_any2'), 'x1.5'),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Text(
+                            I18n.t('slots_history'),
+                            style: ProtocolTheme.mono(
+                              size: 11.5,
+                              weight: FontWeight.w700,
+                              color: ProtocolColors.textSecondary,
+                            ),
                           ),
-                        ),
+                          const Spacer(),
+                          if (s.history.isNotEmpty)
+                            CyberButton(
+                              label: I18n.t('slots_clear_history'),
+                              compact: true,
+                              onPressed: s.clearHistory,
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (s.history.isEmpty)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            I18n.t('slots_history_empty'),
+                            style: ProtocolTheme.sans(size: 12.5, color: ProtocolColors.textDim),
+                          ),
+                        )
+                      else
+                        for (final item in s.history.take(8))
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                Text(item.time, style: ProtocolTheme.mono(size: 11, color: ProtocolColors.textDim)),
+                                const SizedBox(width: 10),
+                                Text(
+                                  '[${item.glyphs}]',
+                                  style: ProtocolTheme.mono(
+                                    size: 12,
+                                    weight: FontWeight.w700,
+                                    color: item.won > 0 ? ProtocolColors.gold : ProtocolColors.textPrimary,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  item.won > 0 ? '+${item.won} ₿ (x${item.mult})' : '-${item.bet} ₿',
+                                  style: ProtocolTheme.mono(
+                                    size: 12,
+                                    weight: FontWeight.w700,
+                                    color: item.won > 0 ? ProtocolColors.emerald : ProtocolColors.crimson,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                    ],
                   ],
                 ),
               ),
@@ -596,22 +632,87 @@ class _SlotsScreenState extends State<SlotsScreen> with SingleTickerProviderStat
   Widget _payChip(String id, String sym, String mult) {
     final active = _winId == id;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
       decoration: BoxDecoration(
-        color: active ? ProtocolColors.gold.withAlpha(35) : ProtocolColors.bgPure,
+        color: active ? ProtocolColors.gold.withAlpha(32) : ProtocolColors.bgVoid,
         border: Border.all(
           color: active ? ProtocolColors.gold : ProtocolColors.borderSubtle,
         ),
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         '$sym • $mult',
         style: ProtocolTheme.mono(
-          size: 11,
+          size: 11.5,
           weight: FontWeight.w700,
           color: active ? ProtocolColors.gold : ProtocolColors.textSecondary,
         ),
       ),
     );
   }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color accent;
+
+  const _StatChip({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: ProtocolColors.bgVoid,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ProtocolColors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: ProtocolTheme.mono(size: 9.5, color: ProtocolColors.textDim)),
+          Text(value, style: ProtocolTheme.mono(size: 12.5, weight: FontWeight.w700, color: accent)),
+        ],
+      ),
+    );
+  }
+}
+
+class _WinParticlesPainter extends CustomPainter {
+  final double progress;
+  final bool isJackpot;
+
+  _WinParticlesPainter({required this.progress, required this.isJackpot});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (progress <= 0 || progress >= 1) return;
+    final center = Offset(size.width / 2, size.height / 2);
+    final count = isJackpot ? 28 : 16;
+    final paint = Paint()..style = PaintingStyle.fill;
+    final alpha = ((1.0 - progress) * 230).round().clamp(0, 255);
+
+    for (var i = 0; i < count; i++) {
+      final angle = (i / count) * pi * 2 + (i % 3) * 0.2;
+      final dist = (size.width * 0.45) * Curves.easeOut.transform(progress);
+      final pos = Offset(
+        center.dx + cos(angle) * dist,
+        center.dy + sin(angle) * dist * 0.55 - progress * 18,
+      );
+      paint.color = (i % 2 == 0
+              ? ProtocolColors.gold
+              : (isJackpot ? ProtocolColors.crimson : ProtocolColors.emerald))
+          .withAlpha(alpha);
+      canvas.drawCircle(pos, isJackpot ? 3.5 : 2.6, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _WinParticlesPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }

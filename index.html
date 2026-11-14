@@ -6,11 +6,11 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#ff3333">
+  <meta name="theme-color" content="#040406">
   <title>BOZHEMAN ≡ PROTOCOL</title>
-  <meta name="description" content="BOZHEMAN ≡ PROTOCOL — официальный портал стримера, разработчика игр и контент-мейкера." />
+  <meta name="description" content="BOZHEMAN ≡ PROTOCOL — официальный цифровой хаб стримера, разработчика игр и медиа-автора." />
   <meta property="og:title" content="BOZHEMAN ≡ PROTOCOL" />
-  <meta property="og:description" content="Стримы, соцсети, Free-to-Play Slots 777 и лаборатория GrowerSim." />
+  <meta property="og:description" content="Стримы Twitch, YouTube, @GrowerSim_bot, Free-to-Play Slots 777 и Neural Lab." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bozheman.com/" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -18,7 +18,7 @@
   <meta name="twitter:image" content="assets/assets/images/gg.png" />
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="BOZHEMAN ≡ PROTOCOL">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="icon" type="image/png" href="favicon.png"/>
@@ -26,7 +26,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     html, body {
@@ -34,13 +34,12 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background-color: #000000;
-      color: #ffffff;
-      font-family: 'Fira Code', monospace;
+      background-color: #040406;
+      color: #f8fafc;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
     }
 
-    /* Minimal lightweight loader shown only until Flutter engine paints frame 1 */
     #bzp-boot {
       position: fixed;
       inset: 0;
@@ -48,33 +47,31 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #000000;
-      color: #ff3333;
-      font-family: 'Fira Code', monospace;
-      font-size: 13px;
-      letter-spacing: 2px;
+      gap: 18px;
+      background: radial-gradient(circle at 50% 42%, rgba(255, 42, 59, 0.12), #040406 60%);
       z-index: 9999;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.35s ease;
     }
 
-    /* Subtle Clean Cyberpunk CRT scanlines (pointer-events: none, low opacity) */
-    #bzp-crt {
-      pointer-events: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9998;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0) 0px,
-        rgba(255, 255, 255, 0) 3px,
-        rgba(0, 0, 0, 0.24) 4px
-      );
-      opacity: 0.35;
-      display: block;
+    .bzp-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-top-color: #ff2a3b;
+      animation: bzp-spin 0.85s linear infinite;
     }
 
-    body.crt-off #bzp-crt {
-      display: none;
+    .bzp-wordmark {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      color: rgba(248, 250, 252, 0.85);
+    }
+
+    @keyframes bzp-spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 
@@ -95,11 +92,22 @@
   </script>
 </head>
 <body>
-  <div id="bzp-boot">BOZHEMAN ≡ PROTOCOL // INIT...</div>
-  <div id="bzp-crt" aria-hidden="true"></div>
+  <div id="bzp-boot">
+    <div class="bzp-ring"></div>
+    <div class="bzp-wordmark">BOZHEMAN</div>
+  </div>
 
   <script>
     (function () {
+      // Proactively unregister legacy service workers so new GitHub deploys appear immediately
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          for (var i = 0; i < regs.length; i++) {
+            regs[i].unregister();
+          }
+        }).catch(function () {});
+      }
+
       let audioCtx = null;
       let masterBus = null;
 
@@ -145,12 +153,8 @@
             }
           } catch (_) {}
         },
-        setCrt: function (enabled) {
-          if (enabled) {
-            document.body.classList.remove('crt-off');
-          } else {
-            document.body.classList.add('crt-off');
-          }
+        setCrt: function (_) {
+          // Intentionally kept as a no-op in V2 for crystal clear typography
         },
         playTone: function (freq, type, dur, gainVal, delaySec, freqEnd) {
           try {
@@ -189,7 +193,7 @@
         const boot = document.getElementById('bzp-boot');
         if (boot) {
           boot.style.opacity = '0';
-          setTimeout(function () { boot.remove(); }, 250);
+          setTimeout(function () { boot.remove(); }, 350);
         }
       });
     })();

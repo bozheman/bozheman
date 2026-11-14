@@ -1,5 +1,6 @@
 # Build artifacts & local caches
 bozheman-server
+bozheman-server.new
 bozheman-server.exe
 flutter_app/.dart_tool/
 flutter_app/build/

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:bozheman_protocol/main.dart';
 import 'package:bozheman_protocol/services/api_service.dart';
 import 'package:bozheman_protocol/state/protocol_state.dart';
@@ -33,11 +34,15 @@ void main() {
 
   test('QR encoder generates square matrix for crypto addresses', () {
     final matrix = QrMatrixEncoder.encode('TF2MHpNpfaYkhVd855mMfTgusfxG8N7hZa');
-    expect(matrix.length, 29); // Version 3 = 29x29 for 34-char address
+    expect(matrix.length, 29);
     expect(matrix.first.length, 29);
   });
 
-  testWidgets('Home screen renders lightweight Three-Stream portal cleanly', (tester) async {
+  testWidgets('V2 Home screen renders ultra-clean 3-world Bento portal without overflow', (tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
     final state = ProtocolState();
     await tester.pumpWidget(BozhemanProtocolApp(injectedState: state));
     await tester.pump();
@@ -47,8 +52,61 @@ void main() {
     expect(find.text('YouTube'), findsOneWidget);
     expect(find.text('Instagram'), findsOneWidget);
     expect(find.text('TikTok'), findsOneWidget);
-    expect(find.textContaining('01 //'), findsOneWidget);
-    expect(find.textContaining('02 //'), findsOneWidget);
-    expect(find.textContaining('03 //'), findsOneWidget);
+    expect(find.text('SLOTS 777'), findsNWidgets(2)); // Nav pill + bottom portal card
+    expect(find.text('NEURAL LAB'), findsNWidgets(2)); // Nav pill + bottom portal card
+  });
+
+  testWidgets('V2 layout works cleanly on 320px narrow mobile across all worlds without throwing', (tester) async {
+    tester.view.physicalSize = const Size(320, 740);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final state = ProtocolState();
+    await tester.pumpWidget(BozhemanProtocolApp(injectedState: state));
+    await tester.pump();
+    expect(find.text('BOZHEMAN ≡ PROTOCOL'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // Switch to SLOTS 777 on 320px mobile
+    await tester.tap(find.text('SLOTS 777').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(tester.takeException(), isNull);
+
+    // Switch to NEURAL LAB and its sub-tabs on 320px mobile
+    await tester.tap(find.text('NEURAL LAB').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.textContaining('Менделя'));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.textContaining('Терминал'));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Switching to SLOTS 777 and NEURAL LAB worlds works cleanly', (tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final state = ProtocolState();
+    await tester.pumpWidget(BozhemanProtocolApp(injectedState: state));
+    await tester.pump();
+
+    // Tap SLOTS 777 nav pill (first match in HudBar)
+    await tester.tap(find.text('SLOTS 777').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(find.text('1000'), findsOneWidget);
+
+    // Tap NEURAL LAB nav pill
+    await tester.tap(find.text('NEURAL LAB').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(find.textContaining('0 / 10'), findsOneWidget);
   });
 }

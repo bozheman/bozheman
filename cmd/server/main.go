@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -20,8 +19,9 @@ import (
 func main() {
 	port := envOr("PORT", "8080")
 	staticDir := envOr("BZP_STATIC_DIR", ".")
-	autoPull := strings.EqualFold(envOr("BZP_AUTO_PULL", "false"), "true")
-	pullInterval := parseDurationOr(envOr("BZP_PULL_INTERVAL", "5m"), 5*time.Minute)
+	autoPullRaw := strings.ToLower(envOr("BZP_AUTO_PULL", "true"))
+	autoPull := autoPullRaw != "false" && autoPullRaw != "0" && autoPullRaw != "off"
+	pullInterval := parseDurationOr(envOr("BZP_PULL_INTERVAL", "20s"), 20*time.Second)
 	syncSecret := os.Getenv("BZP_SYNC_SECRET")
 
 	absDir, err := filepath.Abs(staticDir)
@@ -33,7 +33,7 @@ func main() {
 	defer stop()
 
 	syncMgr := sync.NewManager(absDir, autoPull, pullInterval)
-	syncMgr.StartLoop(ctx)
+	syncMgr.SetSelfRestart(autoPull)
 
 	mux := http.NewServeMux()
 
@@ -42,7 +42,7 @@ func main() {
 		writeJSON(w, http.StatusOK, map[string]any{
 			"status":    "online",
 			"protocol":  "BOZHEMAN ≡ PROTOCOL",
-			"version":   "10.0-go-flutter",
+			"version":   "11.0-v2-bento",
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 			"git":       syncMgr.GetStatus(),
 		})
@@ -99,7 +99,7 @@ func main() {
 		writeJSON(w, http.StatusOK, syncMgr.GetStatus())
 	})
 
-	mux.HandleFunc("/api/v1/sync", func(w http.ResponseWriter, r *http.Request) {
+	syncPullHandler := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeError(w, http.StatusMethodNotAllowed, "use POST to trigger sync")
 			return
@@ -129,11 +129,13 @@ func main() {
 			"output": out,
 			"status": syncMgr.GetStatus(),
 		})
-	})
+	}
+	mux.HandleFunc("/api/v1/sync", syncPullHandler)
+	mux.HandleFunc("/api/v1/sync/pull", syncPullHandler)
 
 	// Legacy .html route redirects to Flutter Web routes
 	legacyRedirects := map[string]string{
-		"/games.html":         "/#/games",
+		"/games.html":         "/#/lab",
 		"/roulet.html":        "/#/slots",
 		"/refer.html":         "/#/support",
 		"/doubleindex.html":   "/#/illusion",
@@ -154,7 +156,9 @@ func main() {
 			return
 		}
 
-		// Check if static file exists; otherwise serve Flutter index.html for SPA routes
+		// Strict cache busting for Flutter entrypoints & manifests
+		applyNoCacheIfEntrypoint(w, cleanPath)
+
 		diskPath := filepath.Join(absDir, filepath.FromSlash(strings.TrimPrefix(cleanPath, "/")))
 		if cleanPath == "/" {
 			diskPath = filepath.Join(absDir, "index.html")
@@ -162,9 +166,6 @@ func main() {
 
 		info, err := os.Stat(diskPath)
 		if err == nil && !info.IsDir() {
-			if strings.HasSuffix(cleanPath, ".json") || cleanPath == "/index.html" || cleanPath == "/" {
-				w.Header().Set("Cache-Control", "no-cache")
-			}
 			fileServer.ServeHTTP(w, r)
 			return
 		}
@@ -173,6 +174,7 @@ func main() {
 		if err == nil && info.IsDir() {
 			idx := filepath.Join(diskPath, "index.html")
 			if _, idxErr := os.Stat(idx); idxErr == nil {
+				applyNoCacheIfEntrypoint(w, "/index.html")
 				fileServer.ServeHTTP(w, r)
 				return
 			}
@@ -180,6 +182,7 @@ func main() {
 
 		// SPA fallback for unknown non-asset routes
 		if !strings.Contains(filepath.Base(cleanPath), ".") {
+			applyNoCacheIfEntrypoint(w, "/index.html")
 			http.ServeFile(w, r, filepath.Join(absDir, "index.html"))
 			return
 		}
@@ -193,8 +196,14 @@ func main() {
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
+	syncMgr.SetBeforeRestart(func() {
+		_ = srv.Close()
+	})
+	syncMgr.StartLoop(ctx)
+
 	go func() {
-		log.Printf("BOZHEMAN ≡ PROTOCOL Go Server listening on http://localhost:%s (static=%s)", port, absDir)
+		log.Printf("BOZHEMAN ≡ PROTOCOL Go Server listening on http://localhost:%s (static=%s, auto_pull=%v every %s)",
+			port, absDir, autoPull, pullInterval)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server failed: %v", err)
 		}
@@ -204,6 +213,21 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_ = srv.Shutdown(shutdownCtx)
+}
+
+func applyNoCacheIfEntrypoint(w http.ResponseWriter, cleanPath string) {
+	switch cleanPath {
+	case "/", "/index.html", "/main.dart.js", "/flutter_bootstrap.js", "/flutter.js", "/flutter_service_worker.js", "/version.json":
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		return
+	}
+	if strings.HasSuffix(cleanPath, ".json") {
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+	}
 }
 
 func isBlockedPath(cleanPath string) bool {
@@ -227,7 +251,6 @@ func isBlockedPath(cleanPath string) bool {
 	if strings.HasSuffix(cleanPath, ".go") || strings.HasSuffix(cleanPath, ".exe") || strings.HasSuffix(cleanPath, ".ps1") || strings.HasSuffix(cleanPath, ".bat") || strings.HasSuffix(cleanPath, ".sh") {
 		return true
 	}
-	_ = fs.ErrNotExist
 	return false
 }
 

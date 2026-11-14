@@ -10,12 +10,12 @@ class _Vec3 {
   const _Vec3(this.x, this.y, this.z);
 }
 
-/// Lightweight native 3D Protocol Core painter (Icosahedron + Ruby Octahedron + Orbital Ring)
-/// replacing heavy Three.js WebGL overhead while preserving 3D interactivity.
+/// Interactive Native 3D Protocol Core Painter (Icosahedron + Ruby Inner Octahedron
+/// + Twin Orbital Telemetry Rings + Expanding Click Shockwave Ripples).
 class Core3DPainter extends CustomPainter {
   final double yaw;
   final double pitch;
-  final double pulse; // 0..1 click reaction
+  final double pulse; // 0..1 click reaction (decays from 1 -> 0)
   final double progress; // 0..1 decryption progress (clicks / 10)
 
   Core3DPainter({
@@ -64,52 +64,66 @@ class Core3DPainter extends CustomPainter {
   }
 
   Offset _project(_Vec3 v, Size size, double scale, double ry, double rx) {
-    // Rotate around Y
     final cy = cos(ry);
     final sy = sin(ry);
     final x1 = v.x * cy - v.z * sy;
     final z1 = v.x * sy + v.z * cy;
-    // Rotate around X
     final cx = cos(rx);
     final sx = sin(rx);
     final y2 = v.y * cx - z1 * sx;
     final z2 = v.y * sx + z1 * cx;
 
     final perspective = 3.2 / (3.2 - z2);
-    final px = size.width / 2 + x1 * scale * perspective;
-    final py = size.height / 2 + y2 * scale * perspective;
-    return Offset(px, py);
+    return Offset(
+      size.width / 2 + x1 * scale * perspective,
+      size.height / 2 + y2 * scale * perspective,
+    );
   }
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final center = Offset(size.width / 2, size.height / 2);
     final minDim = min(size.width, size.height);
-    final scale = minDim * 0.30 * (1.0 + pulse * 0.12);
+    final scale = minDim * 0.30 * (1.0 + pulse * 0.14);
+    final unlocked = progress >= 1.0;
+    final coreColor = unlocked ? ProtocolColors.emerald : ProtocolColors.crimson;
 
-    // Draw orbital ring
-    final ringPaint = Paint()
-      ..color = ProtocolColors.crimsonDim.withAlpha(160)
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-    final ringPts = <Offset>[];
-    for (var i = 0; i <= 48; i++) {
-      final a = (i / 48) * pi * 2;
-      final pt = _Vec3(cos(a) * 1.38, sin(a) * 0.38, sin(a) * 1.28);
-      ringPts.add(_project(pt, size, scale, yaw * 0.7, pitch + 0.45));
-    }
-    for (var i = 0; i < ringPts.length - 1; i++) {
-      canvas.drawLine(ringPts[i], ringPts[i + 1], ringPaint);
+    // 1. Soft atmospheric radial aura behind 3D Core
+    final auraPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          coreColor.withAlpha((42 + pulse * 48).round()),
+          Colors.transparent,
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: minDim * 0.48));
+    canvas.drawCircle(center, minDim * 0.48, auraPaint);
+
+    // 2. Expanding shockwave ripple when clicked
+    if (pulse > 0.01) {
+      final rippleProgress = 1.0 - pulse;
+      final rippleRadius = minDim * (0.20 + rippleProgress * 0.34);
+      final ripplePaint = Paint()
+        ..color = (unlocked ? ProtocolColors.emerald : ProtocolColors.gold)
+            .withAlpha((pulse * 150).round())
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0 * pulse + 0.5;
+      canvas.drawCircle(center, rippleRadius, ripplePaint);
     }
 
-    // Draw outer icosahedron wireframe
+    // 3. Primary & Secondary 3D Orbital Rings
+    _drawOrbit(canvas, size, scale, yaw * 0.65, pitch + 0.45, coreColor.withAlpha(110));
+    _drawOrbit(canvas, size, scale * 1.12, -yaw * 0.4, pitch - 0.6, ProtocolColors.gold.withAlpha(65));
+
+    // 4. Outer Icosahedron Wireframe
     final outerColor = Color.lerp(
-      ProtocolColors.crimsonMid,
-      progress >= 1.0 ? ProtocolColors.emerald : ProtocolColors.gold,
-      pulse * 0.75 + (progress >= 1.0 ? 0.35 : 0.0),
+      coreColor.withAlpha(200),
+      unlocked ? ProtocolColors.emerald : ProtocolColors.gold,
+      pulse * 0.8 + (unlocked ? 0.35 : 0.0),
     )!;
     final outerPaint = Paint()
       ..color = outerColor
-      ..strokeWidth = 1.5
+      ..strokeWidth = 1.6
       ..style = PaintingStyle.stroke;
 
     final projIco = _icoVerts
@@ -119,16 +133,16 @@ class Core3DPainter extends CustomPainter {
       canvas.drawLine(projIco[edge[0]], projIco[edge[1]], outerPaint);
     }
 
-    // Vertex nodes
-    final nodePaint = Paint()..color = ProtocolColors.crimson;
+    // Glowing vertices
+    final nodePaint = Paint()..color = ProtocolColors.textPrimary.withAlpha(220);
     for (final p in projIco) {
-      canvas.drawCircle(p, 2.1, nodePaint);
+      canvas.drawCircle(p, 2.2, nodePaint);
     }
 
-    // Inner counter-rotating ruby/gold octahedron
+    // 5. Inner counter-rotating ruby/emerald octahedron
     final innerPaint = Paint()
-      ..color = progress >= 1.0 ? ProtocolColors.emerald : ProtocolColors.crimson
-      ..strokeWidth = 1.6
+      ..color = unlocked ? ProtocolColors.emerald : ProtocolColors.gold
+      ..strokeWidth = 1.75
       ..style = PaintingStyle.stroke;
 
     final projOct = _octVerts
@@ -136,6 +150,22 @@ class Core3DPainter extends CustomPainter {
         .toList();
     for (final edge in _octEdges) {
       canvas.drawLine(projOct[edge[0]], projOct[edge[1]], innerPaint);
+    }
+  }
+
+  void _drawOrbit(Canvas canvas, Size size, double scale, double ry, double rx, Color color) {
+    final ringPaint = Paint()
+      ..color = color
+      ..strokeWidth = 1.1
+      ..style = PaintingStyle.stroke;
+    final pts = <Offset>[];
+    for (var i = 0; i <= 54; i++) {
+      final a = (i / 54) * pi * 2;
+      final pt = _Vec3(cos(a) * 1.38, sin(a) * 0.36, sin(a) * 1.28);
+      pts.add(_project(pt, size, scale, ry, rx));
+    }
+    for (var i = 0; i < pts.length - 1; i++) {
+      canvas.drawLine(pts[i], pts[i + 1], ringPaint);
     }
   }
 
