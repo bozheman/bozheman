@@ -1,21 +1,83 @@
 <!DOCTYPE html>
-<html lang="ru" data-page-title="title_main">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ff3333" />
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ff3333">
   <title>BOZHEMAN ≡ PROTOCOL</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
   <meta name="description" content="BOZHEMAN ≡ PROTOCOL — официальный портал стримера, разработчика игр и контент-мейкера." />
   <meta property="og:title" content="BOZHEMAN ≡ PROTOCOL" />
-  <meta property="og:description" content="Официальный портал стримера, разработчика игр и контент-мейкера." />
+  <meta property="og:description" content="Стримы, соцсети, Free-to-Play Slots 777 и лаборатория GrowerSim." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://bozheman.com/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="BOZHEMAN ≡ PROTOCOL" />
-  <meta name="twitter:description" content="Официальный портал стримера, разработчика игр и контент-мейкера." />
-  <meta name="twitter:image" content="assets/images/gg.png" />
-  <link rel="canonical" href="https://bozheman.com/" />
+  <meta name="twitter:image" content="assets/assets/images/gg.png" />
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="BOZHEMAN ≡ PROTOCOL">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Fira Code', monospace;
+      overflow: hidden;
+    }
+
+    /* Minimal lightweight loader shown only until Flutter engine paints frame 1 */
+    #bzp-boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      color: #ff3333;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      letter-spacing: 2px;
+      z-index: 9999;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Subtle Clean Cyberpunk CRT scanlines (pointer-events: none, low opacity) */
+    #bzp-crt {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0px,
+        rgba(255, 255, 255, 0) 3px,
+        rgba(0, 0, 0, 0.24) 4px
+      );
+      opacity: 0.35;
+      display: block;
+    }
+
+    body.crt-off #bzp-crt {
+      display: none;
+    }
+  </style>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,107 +93,108 @@
     ]
   }
   </script>
-  <link rel="icon" type="image/png" href="assets/images/gg.png" />
-  <link rel="apple-touch-icon" href="assets/images/gg.png" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/neon.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- PREFETCHING -->
-  <link rel="prefetch" href="games.html" />
-  <link rel="prefetch" href="roulet.html" />
-  <link rel="prefetch" href="refer.html" />
-  <link rel="prefetch" href="grower_manual.html" />
 </head>
 <body>
+  <div id="bzp-boot">BOZHEMAN ≡ PROTOCOL // INIT...</div>
+  <div id="bzp-crt" aria-hidden="true"></div>
 
-  <!-- ЭКРАН ЗАГРУЗКИ -->
-  <div id="preloader">
-    <div id="preloader-text"></div>
-    <div class="preloader-skip-hint" data-i18n="preloader_skip">[ Нажмите клик или Пробел для пропуска ]</div>
-  </div>
-
-  <!-- ФОНОВАЯ АНИМАЦИЯ (МАТРИЦА) -->
-  <canvas id="matrix-canvas" data-i18n-attr="aria-label" data-i18n="canvas_matrix" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
-
-  <!-- ИНТЕРФЕЙС ШАПКИ -->
-  <header id="ui-header">
-    <h1 id="brand-title" data-i18n="title_main">BOZHEMAN ≡ PROTOCOL</h1>
-    <div class="brand-subtitle" data-i18n="brand_subtitle">CYBERPUNK SYSTEM // УЗЕЛ АКТИВЕН</div>
-  </header>
-
-  <!-- 3D СЦЕНА -->
-  <div id="scene-container">
-    <canvas id="scene-canvas" tabindex="0" data-i18n-attr="aria-label" data-i18n="canvas_scene" aria-label="Interactive 3D Protocol Core" role="img"></canvas>
-    <div class="core-hint" data-i18n="core_hint">[ Кликните по 3D-ядру 10 раз для дешифровки секретного протокола ]</div>
-  </div>
-
-  <!-- КНОПКИ (СИММЕТРИЧНАЯ СЕТКА 8 ЭЛЕМЕНТОВ) -->
-  <nav id="links-container" class="scanlines-effect" aria-label="Main Protocol Navigation"></nav>
-
-  <!-- МОНЕТИЗАЦИЯ И ПАРТНЕРЫ -->
-  <section id="monetization-banner">
-    <a href="refer.html" class="btn-glitch" id="partner-link" data-text="ПАРТНЕРЫ И КРИПТО-ШЛЮЗЫ" data-i18n="partner_link">
-      <span class="banner-text">ПАРТНЕРЫ И КРИПТО-ШЛЮЗЫ</span>
-    </a>
-  </section>
-
-  <footer class="protocol-footer" data-i18n="footer_status">BOZHEMAN ≡ PROTOCOL v7.0 // ВСЕ СИСТЕМЫ В НОРМЕ</footer>
-
-  <!-- АУДИО -->
-  <audio id="ambient-audio" loop preload="auto">
-    <source src="assets/audio/omega.m4a" type="audio/mp4" />
-  </audio>
-
-  <!-- СКРИПТЫ THREE.JS -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
-      }
-    }
-  </script>
-
-  <!-- ПАНЕЛЬ УПРАВЛЕНИЯ (HUD) -->
-  <div id="hud-controls">
-    <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
-      <option value="ru">[RU] Русский</option>
-      <option value="en">[EN] English</option>
-      <option value="uk">[UK] Українська</option>
-      <option value="be">[BE] Беларуская</option>
-      <option value="pl">[PL] Polski</option>
-      <option value="de">[DE] Deutsch</option>
-      <option value="fr">[FR] Français</option>
-      <option value="es">[ES] Español</option>
-    </select>
-
-    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT effect">CRT: ON</button>
-
-    <button id="sound-toggle" class="hud-btn sound-toggle" data-i18n-attr="aria-label" data-i18n="sound_toggle_aria" aria-label="Toggle sound">
-      <span data-i18n="sound_off">SOUND: OFF</span>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="sound-icon">
-        <path class="sound-on-icon" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-        <path class="sound-off-icon" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-      </svg>
-    </button>
-  </div>
-
-  <!-- ТЕРМИНАЛ (Live Logs & CLI) -->
-  <div id="terminal-widget"></div>
-
-  <!-- CRT OVERLAY -->
-  <div id="crt-overlay" class="crt-overlay"></div>
-
-  <script type="module" src="js/index.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    (function () {
+      let audioCtx = null;
+      let masterBus = null;
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          audioCtx = new AC();
+          const comp = audioCtx.createDynamicsCompressor();
+          masterBus = audioCtx.createGain();
+          masterBus.gain.setValueAtTime(0.75, audioCtx.currentTime);
+          masterBus.connect(comp);
+          comp.connect(audioCtx.destination);
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function () {});
+        }
+        return audioCtx;
+      }
+
+      window.bzpBridge = {
+        storageGet: function (key) {
+          try {
+            return window.localStorage.getItem(key) || '';
+          } catch (_) {
+            return '';
+          }
+        },
+        storageSet: function (key, val) {
+          try {
+            window.localStorage.setItem(key, val);
+          } catch (_) {}
+        },
+        openUrl: function (url) {
+          try {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } catch (_) {}
+        },
+        copyText: function (text) {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).catch(function () {});
+            }
+          } catch (_) {}
+        },
+        setCrt: function (enabled) {
+          if (enabled) {
+            document.body.classList.remove('crt-off');
+          } else {
+            document.body.classList.add('crt-off');
+          }
+        },
+        playTone: function (freq, type, dur, gainVal, delaySec, freqEnd) {
+          try {
+            const ac = ensureAudio();
+            if (!ac || !masterBus) return;
+            const start = ac.currentTime + (delaySec || 0);
+            const stop = start + (dur || 0.05);
+            const osc = ac.createOscillator();
+            const g = ac.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, start);
+            if (freqEnd && freqEnd > 20) {
+              osc.frequency.exponentialRampToValueAtTime(freqEnd, stop);
+            }
+            g.gain.setValueAtTime(Math.max(0.0001, gainVal || 0.1), start);
+            g.gain.exponentialRampToValueAtTime(0.0001, stop);
+            osc.connect(g);
+            g.connect(masterBus);
+            osc.start(start);
+            osc.stop(stop + 0.02);
+          } catch (_) {}
+        },
+        fetchJson: function (url, method, body) {
+          return fetch(url, {
+            method: method || 'GET',
+            headers: body ? { 'Content-Type': 'application/json' } : {},
+            body: body || undefined
+          }).then(function (resp) {
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return resp.text();
+          });
+        }
+      };
+
+      window.addEventListener('flutter-first-frame', function () {
+        const boot = document.getElementById('bzp-boot');
+        if (boot) {
+          boot.style.opacity = '0';
+          setTimeout(function () { boot.remove(); }, 250);
+        }
       });
-    }
+    })();
   </script>
+
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

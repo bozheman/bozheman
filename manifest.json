@@ -1,48 +1,23 @@
 {
   "name": "BOZHEMAN ≡ PROTOCOL",
   "short_name": "BOZHEMAN",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#ff3333",
-  "orientation": "any",
-  "description": "BOZHEMAN ≡ PROTOCOL v8.0 — Cyberpunk Hub, Slots 777, @GrowerSim_bot & Game Dev.",
+  "description": "BOZHEMAN ≡ PROTOCOL — официальный портал стримера, Free-to-Play аркада Slots 777 и лаборатория GrowerSim.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/images/gg.png",
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "BOZHEMAN SLOTS 777",
-      "short_name": "Slots 777",
-      "description": "Play BOZHEMAN Cyberpunk Slots 777",
-      "url": "./roulet.html",
-      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
-    },
-    {
-      "name": "GAMES HUB & @GrowerSim_bot",
-      "short_name": "Games Hub",
-      "description": "Explore BOZHEMAN Games & @GrowerSim_bot",
-      "url": "./games.html",
-      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
-    },
-    {
-      "name": "GROWERSIM LAB MANUAL",
-      "short_name": "GrowerSim Lab",
-      "description": "GrowerSim Full Manual & Mendel Genetics Calculator",
-      "url": "./grower_manual.html",
-      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
-    },
-    {
-      "name": "SUPPORT & CRYPTO",
-      "short_name": "Support",
-      "description": "Crypto Gateways & Referral Links",
-      "url": "./refer.html",
-      "icons": [{ "src": "assets/images/gg.png", "sizes": "512x512" }]
+      "type": "image/png"
     }
   ]
 }

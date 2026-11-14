@@ -1,97 +1,12 @@
 <!DOCTYPE html>
-<html lang="ru" data-page-title="illusion_title">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com; img-src 'self' data: https:;" />
   <title>BOZHEMAN ≡ ILLUSION</title>
-  <meta name="description" content="BOZHEMAN ≡ ILLUSION — terminal protocol." />
-  <meta property="og:title" content="BOZHEMAN ≡ ILLUSION" />
-  <meta property="og:description" content="BOZHEMAN Protocol Terminal." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://bozheman.com/doubleindex.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="BOZHEMAN ≡ ILLUSION" />
-  <meta name="twitter:image" content="assets/images/gg.png" />
-  <link rel="canonical" href="https://bozheman.com/doubleindex.html" />
-  <link rel="icon" type="image/png" href="assets/images/gg.png" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/doubleindex.css">
-  <link rel="stylesheet" href="css/neon.css">
+  <meta http-equiv="refresh" content="0; url=/#/illusion" />
+  <script>window.location.replace('/#/illusion');</script>
 </head>
-<body>
-
-  <canvas id="matrix-canvas" aria-label="Matrix Code Rain Background Animation" role="img"></canvas>
-
-  <main class="terminal-window" id="terminal">
-    <h1 data-text="ИЛЛЮЗИЯ" data-i18n="illusion_title">ИЛЛЮЗИЯ</h1>
-    <div id="fragment-counter" class="fragment-meta">ФРАГМЕНТ [0/7]</div>
-
-    <!-- 7 INTERACTIVE FRAGMENT DOTS -->
-    <div class="fragment-dots" id="fragment-dots" aria-label="Fragment selector">
-      <button type="button" class="frag-dot" data-frag-idx="0">1</button>
-      <button type="button" class="frag-dot" data-frag-idx="1">2</button>
-      <button type="button" class="frag-dot" data-frag-idx="2">3</button>
-      <button type="button" class="frag-dot" data-frag-idx="3">4</button>
-      <button type="button" class="frag-dot" data-frag-idx="4">5</button>
-      <button type="button" class="frag-dot" data-frag-idx="5">6</button>
-      <button type="button" class="frag-dot" data-frag-idx="6">7</button>
-    </div>
-
-    <div id="weaver-bonus-badge" class="weaver-bonus-badge" data-i18n="illusion_weaver_bonus">🕸️ ПОСВЯЩЕНИЕ ТКАЧА: +500 МОНЕТ НАЧИСЛЕНО</div>
-
-    <div id="fragment-display">
-      <p data-i18n="illusion_click">[НАЖМИТЕ, ЧТОБЫ УЗРЕТЬ]</p>
-    </div>
-
-    <div class="fragment-controls" id="fragment-controls">
-      <button type="button" id="frag-prev" class="frag-btn" data-i18n="illusion_prev">← НАЗАД</button>
-      <button type="button" id="frag-pause" class="frag-btn" data-i18n="illusion_pause">⏸ ПАУЗА</button>
-      <button type="button" id="frag-next" class="frag-btn" data-i18n="illusion_next">ДАЛЕЕ →</button>
-    </div>
-
-    <div id="countdown-timer">
-      <span data-i18n="illusion_redirect">ПЕРЕНАПРАВЛЕНИЕ ПРОТОКОЛА...</span> <strong id="countdown-sec">60s</strong>
-      <div id="progress-bar">
-        <div id="progress-bar-inner"></div>
-      </div>
-    </div>
-
-    <div class="illusion-bottom-nav" id="illusion-bottom-nav">
-      <a href="index.html" class="btn-glitch" data-i18n="illusion_home_btn">← В ПРОТОКОЛ</a>
-      <a href="roulet.html" class="btn-glitch" data-i18n="illusion_slots_btn">🎰 В SLOTS 777</a>
-      <a href="https://t.me/GrowerSim_bot" target="_blank" rel="noopener noreferrer" class="btn-glitch" data-i18n="slots_bot_link">🌱 БОТ @GrowerSim_bot</a>
-    </div>
-  </main>
-
-  <audio id="ambient-audio" preload="auto" loop>
-    <source src="assets/audio/omega2.m4a" type="audio/mp4" />
-  </audio>
-
-  <!-- SKIP BUTTON -->
-  <button id="skip-btn" class="hud-btn skip-btn" data-i18n="preloader_skip" aria-label="Skip to roulette">[ SKIP ]</button>
-
-  <!-- CRT OVERLAY -->
-  <div id="crt-overlay" class="crt-overlay"></div>
-
-  <!-- HUD CONTROLS -->
-  <div id="hud-controls">
-    <select id="lang-select" class="lang-select" data-i18n-attr="aria-label" data-i18n="select_language" aria-label="Select language">
-      <option value="en">English</option>
-      <option value="ru">Русский</option>
-      <option value="uk">Українська</option>
-      <option value="be">Беларуская</option>
-      <option value="pl">Polski</option>
-      <option value="de">Deutsch</option>
-      <option value="fr">Français</option>
-      <option value="es">Español</option>
-    </select>
-    <button id="crt-toggle" class="hud-btn" data-i18n="crt_on" aria-label="Toggle CRT">CRT: ON</button>
-  </div>
-
-  <script type="module" src="js/doubleindex.js"></script>
+<body style="background:#000;color:#ff3333;font-family:monospace;padding:24px;">
+  Redirecting to <a href="/#/illusion" style="color:#ff3333;">BOZHEMAN ≡ ILLUSION</a>...
 </body>
 </html>

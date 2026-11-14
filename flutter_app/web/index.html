@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ff3333">
+  <title>BOZHEMAN ≡ PROTOCOL</title>
+  <meta name="description" content="BOZHEMAN ≡ PROTOCOL — официальный портал стримера, разработчика игр и контент-мейкера." />
+  <meta property="og:title" content="BOZHEMAN ≡ PROTOCOL" />
+  <meta property="og:description" content="Стримы, соцсети, Free-to-Play Slots 777 и лаборатория GrowerSim." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bozheman.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BOZHEMAN ≡ PROTOCOL" />
+  <meta name="twitter:image" content="assets/assets/images/gg.png" />
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="BOZHEMAN ≡ PROTOCOL">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Fira Code', monospace;
+      overflow: hidden;
+    }
+
+    /* Minimal lightweight loader shown only until Flutter engine paints frame 1 */
+    #bzp-boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      color: #ff3333;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      letter-spacing: 2px;
+      z-index: 9999;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Subtle Clean Cyberpunk CRT scanlines (pointer-events: none, low opacity) */
+    #bzp-crt {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0px,
+        rgba(255, 255, 255, 0) 3px,
+        rgba(0, 0, 0, 0.24) 4px
+      );
+      opacity: 0.35;
+      display: block;
+    }
+
+    body.crt-off #bzp-crt {
+      display: none;
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "BOZHEMAN",
+    "url": "https://bozheman.com/",
+    "sameAs": [
+      "https://www.twitch.tv/Bozhemany",
+      "https://www.instagram.com/bozheman",
+      "https://www.youtube.com/channel/UC_BgtvZc1dxQbJA1uEeFimw",
+      "https://www.tiktok.com/@bozheman_",
+      "https://t.me/GrowerSim_bot"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <div id="bzp-boot">BOZHEMAN ≡ PROTOCOL // INIT...</div>
+  <div id="bzp-crt" aria-hidden="true"></div>
+
+  <script>
+    (function () {
+      let audioCtx = null;
+      let masterBus = null;
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          audioCtx = new AC();
+          const comp = audioCtx.createDynamicsCompressor();
+          masterBus = audioCtx.createGain();
+          masterBus.gain.setValueAtTime(0.75, audioCtx.currentTime);
+          masterBus.connect(comp);
+          comp.connect(audioCtx.destination);
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function () {});
+        }
+        return audioCtx;
+      }
+
+      window.bzpBridge = {
+        storageGet: function (key) {
+          try {
+            return window.localStorage.getItem(key) || '';
+          } catch (_) {
+            return '';
+          }
+        },
+        storageSet: function (key, val) {
+          try {
+            window.localStorage.setItem(key, val);
+          } catch (_) {}
+        },
+        openUrl: function (url) {
+          try {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } catch (_) {}
+        },
+        copyText: function (text) {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).catch(function () {});
+            }
+          } catch (_) {}
+        },
+        setCrt: function (enabled) {
+          if (enabled) {
+            document.body.classList.remove('crt-off');
+          } else {
+            document.body.classList.add('crt-off');
+          }
+        },
+        playTone: function (freq, type, dur, gainVal, delaySec, freqEnd) {
+          try {
+            const ac = ensureAudio();
+            if (!ac || !masterBus) return;
+            const start = ac.currentTime + (delaySec || 0);
+            const stop = start + (dur || 0.05);
+            const osc = ac.createOscillator();
+            const g = ac.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, start);
+            if (freqEnd && freqEnd > 20) {
+              osc.frequency.exponentialRampToValueAtTime(freqEnd, stop);
+            }
+            g.gain.setValueAtTime(Math.max(0.0001, gainVal || 0.1), start);
+            g.gain.exponentialRampToValueAtTime(0.0001, stop);
+            osc.connect(g);
+            g.connect(masterBus);
+            osc.start(start);
+            osc.stop(stop + 0.02);
+          } catch (_) {}
+        },
+        fetchJson: function (url, method, body) {
+          return fetch(url, {
+            method: method || 'GET',
+            headers: body ? { 'Content-Type': 'application/json' } : {},
+            body: body || undefined
+          }).then(function (resp) {
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return resp.text();
+          });
+        }
+      };
+
+      window.addEventListener('flutter-first-frame', function () {
+        const boot = document.getElementById('bzp-boot');
+        if (boot) {
+          boot.style.opacity = '0';
+          setTimeout(function () { boot.remove(); }, 250);
+        }
+      });
+    })();
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
